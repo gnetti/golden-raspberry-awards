@@ -21,9 +21,9 @@
         <!-- Action Bar: New Movie Button and Filter -->
         <div class="row mb-3">
             <div class="col-12 col-md-6 mb-2 mb-md-0">
-                <button type="button" class="btn btn-primary btn-new-movie w-100 w-md-auto" onclick="openNewMovieModal()">
+                <a th:href="@{/movies/new}" class="btn btn-primary btn-new-movie w-100 w-md-auto">
                     <i class="fa-solid fa-plus"></i> <span class="d-none d-sm-inline">New Movie</span><span class="d-sm-none">New</span>
-                </button>
+                </a>
             </div>
             <div class="col-12 col-md-6">
                 <div class="input-group">
@@ -132,17 +132,10 @@
                                             <span th:unless="${movie.winner}" class="badge bg-secondary">No</span>
                                         </td>
                                         <td class="text-end">
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-action btn-edit" 
-                                                    th:data-id="${movie.id}"
-                                                    th:data-year="${movie.year}"
-                                                    th:data-title="${movie.title}"
-                                                    th:data-studios="${movie.studios}"
-                                                    th:data-producers="${movie.producers}"
-                                                    th:data-winner="${movie.winner}"
-                                                    onclick="openEditMovieModal(this)">
+                                            <a th:href="@{/movies/{id}/edit(id=${movie.id})}" 
+                                               class="btn btn-sm btn-action btn-edit">
                                                 <i class="fa-solid fa-pencil"></i>
-                                            </button>
+                                            </a>
                                             <button type="button" 
                                                     class="btn btn-sm btn-action btn-delete" 
                                                     th:data-id="${movie.id}"
@@ -189,17 +182,10 @@
                             <small class="text-muted d-block"><strong>Producers:</strong> <span th:text="${movie.producers}"></span></small>
                         </div>
                         <div class="d-flex justify-content-end gap-2 mt-3">
-                            <button type="button" 
-                                    class="btn btn-sm btn-action btn-edit" 
-                                    th:data-id="${movie.id}"
-                                    th:data-year="${movie.year}"
-                                    th:data-title="${movie.title}"
-                                    th:data-studios="${movie.studios}"
-                                    th:data-producers="${movie.producers}"
-                                    th:data-winner="${movie.winner}"
-                                    onclick="openEditMovieModal(this)">
+                            <a th:href="@{/movies/{id}/edit(id=${movie.id})}" 
+                               class="btn btn-sm btn-action btn-edit">
                                 <i class="fa-solid fa-pencil"></i> Edit
-                            </button>
+                            </a>
                             <button type="button" 
                                     class="btn btn-sm btn-action btn-delete" 
                                     th:data-id="${movie.id}"
@@ -331,8 +317,11 @@
                                    id="movieYear" 
                                    name="year" 
                                    min="1900" 
-                                   max="2100" 
+                                   th:max="${currentYear}"
+                                   th:attr="data-current-year=${currentYear}"
+                                   placeholder="Enter year (1900-current year)"
                                    required>
+                            <div class="invalid-feedback" id="movieYear-error"></div>
                         </div>
                         <div class="mb-3">
                             <label for="movieTitle" class="form-label">Title <span class="text-danger">*</span></label>

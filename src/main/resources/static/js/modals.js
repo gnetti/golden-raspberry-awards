@@ -83,6 +83,19 @@ function loadOpenApiModal() {
     return true;
 }
 
+function loadMoviesModal() {
+    if (isMobile()) {
+        return false;
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('moviesModal'));
+    const iframe = document.getElementById('moviesIframe');
+    
+    iframe.src = '/movies';
+    modal.show();
+    return true;
+}
+
 function loadMoviesApiModal() {
     if (isMobile()) {
         return false;
@@ -104,6 +117,17 @@ function loadMoviesApiModal() {
             content.innerHTML = '<code class="text-danger">Error loading movies data.</code>';
         });
     
+    modal.show();
+    return true;
+}
+
+function loadManualModal() {
+    if (isMobile()) {
+        return false;
+    }
+    const modal = new bootstrap.Modal(document.getElementById('manualModal'));
+    const iframe = document.getElementById('manualIframe');
+    iframe.src = '/manual';
     modal.show();
     return true;
 }
@@ -192,7 +216,21 @@ function loadH2ConsoleModal() {
     return true;
 }
 
+// Detect if page is loaded inside an iframe (modal)
+function isInIframe() {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Don't intercept links if we're inside an iframe (modal)
+    if (isInIframe()) {
+        return;
+    }
+    
     const intervalsLinks = document.querySelectorAll('a[href="/intervals"], a[href*="/intervals"]');
     intervalsLinks.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -233,6 +271,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    const moviesLinks = document.querySelectorAll('a[href="/movies"], a[href*="/movies"]');
+    moviesLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Don't intercept if link has data-iframe-navigate attribute (set by setupIframeLinks)
+            if (this.hasAttribute('data-iframe-navigate')) {
+                return;
+            }
+            
+            const href = this.getAttribute('href') || this.href;
+            // Only intercept exact /movies links, not /movies/new, /movies/{id}/edit, /movies/{id}, or /api/movies
+            const isExactMoviesLink = href === '/movies' || href === '@{/movies}' || 
+                                     (href.includes('/movies') && !href.includes('/movies/new') && 
+                                      !href.match(/\/movies\/\d+/) && !href.includes('/api/movies') &&
+                                      !href.includes('/dashboard'));
+            
+            if (!isMobile() && !this.hasAttribute('data-force-page') && !this.hasAttribute('target') && isExactMoviesLink) {
+                e.preventDefault();
+                loadMoviesModal();
+            }
+        });
+    });
+
     const moviesApiLinks = document.querySelectorAll('a[href="/api/movies"], a[href*="/api/movies"]');
     moviesApiLinks.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -249,6 +309,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isMobile() && !this.hasAttribute('data-force-page') && !this.hasAttribute('target')) {
                 e.preventDefault();
                 loadH2ConsoleModal();
+            }
+        });
+    });
+
+    const manualLinks = document.querySelectorAll('a[href="/manual"], a[href*="/manual"]');
+    manualLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (!isMobile() && !this.hasAttribute('data-force-page') && !this.hasAttribute('target')) {
+                e.preventDefault();
+                loadManualModal();
             }
         });
     });
