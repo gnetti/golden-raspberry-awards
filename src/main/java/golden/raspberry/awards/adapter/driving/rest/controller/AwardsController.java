@@ -4,8 +4,11 @@ import golden.raspberry.awards.adapter.driving.rest.dto.ApiErrorDTO;
 import golden.raspberry.awards.adapter.driving.rest.dto.ProducerIntervalResponseDTO;
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsPort;
 import golden.raspberry.awards.core.application.port.out.ConverterDtoPort;
+import golden.raspberry.awards.adapter.driving.rest.controller.constants.ApiIllustrationSetConstants;
+import golden.raspberry.awards.adapter.driving.rest.controller.constants.AwardsControllerConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -42,11 +45,11 @@ public class AwardsController {
             ConverterDtoPort converterDtoPort) {
         this.calculateIntervalsPort = Objects.requireNonNull(
                 calculateIntervalsPort,
-                "CalculateIntervalsPort cannot be null"
+                AwardsControllerConstants.ERROR_MESSAGE_CALCULATE_INTERVALS_PORT_CANNOT_BE_NULL
         );
         this.converterDtoPort = Objects.requireNonNull(
                 converterDtoPort,
-                "ConverterDtoPort cannot be null"
+                AwardsControllerConstants.ERROR_MESSAGE_CONVERTER_DTO_PORT_CANNOT_BE_NULL
         );
     }
 
@@ -56,19 +59,31 @@ public class AwardsController {
      * @return ResponseEntity with ProducerIntervalResponseDTO
      */
     @Operation(
-            summary = "Get producer intervals",
-            description = "Returns producers with the minimum and maximum intervals between consecutive awards"
+            summary = AwardsControllerConstants.OPERATION_SUMMARY_GET_PRODUCER_INTERVALS,
+            description = AwardsControllerConstants.OPERATION_DESCRIPTION_GET_PRODUCER_INTERVALS
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved producer intervals",
-                    content = @Content(schema = @Schema(implementation = ProducerIntervalResponseDTO.class))
+                    responseCode = AwardsControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = AwardsControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESSFULLY_RETRIEVED_INTERVALS,
+                    content = @Content(
+                            schema = @Schema(implementation = ProducerIntervalResponseDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Success",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_PRODUCER_INTERVALS_SUCCESS
+                            )
+                    )
             ),
             @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+                    responseCode = AwardsControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = AwardsControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
             )
     })
     @GetMapping("/producers/intervals")
