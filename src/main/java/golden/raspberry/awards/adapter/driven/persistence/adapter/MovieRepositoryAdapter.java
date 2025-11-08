@@ -4,7 +4,7 @@ import golden.raspberry.awards.adapter.driven.persistence.mapper.MovieMapper;
 import golden.raspberry.awards.adapter.driven.persistence.repository.MovieJpaRepository;
 import golden.raspberry.awards.core.domain.model.Movie;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +16,7 @@ import java.util.Objects;
  * Follows Hexagonal Architecture: adapter implements port.
  * Uses Spring for dependency injection.
  */
-@Service
+@Component
 public class MovieRepositoryAdapter implements MovieRepositoryPort {
 
     private final MovieJpaRepository jpaRepository;

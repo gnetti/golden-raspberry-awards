@@ -22,7 +22,7 @@ public final class ChangeDetector {
      * @return Detected changes
      */
     public Object detect(Object before, Object after) {
-        // Implementation for change detection pattern
+        // todo Implementation for change detection pattern
         return null;
     }
     
@@ -33,7 +33,7 @@ public final class ChangeDetector {
      * @return Identified variations
      */
     public Object identify(Object data) {
-        // Implementation for variation identification
+        // todo Implementation for change detection pattern
         return null;
     }
     
@@ -43,7 +43,7 @@ public final class ChangeDetector {
      * @param data Data to monitor
      */
     public void monitor(Object data) {
-        // Implementation for change monitoring
+        // todo Implementation for change detection pattern
     }
 }
 

@@ -25,19 +25,17 @@ import java.util.stream.Collectors;
  * @author Golden Raspberry Awards Team
  * @since 1.0.0
  */
-public class ProducerIntervalService {
-    
-    private final MovieRepositoryPort repository;
-    
+public record ProducerIntervalService(MovieRepositoryPort repository) {
+
     /**
-     * Constructor for dependency injection.
+     * Compact constructor for validation.
      *
      * @param repository Movie repository port (output port)
      */
-    public ProducerIntervalService(MovieRepositoryPort repository) {
-        this.repository = Objects.requireNonNull(repository, "Repository cannot be null");
+    public ProducerIntervalService {
+        Objects.requireNonNull(repository, "Repository cannot be null");
     }
-    
+
     /**
      * Calculates producer intervals based on winning movies.
      * This is pure business logic - no orchestration concerns.
@@ -128,9 +126,8 @@ public class ProducerIntervalService {
             for (int i = 0; i < years.size() - 1; i++) {
                 Integer previousWin = years.get(i);
                 Integer followingWin = years.get(i + 1);
-                Integer interval = followingWin - previousWin;
 
-                intervals.add(new ProducerInterval(producer, interval, previousWin, followingWin));
+                intervals.add(ProducerInterval.of(producer, previousWin, followingWin));
             }
         }
 

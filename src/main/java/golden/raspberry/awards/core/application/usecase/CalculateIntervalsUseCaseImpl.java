@@ -26,13 +26,12 @@ import java.util.Objects;
  *
  * <p>Uses Java 21 features: var, Objects.requireNonNull.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
-public class CalculateIntervalsUseCaseImpl implements CalculateIntervalsUseCase {
-    
-    private final ProducerIntervalService producerIntervalService;
-    
+public record CalculateIntervalsUseCaseImpl(
+        ProducerIntervalService producerIntervalService) implements CalculateIntervalsUseCase {
+
     /**
      * Constructor for dependency injection.
      *
@@ -40,11 +39,11 @@ public class CalculateIntervalsUseCaseImpl implements CalculateIntervalsUseCase 
      */
     public CalculateIntervalsUseCaseImpl(ProducerIntervalService producerIntervalService) {
         this.producerIntervalService = Objects.requireNonNull(
-            producerIntervalService, 
-            "ProducerIntervalService cannot be null"
+                producerIntervalService,
+                "ProducerIntervalService cannot be null"
         );
     }
-    
+
     @Override
     public ProducerIntervalResponse execute() {
         return producerIntervalService.calculateIntervals();

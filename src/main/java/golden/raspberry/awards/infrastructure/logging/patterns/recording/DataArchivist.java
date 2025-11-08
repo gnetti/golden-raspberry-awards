@@ -20,7 +20,7 @@ public final class DataArchivist {
      * @param data Data to archive
      */
     public void archive(Object data) {
-        // Implementation for data archiving pattern
+        //todo Implementation for data archiving pattern
     }
     
     /**
@@ -29,7 +29,7 @@ public final class DataArchivist {
      * @param data Data to store
      */
     public void store(Object data) {
-        // Implementation for storing data
+        //todo Implementation for storing data
     }
     
     /**
@@ -38,7 +38,7 @@ public final class DataArchivist {
      * @param data Data to preserve
      */
     public void preserve(Object data) {
-        // Implementation for preserving data
+        //todo Implementation for preserving data
     }
 }
 

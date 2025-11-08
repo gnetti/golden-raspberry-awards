@@ -1,5 +1,7 @@
 package golden.raspberry.awards.core.domain.model;
 
+import org.springframework.lang.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -34,6 +36,7 @@ public record Movie(Integer year, String title, String studios, String producers
     }
 
     @Override
+    @NonNull
     public String toString() {
         return "Movie{year=%d, title='%s', winner=%s}".formatted(year, title, winner);
     }

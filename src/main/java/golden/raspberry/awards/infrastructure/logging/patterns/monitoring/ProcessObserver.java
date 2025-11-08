@@ -20,7 +20,7 @@ public final class ProcessObserver {
      * @param process Process to observe
      */
     public void observe(Object process) {
-        // Implementation for process observation pattern
+        //todo Implementation for process observation pattern
     }
     
     /**
@@ -29,7 +29,7 @@ public final class ProcessObserver {
      * @param process Process to watch
      */
     public void watch(Object process) {
-        // Implementation for watching processes
+        //todo Implementation for process observation pattern
     }
     
     /**
@@ -38,7 +38,7 @@ public final class ProcessObserver {
      * @param process Process to monitor
      */
     public void monitor(Object process) {
-        // Implementation for process monitoring
+        //todo Implementation for process observation pattern
     }
 }
 

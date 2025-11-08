@@ -20,7 +20,7 @@ public final class ResultRecorder {
      * @param result Result to record
      */
     public void record(Object result) {
-        // Implementation for result recording pattern
+        //todo Implementation for result recording pattern
     }
     
     /**
@@ -30,7 +30,7 @@ public final class ResultRecorder {
      * @param result Result to log
      */
     public void log(String operation, Object result) {
-        // Implementation for logging operation results
+        //todo Implementation for logging operation results
     }
     
     /**
@@ -39,7 +39,7 @@ public final class ResultRecorder {
      * @param result Result to store
      */
     public void store(Object result) {
-        // Implementation for storing results
+        //todo Implementation for storing results
     }
 }
 

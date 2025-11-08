@@ -59,8 +59,7 @@ public class LoggingAspect {
     @Around("@annotation(Loggable)")
     public Object logOperation(ProceedingJoinPoint joinPoint) throws Throwable {
         // TODO: Implement automatic interception of CREATE, UPDATE, DELETE operations
-        // This will be enhanced in future iterations to automatically detect
-        // repository save, update, delete methods and log them
+
         return joinPoint.proceed();
     }
 }

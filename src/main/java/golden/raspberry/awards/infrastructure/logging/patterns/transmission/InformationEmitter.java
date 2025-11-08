@@ -20,7 +20,7 @@ public final class InformationEmitter {
      * @param information Information to emit
      */
     public void emit(Object information) {
-        // Implementation for information emission pattern
+        //todo Implementation for information emission pattern
     }
     
     /**
@@ -30,7 +30,7 @@ public final class InformationEmitter {
      * @param correlationId Correlation identifier
      */
     public void withCorrelation(Object information, String correlationId) {
-        // Implementation for correlated emission
+        //todo Implementation for correlated emission
     }
     
     /**
@@ -40,7 +40,7 @@ public final class InformationEmitter {
      * @param sessionId Session identifier
      */
     public void withSession(Object information, String sessionId) {
-        // Implementation for session-based emission
+        //todo Implementation for session-based emission
     }
 }
 
