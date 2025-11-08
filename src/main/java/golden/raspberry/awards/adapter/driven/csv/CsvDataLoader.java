@@ -4,6 +4,7 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
 import golden.raspberry.awards.adapter.driven.persistence.entity.MovieEntity;
 import golden.raspberry.awards.adapter.driven.persistence.repository.MovieJpaRepository;
+import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +57,7 @@ public class CsvDataLoader implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(CsvDataLoader.class);
 
     private final MovieJpaRepository jpaRepository;
+    private final IdKeyManagerPort idKeyManagerPort;
     private final boolean resetToOriginal;
     private final String csvFile;
     private final String csvOriginalFile;
@@ -72,16 +74,18 @@ public class CsvDataLoader implements CommandLineRunner {
      *   <li>Objects.requireNonNull for null safety</li>
      * </ul>
      *
-     * @param jpaRepository   JPA repository for saving movies with IDs from CSV
-     * @param resetToOriginal If true, resets CSV to original file from primary-base on startup
-     * @param csvFile         CSV file path from properties
-     * @param csvOriginalFile Original CSV file path from properties
-     * @param csvSeparator    CSV separator character from properties
-     * @param minColumns      Minimum required columns from properties (6: id;year;title;studios;producers;winner)
-     * @param winnerYes       Winner value string from properties
+     * @param jpaRepository    JPA repository for saving movies with IDs from CSV
+     * @param idKeyManagerPort Port for managing ID keys in XML
+     * @param resetToOriginal  If true, resets CSV to original file from primary-base on startup
+     * @param csvFile          CSV file path from properties
+     * @param csvOriginalFile  Original CSV file path from properties
+     * @param csvSeparator     CSV separator character from properties
+     * @param minColumns       Minimum required columns from properties (6: id;year;title;studios;producers;winner)
+     * @param winnerYes        Winner value string from properties
      */
     public CsvDataLoader(
             MovieJpaRepository jpaRepository,
+            IdKeyManagerPort idKeyManagerPort,
             @Value("${csv.reset-to-original:false}") boolean resetToOriginal,
             @Value("${csv.file:data/movieList.csv}") String csvFile,
             @Value("${csv.original-file:data/primary-base/MovieList.csv}") String csvOriginalFile,
@@ -89,6 +93,7 @@ public class CsvDataLoader implements CommandLineRunner {
             @Value("${csv.min-columns:6}") int minColumns,
             @Value("${csv.winner-yes:yes}") String winnerYes) {
         this.jpaRepository = Objects.requireNonNull(jpaRepository, "JpaRepository cannot be null");
+        this.idKeyManagerPort = Objects.requireNonNull(idKeyManagerPort, "IdKeyManagerPort cannot be null");
         this.resetToOriginal = resetToOriginal;
         this.csvFile = Objects.requireNonNull(csvFile, "CSV file path cannot be null");
         this.csvOriginalFile = Objects.requireNonNull(csvOriginalFile, "CSV original file path cannot be null");
@@ -131,13 +136,21 @@ public class CsvDataLoader implements CommandLineRunner {
             var entities = loadMoviesFromCsv();
             saveMoviesWithIds(entities);
 
+            // Synchronize XML with database MAX(id)
+            // If resetToOriginal=true, always use MAX(id) from database (recently created)
+            // Otherwise, compare MAX(id) with XML lastId and use the greater value
+            var maxIdFromDatabase = jpaRepository.findMaxId().orElse(0L);
+            var synchronizedId = idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase);
+
             logger.info("""
                     ========================================
                     CSV Data Load Completed Successfully
                     ========================================
                     Total movies loaded: {}
+                    Database MAX(id): {}
+                    Synchronized lastId: {}
                     ========================================
-                    """, entities.size());
+                    """, entities.size(), maxIdFromDatabase, synchronizedId);
         } catch (Exception e) {
             logger.error("""
                     ========================================

@@ -1,11 +1,11 @@
 package golden.raspberry.awards.core.application.usecase;
 
 import golden.raspberry.awards.core.application.port.in.CreateMovieUseCase;
-import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
+import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
+import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
 import golden.raspberry.awards.core.application.validator.MovieValidator;
 import golden.raspberry.awards.core.domain.model.Movie;
 import golden.raspberry.awards.core.domain.model.MovieWithId;
-import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 
 import java.util.Objects;
 
@@ -42,18 +42,18 @@ import static golden.raspberry.awards.core.application.validator.MovieValidator.
  * @since 1.0.0
  */
 public record CreateMovieUseCaseImpl(
-        MovieRepositoryPort repository,
-        GetMovieWithIdPort getMovieWithIdPort) implements CreateMovieUseCase {
+        SaveMovieWithIdPort saveMovieWithIdPort,
+        IdKeyManagerPort idKeyManagerPort) implements CreateMovieUseCase {
 
     /**
      * Constructor for dependency injection.
      *
-     * @param repository        Movie repository port (output port)
-     * @param getMovieWithIdPort Port for getting movie with ID
+     * @param saveMovieWithIdPort Port for saving movie with specific ID
+     * @param idKeyManagerPort    Port for managing ID keys in XML
      */
     public CreateMovieUseCaseImpl {
-        Objects.requireNonNull(repository, "Repository cannot be null");
-        Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
+        Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
+        Objects.requireNonNull(idKeyManagerPort, "IdKeyManagerPort cannot be null");
     }
 
     @Override
@@ -67,6 +67,8 @@ public record CreateMovieUseCaseImpl(
             );
         }
 
+        var nextId = idKeyManagerPort.getNextId();
+
         var movie = new Movie(
                 year,
                 title.trim(),
@@ -75,13 +77,7 @@ public record CreateMovieUseCaseImpl(
                 winner
         );
 
-        repository.save(movie);
-        return getMovieWithIdPort.findByYearAndTitle(movie.year(), movie.title())
-                .orElseThrow(() -> new IllegalStateException(
-                        "Movie was created but could not be found: year=%d, title='%s'".formatted(
-                                movie.year(), movie.title()
-                        )
-                ));
+        return saveMovieWithIdPort.saveWithId(movie, nextId);
     }
 }
 

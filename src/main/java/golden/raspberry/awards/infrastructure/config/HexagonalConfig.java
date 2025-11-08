@@ -6,7 +6,9 @@ import golden.raspberry.awards.core.application.port.in.DeleteMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.GetMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.UpdateMovieUseCase;
 import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
+import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import golden.raspberry.awards.core.application.port.out.LoggingPort;
+import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
 import golden.raspberry.awards.core.application.usecase.CalculateIntervalsUseCaseImpl;
 import golden.raspberry.awards.core.application.usecase.CreateMovieUseCaseImpl;
 import golden.raspberry.awards.core.application.usecase.DeleteMovieUseCaseImpl;
@@ -123,17 +125,17 @@ public class HexagonalConfig {
     /**
      * Creates a bean for the CreateMovieUseCase.
      *
-     * @param repository        Movie repository port (automatically injected by Spring)
-     * @param getMovieWithIdPort Port for getting movie with ID (automatically injected by Spring)
+     * @param saveMovieWithIdPort Port for saving movie with specific ID (automatically injected by Spring)
+     * @param idKeyManagerPort    Port for managing ID keys in XML (automatically injected by Spring)
      * @return CreateMovieUseCase bean
      */
     @Bean
     public CreateMovieUseCase createMovieUseCase(
-            MovieRepositoryPort repository,
-            GetMovieWithIdPort getMovieWithIdPort) {
-        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
-        Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
-        return new CreateMovieUseCaseImpl(repository, getMovieWithIdPort);
+            SaveMovieWithIdPort saveMovieWithIdPort,
+            IdKeyManagerPort idKeyManagerPort) {
+        Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
+        Objects.requireNonNull(idKeyManagerPort, "IdKeyManagerPort cannot be null");
+        return new CreateMovieUseCaseImpl(saveMovieWithIdPort, idKeyManagerPort);
     }
 
     /**

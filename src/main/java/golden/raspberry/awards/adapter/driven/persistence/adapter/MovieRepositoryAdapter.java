@@ -5,6 +5,7 @@ import golden.raspberry.awards.adapter.driven.persistence.mapper.MovieMapper;
 import golden.raspberry.awards.adapter.driven.persistence.mapper.MovieWithIdMapper;
 import golden.raspberry.awards.adapter.driven.persistence.repository.MovieJpaRepository;
 import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
+import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
 import golden.raspberry.awards.core.domain.model.Movie;
 import golden.raspberry.awards.core.domain.model.MovieWithId;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
@@ -22,7 +23,7 @@ import java.util.Optional;
  * Uses Spring for dependency injection.
  */
 @Component
-public class MovieRepositoryAdapter implements MovieRepositoryPort, GetMovieWithIdPort {
+public class MovieRepositoryAdapter implements MovieRepositoryPort, GetMovieWithIdPort, SaveMovieWithIdPort {
 
     private final MovieJpaRepository jpaRepository;
 
@@ -49,6 +50,25 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, GetMovieWith
         var entity = MovieMapper.toEntity(movie);
         var savedEntity = jpaRepository.save(entity);
         return MovieMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    public MovieWithId saveWithId(Movie movie, Long id) {
+        Objects.requireNonNull(movie, "Movie cannot be null");
+        Objects.requireNonNull(id, "ID cannot be null");
+        var entity = new MovieEntity(
+                id,
+                movie.year(),
+                movie.title(),
+                movie.studios(),
+                movie.producers(),
+                movie.winner()
+        );
+        var savedEntity = jpaRepository.save(entity);
+        return MovieWithIdMapper.toDomain(savedEntity)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Movie was saved but could not be converted to MovieWithId: id=%d".formatted(id)
+                ));
     }
 
     @Override
