@@ -17,37 +17,37 @@
         </div>
     </div>
 
-    <div class="row mt-5">
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fa-solid fa-chart-line fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title">Producer Intervals</h5>
-                    <p class="card-text">
-                        Visualize the producers with the longest and shortest intervals between consecutive awards.
-                    </p>
-                    <a th:href="@{/intervals}" class="btn btn-primary">
-                        <i class="fa-solid fa-arrow-right"></i> View Intervals
-                    </a>
+        <div class="row mt-5">
+            <div class="col-md-6 mb-4 d-flex">
+                <div class="card w-100">
+                    <div class="card-body text-center d-flex flex-column">
+                        <i class="fa-solid fa-chart-line fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Producer Intervals</h5>
+                        <p class="card-text flex-grow-1">
+                            Visualize the producers with the longest and shortest intervals between consecutive awards.
+                        </p>
+                        <a th:href="@{/intervals}" class="btn btn-primary mt-auto">
+                            <i class="fa-solid fa-arrow-right"></i> View Intervals
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fa-solid fa-film fa-3x text-success mb-3"></i>
-                    <h5 class="card-title">API REST</h5>
-                    <p class="card-text">
-                       Access the REST API documentation via Swagger UI.
-                    </p>
-                    <a href="/swagger-ui.html" class="btn btn-success" target="_blank">
-                        <i class="fa-solid fa-book"></i> Swagger UI
-                    </a>
+            <div class="col-md-6 mb-4 d-flex">
+                <div class="card w-100">
+                    <div class="card-body text-center d-flex flex-column">
+                        <i class="fa-solid fa-film fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">API REST</h5>
+                        <p class="card-text flex-grow-1">
+                           Access the REST API documentation via Swagger UI.
+                        </p>
+                        <a href="/swagger-ui.html" class="btn btn-success mt-auto" target="_blank">
+                            <i class="fa-solid fa-book"></i> Swagger UI
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 </div>
 </body>
 </html>
