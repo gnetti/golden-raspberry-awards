@@ -1,6 +1,9 @@
 package golden.raspberry.awards.infrastructure.config;
 
-import golden.raspberry.awards.core.domain.port.in.CalculateIntervalsUseCase;
+import golden.raspberry.awards.core.application.port.in.CalculateIntervalsUseCase;
+import golden.raspberry.awards.core.application.port.out.LoggingPort;
+import golden.raspberry.awards.core.application.usecase.CalculateIntervalsUseCaseImpl;
+import golden.raspberry.awards.core.application.usecase.LogOperationUseCase;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 import golden.raspberry.awards.core.domain.service.ProducerIntervalService;
 import org.springframework.context.annotation.Bean;
@@ -32,34 +35,80 @@ import java.util.Objects;
 public class HexagonalConfig {
 
     /**
+     * Creates a bean for the ProducerIntervalService (Domain Service).
+     *
+     * <p>This bean wires the domain service with the repository adapter.
+     * The adapter is automatically injected by Spring, maintaining the
+     * hexagonal architecture pattern.
+     *
+     * @param repository Movie repository port (automatically injected by Spring)
+     * @return ProducerIntervalService bean
+     * @throws NullPointerException if repository is null
+     */
+    @Bean
+    public ProducerIntervalService producerIntervalService(MovieRepositoryPort repository) {
+        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
+        return new ProducerIntervalService(repository);
+    }
+    
+    /**
      * Creates a bean for the CalculateIntervalsUseCase.
      *
-     * <p>This bean wires the domain service (ProducerIntervalService) with
-     * the repository adapter (MovieRepositoryPort). The adapter is automatically
+     * <p>This bean wires the application use case (CalculateIntervalsUseCaseImpl) with
+     * the domain service (ProducerIntervalService). The domain service is automatically
      * injected by Spring, maintaining the hexagonal architecture pattern.
      *
      * <p><strong>Flow:</strong>
      * <pre>
      * REST Controller → CalculateIntervalsUseCase (this bean)
      *                                    ↓
-     *                    ProducerIntervalService (domain service)
+     *                    CalculateIntervalsUseCaseImpl (Application - Use Case)
      *                                    ↓
-     *                    MovieRepositoryPort (adapter implementation)
+     *                    ProducerIntervalService (Domain - Service)
      *                                    ↓
-     *                    MovieRepositoryAdapter (JPA adapter)
+     *                    MovieRepositoryPort (Domain - Port OUT)
+     *                                    ↓
+     *                    MovieRepositoryAdapter (Infrastructure - Adapter OUT)
      * </pre>
      *
-     * @param repository Movie repository port (automatically injected by Spring)
+     * @param producerIntervalService Domain service (automatically injected by Spring)
      * @return CalculateIntervalsUseCase bean
-     * @throws NullPointerException if repository is null
+     * @throws NullPointerException if producerIntervalService is null
      */
     @Bean
     public CalculateIntervalsUseCase calculateIntervalsUseCase(
-            MovieRepositoryPort repository) {
+            ProducerIntervalService producerIntervalService) {
         
-        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
-        
-        return new ProducerIntervalService(repository);
+        Objects.requireNonNull(producerIntervalService, "ProducerIntervalService cannot be null");
+        return new CalculateIntervalsUseCaseImpl(producerIntervalService);
+    }
+    
+    /**
+     * Creates a bean for the LogOperationUseCase.
+     *
+     * <p>This bean wires the application use case (LogOperationUseCase) with
+     * the logging adapter (LoggingPort). The adapter is automatically
+     * injected by Spring, maintaining the hexagonal architecture pattern.
+     *
+     * <p><strong>Flow:</strong>
+     * <pre>
+     * Application → LogOperationUseCase (this bean)
+     *                                    ↓
+     *                    LoggingPort (adapter implementation)
+     *                                    ↓
+     *                    FileLoggingAdapter (file adapter)
+     *                                    ↓
+     *                    File System (resources/log)
+     * </pre>
+     *
+     * @param loggingPort Logging port (automatically injected by Spring)
+     * @return LogOperationUseCase bean
+     * @throws NullPointerException if loggingPort is null
+     */
+    @Bean
+    public LogOperationUseCase logOperationUseCase(LoggingPort loggingPort) {
+        Objects.requireNonNull(loggingPort, "LoggingPort cannot be null");
+        return new LogOperationUseCase(loggingPort);
     }
 }
 

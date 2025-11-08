@@ -4,7 +4,6 @@ import golden.raspberry.awards.core.domain.model.Movie;
 import golden.raspberry.awards.core.domain.model.Producer;
 import golden.raspberry.awards.core.domain.model.ProducerInterval;
 import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
-import golden.raspberry.awards.core.domain.port.in.CalculateIntervalsUseCase;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 
 import java.util.*;
@@ -12,17 +11,40 @@ import java.util.stream.Collectors;
 
 /**
  * Domain Service implementing the business logic for calculating producer intervals.
- * Pure Java - no Spring annotations.
- * Uses Java 21 features: Records, Pattern Matching, Streams.
+ * Pure Java - no Spring annotations, no framework dependencies.
+ *
+ * <p>This service contains pure business logic for:
+ * <ul>
+ *   <li>Grouping winning movies by producer</li>
+ *   <li>Calculating intervals between consecutive wins</li>
+ *   <li>Finding minimum and maximum intervals</li>
+ * </ul>
+ *
+ * <p>Uses Java 21 features: Records, Pattern Matching, Streams.
+ *
+ * @author Golden Raspberry Awards Team
+ * @since 1.0.0
  */
-public record ProducerIntervalService(MovieRepositoryPort repository) implements CalculateIntervalsUseCase {
-
+public class ProducerIntervalService {
+    
+    private final MovieRepositoryPort repository;
+    
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param repository Movie repository port (output port)
+     */
     public ProducerIntervalService(MovieRepositoryPort repository) {
         this.repository = Objects.requireNonNull(repository, "Repository cannot be null");
     }
-
-    @Override
-    public ProducerIntervalResponse execute() {
+    
+    /**
+     * Calculates producer intervals based on winning movies.
+     * This is pure business logic - no orchestration concerns.
+     *
+     * @return ProducerIntervalResponse with min and max intervals
+     */
+    public ProducerIntervalResponse calculateIntervals() {
         List<Movie> winningMovies = repository.findByWinnerTrue();
 
         if (winningMovies.isEmpty()) {
@@ -61,6 +83,9 @@ public record ProducerIntervalService(MovieRepositoryPort repository) implements
     /**
      * Groups winning movies by producer.
      * Handles multiple producers per movie (comma and "and" separated).
+     *
+     * @param winningMovies List of winning movies
+     * @return Map of producer names to their winning years
      */
     private Map<String, List<Integer>> groupWinsByProducer(List<Movie> winningMovies) {
         Map<String, List<Integer>> producerWins = new HashMap<>();
@@ -85,6 +110,9 @@ public record ProducerIntervalService(MovieRepositoryPort repository) implements
 
     /**
      * Calculates intervals between consecutive wins for each producer.
+     *
+     * @param producerWins Map of producer names to their winning years
+     * @return List of intervals for all producers
      */
     private List<ProducerInterval> calculateIntervals(Map<String, List<Integer>> producerWins) {
         List<ProducerInterval> intervals = new ArrayList<>();
@@ -109,4 +137,3 @@ public record ProducerIntervalService(MovieRepositoryPort repository) implements
         return intervals;
     }
 }
-
