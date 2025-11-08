@@ -13,10 +13,10 @@
 
     <link th:href="@{/css/custom.css}" rel="stylesheet">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <div th:replace="~{layout/fragments/navbar :: navbar}"></div>
 
-<main class="container mt-4 mb-5">
+<main class="container mt-4 mb-5 flex-grow-1">
     <div layout:fragment="content">
         
     </div>
