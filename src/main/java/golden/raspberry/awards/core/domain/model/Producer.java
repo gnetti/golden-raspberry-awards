@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Handles parsing of producer strings (comma and "and" separated).
  * Uses Java 21 features: Records, Streams.
  */
-public record Producer(@NonNull String name) {
+public record Producer(String name) {
     public Producer {
         Objects.requireNonNull(name, "Producer name cannot be null");
         if (name.trim().isBlank()) {
@@ -28,11 +28,11 @@ public record Producer(@NonNull String name) {
     /**
      * Parses a producer string that may contain multiple producers
      * separated by comma or "and".
-     * 
+     *
      * @param producersString String containing one or more producers
      * @return List of Producer objects parsed from the string
      * @example "Producer 1, Producer 2 and Producer 3" returns
-     *          [Producer("Producer 1"), Producer("Producer 2"), Producer("Producer 3")]
+     * [Producer("Producer 1"), Producer("Producer 2"), Producer("Producer 3")]
      */
     public static List<Producer> parseMultiple(String producersString) {
         if (producersString == null || producersString.isBlank()) {

@@ -1,7 +1,5 @@
 package golden.raspberry.awards.core.domain.model;
 
-import org.springframework.lang.NonNull;
-
 import java.util.Objects;
 
 /**
@@ -14,10 +12,10 @@ import java.util.Objects;
  * @param followingWin Year of the following win
  */
 public record ProducerInterval(
-    @NonNull String producer,
-    @NonNull Integer interval,
-    @NonNull Integer previousWin,
-    @NonNull Integer followingWin
+    String producer,
+    Integer interval,
+    Integer previousWin,
+    Integer followingWin
 ) {
     public ProducerInterval {
 

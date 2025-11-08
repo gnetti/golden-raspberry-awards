@@ -15,9 +15,7 @@ import java.util.stream.Collectors;
  * Pure Java - no Spring annotations.
  * Uses Java 21 features: Records, Pattern Matching, Streams.
  */
-public final class ProducerIntervalService implements CalculateIntervalsUseCase {
-
-    private final MovieRepositoryPort repository;
+public record ProducerIntervalService(MovieRepositoryPort repository) implements CalculateIntervalsUseCase {
 
     public ProducerIntervalService(MovieRepositoryPort repository) {
         this.repository = Objects.requireNonNull(repository, "Repository cannot be null");

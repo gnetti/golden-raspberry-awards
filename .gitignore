@@ -66,7 +66,7 @@ Thumbs.db
 *.trace.db
 *.lock.db
 
-# Application specific
+# StartApplication specific
 application-local.properties
 application-dev.properties
 
