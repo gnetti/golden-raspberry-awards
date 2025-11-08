@@ -20,7 +20,7 @@ public class MovieEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false)
+    @Column(name = "\"year\"", nullable = false)
     @NonNull
     private Integer year;
     
