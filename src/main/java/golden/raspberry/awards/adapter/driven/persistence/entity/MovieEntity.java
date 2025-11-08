@@ -1,118 +1,133 @@
 package golden.raspberry.awards.adapter.driven.persistence.entity;
 
-import jakarta.persistence.*;
-import org.springframework.lang.NonNull;
-
-import java.util.Objects;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * JPA Entity for Movie.
  * Represents the database table structure.
  * Schema is created automatically via JPA (ddl-auto=create-drop).
- * <p>
- * Uses Java 21 features: Records (if applicable), clean code.
+ *
+ * <p>All validations are performed in Application Layer (MovieValidator) BEFORE reaching this entity.
+ *
+ * <p>Uses Java 21 features: String Templates for toString.
+ *
+ * @author Luiz Generoso
+ * @since 1.0.0
  */
 @Entity
 @Table(name = "movies")
 public class MovieEntity {
-    
+
     @Id
     private Long id;
-    
+
     @Column(name = "\"year\"", nullable = false)
-    @NonNull
     private Integer year;
-    
-    @Column(nullable = false, length = 500)
-    @NonNull
-    private String title;
-    
-    @Column(nullable = false, length = 500)
-    @NonNull
-    private String studios;
-    
-    @Column(nullable = false, length = 1000)
-    @NonNull
-    private String producers;
-    
+
     @Column(nullable = false)
-    @NonNull
+    private String title;
+
+    @Column(nullable = false)
+    private String studios;
+
+    @Column(nullable = false)
+    private String producers;
+
+    @Column(nullable = false)
     private Boolean winner;
 
+    /**
+     * Default constructor (required by JPA).
+     */
     public MovieEntity() {
     }
 
-    public MovieEntity(@NonNull Integer year, @NonNull String title, 
-                      @NonNull String studios, @NonNull String producers, 
-                      @NonNull Boolean winner) {
-        this.year = Objects.requireNonNull(year, "Year cannot be null");
-        this.title = Objects.requireNonNull(title, "Title cannot be null");
-        this.studios = Objects.requireNonNull(studios, "Studios cannot be null");
-        this.producers = Objects.requireNonNull(producers, "Producers cannot be null");
-        this.winner = winner;
-    }
-
-    public MovieEntity(Long id, @NonNull Integer year, @NonNull String title, 
-                      @NonNull String studios, @NonNull String producers, 
-                      @NonNull Boolean winner) {
+    /**
+     * Constructor with all fields.
+     *
+     * @param id        Movie ID
+     * @param year      Movie release year
+     * @param title     Movie title
+     * @param studios   Movie studios
+     * @param producers Movie producers
+     * @param winner    Winner flag
+     */
+    public MovieEntity(Long id, Integer year, String title,
+                       String studios, String producers, Boolean winner) {
         this.id = id;
-        this.year = Objects.requireNonNull(year, "Year cannot be null");
-        this.title = Objects.requireNonNull(title, "Title cannot be null");
-        this.studios = Objects.requireNonNull(studios, "Studios cannot be null");
-        this.producers = Objects.requireNonNull(producers, "Producers cannot be null");
+        this.year = year;
+        this.title = title;
+        this.studios = studios;
+        this.producers = producers;
         this.winner = winner;
     }
 
-    public Long getId() { 
-        return id; 
+    /**
+     * Constructor without ID (for new entities).
+     *
+     * @param year      Movie release year
+     * @param title     Movie title
+     * @param studios   Movie studios
+     * @param producers Movie producers
+     * @param winner    Winner flag
+     */
+    public MovieEntity(Integer year, String title,
+                       String studios, String producers, Boolean winner) {
+        this.year = year;
+        this.title = title;
+        this.studios = studios;
+        this.producers = producers;
+        this.winner = winner;
     }
-    
-    public void setId(Long id) { 
-        this.id = id; 
+
+    public Long getId() {
+        return id;
     }
-    
-    @NonNull
-    public Integer getYear() { 
-        return year; 
+
+    public void setId(Long id) {
+        this.id = id;
     }
-    
-    public void setYear(@NonNull Integer year) { 
-        this.year = Objects.requireNonNull(year, "Year cannot be null");
+
+    public Integer getYear() {
+        return year;
     }
-    
-    @NonNull
-    public String getTitle() { 
-        return title; 
+
+    public void setYear(Integer year) {
+        this.year = year;
     }
-    
-    public void setTitle(@NonNull String title) { 
-        this.title = Objects.requireNonNull(title, "Title cannot be null");
+
+    public String getTitle() {
+        return title;
     }
-    
-    @NonNull
-    public String getStudios() { 
-        return studios; 
+
+    public void setTitle(String title) {
+        this.title = title;
     }
-    
-    public void setStudios(@NonNull String studios) { 
-        this.studios = Objects.requireNonNull(studios, "Studios cannot be null");
+
+    public String getStudios() {
+        return studios;
     }
-    
-    @NonNull
-    public String getProducers() { 
-        return producers; 
+
+    public void setStudios(String studios) {
+        this.studios = studios;
     }
-    
-    public void setProducers(@NonNull String producers) { 
-        this.producers = Objects.requireNonNull(producers, "Producers cannot be null");
+
+    public String getProducers() {
+        return producers;
     }
-    
-    @NonNull
-    public Boolean getWinner() { 
-        return winner; 
+
+    public void setProducers(String producers) {
+        this.producers = producers;
     }
-    
-    public void setWinner(@NonNull Boolean winner) { 
+
+    public Boolean getWinner() {
+        return winner;
+    }
+
+    public void setWinner(Boolean winner) {
         this.winner = winner;
     }
 
@@ -121,19 +136,17 @@ public class MovieEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MovieEntity that = (MovieEntity) o;
-        return Objects.equals(id, that.id);
+        return id != null && id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
-    @NonNull
     public String toString() {
         return "MovieEntity{id=%d, year=%d, title='%s', winner=%s}"
                 .formatted(id, year, title, winner);
     }
 }
-
