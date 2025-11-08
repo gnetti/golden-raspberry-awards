@@ -2,8 +2,8 @@ package golden.raspberry.awards.adapter.driven.csv;
 
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
-import golden.raspberry.awards.core.domain.model.Movie;
-import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
+import golden.raspberry.awards.adapter.driven.persistence.entity.MovieEntity;
+import golden.raspberry.awards.adapter.driven.persistence.repository.MovieJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +55,7 @@ public class CsvDataLoader implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvDataLoader.class);
 
-    private final MovieRepositoryPort repository;
+    private final MovieJpaRepository jpaRepository;
     private final boolean resetToOriginal;
     private final String csvFile;
     private final String csvOriginalFile;
@@ -72,23 +72,23 @@ public class CsvDataLoader implements CommandLineRunner {
      *   <li>Objects.requireNonNull for null safety</li>
      * </ul>
      *
-     * @param repository      Movie repository port for saving movies
+     * @param jpaRepository   JPA repository for saving movies with IDs from CSV
      * @param resetToOriginal If true, resets CSV to original file from primary-base on startup
      * @param csvFile         CSV file path from properties
      * @param csvOriginalFile Original CSV file path from properties
      * @param csvSeparator    CSV separator character from properties
-     * @param minColumns      Minimum required columns from properties
+     * @param minColumns      Minimum required columns from properties (6: id;year;title;studios;producers;winner)
      * @param winnerYes       Winner value string from properties
      */
     public CsvDataLoader(
-            MovieRepositoryPort repository,
+            MovieJpaRepository jpaRepository,
             @Value("${csv.reset-to-original:false}") boolean resetToOriginal,
             @Value("${csv.file:data/movieList.csv}") String csvFile,
             @Value("${csv.original-file:data/primary-base/MovieList.csv}") String csvOriginalFile,
             @Value("${csv.separator:;}") String csvSeparator,
-            @Value("${csv.min-columns:5}") int minColumns,
+            @Value("${csv.min-columns:6}") int minColumns,
             @Value("${csv.winner-yes:yes}") String winnerYes) {
-        this.repository = Objects.requireNonNull(repository, "Repository cannot be null");
+        this.jpaRepository = Objects.requireNonNull(jpaRepository, "JpaRepository cannot be null");
         this.resetToOriginal = resetToOriginal;
         this.csvFile = Objects.requireNonNull(csvFile, "CSV file path cannot be null");
         this.csvOriginalFile = Objects.requireNonNull(csvOriginalFile, "CSV original file path cannot be null");
@@ -122,12 +122,14 @@ public class CsvDataLoader implements CommandLineRunner {
                 """, csvFile, resetToOriginal);
 
         try {
-                 if (resetToOriginal) {
+            // Reset CSV to original FIRST if configured
+            if (resetToOriginal) {
                 resetCsvToOriginal();
             }
 
-            var movies = loadMoviesFromCsv();
-            repository.saveAll(movies);
+            // Load movies AFTER reset (if reset was done, reads from overwritten file)
+            var entities = loadMoviesFromCsv();
+            saveMoviesWithIds(entities);
 
             logger.info("""
                     ========================================
@@ -135,7 +137,7 @@ public class CsvDataLoader implements CommandLineRunner {
                     ========================================
                     Total movies loaded: {}
                     ========================================
-                    """, movies.size());
+                    """, entities.size());
         } catch (Exception e) {
             logger.error("""
                     ========================================
@@ -182,11 +184,24 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
+     * Saves movies with IDs from CSV directly to database.
+     * Uses JPA repository to preserve IDs from CSV.
+     *
+     * @param entities List of MovieEntity with IDs from CSV
+     */
+    private void saveMoviesWithIds(List<MovieEntity> entities) {
+        jpaRepository.saveAll(entities);
+    }
+
+    /**
      * Loads movies from CSV file using Java 21 Streams API EXTREMELY.
      *
-     * <p>Reads the CSV file from classpath, parses each line using streams,
-     * and converts them to Movie domain models. Invalid lines are skipped
+     * <p>Reads the CSV file from file system first (if reset was done),
+     * otherwise from classpath. Parses each line using streams,
+     * and converts them to MovieEntity with IDs from CSV. Invalid lines are skipped
      * with appropriate warnings.
+     *
+     * <p>CSV format: id;year;title;studios;producers;winner
      *
      * <p>Uses Java 21 features EXTREMELY:
      * <ul>
@@ -196,24 +211,37 @@ public class CsvDataLoader implements CommandLineRunner {
      *   <li>String Templates for error messages</li>
      * </ul>
      *
-     * @return List of Movie domain models parsed from CSV
+     * @return List of MovieEntity with IDs from CSV
      * @throws Exception if CSV file cannot be read or parsed
      */
-    private List<Movie> loadMoviesFromCsv() throws Exception {
-        var resource = Optional.of(new ClassPathResource(csvFile))
-                .filter(ClassPathResource::exists)
-                .orElseThrow(() -> new IllegalStateException(
-                        "CSV file not found: %s".formatted(csvFile)
-                ));
+    private List<MovieEntity> loadMoviesFromCsv() throws Exception {
+        // Try to read from file system first (if reset was done, this will be the overwritten file)
+        var fileSystemPath = Paths.get("src/main/resources", csvFile);
+        var inputStream = Files.exists(fileSystemPath)
+                ? Files.newInputStream(fileSystemPath)
+                : Optional.of(new ClassPathResource(csvFile))
+                        .filter(ClassPathResource::exists)
+                        .map(resource -> {
+                            try {
+                                return resource.getInputStream();
+                            } catch (Exception e) {
+                                throw new IllegalStateException(
+                                        "CSV file not found: %s".formatted(csvFile), e);
+                            }
+                        })
+                        .orElseThrow(() -> new IllegalStateException(
+                                "CSV file not found: %s".formatted(csvFile)
+                        ));
 
         var parser = new CSVParserBuilder()
                 .withSeparator(csvSeparator)
                 .build();
 
-        try (var reader = new CSVReaderBuilder(
-                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))
-                .withCSVParser(parser)
-                .build()) {
+        try (var stream = inputStream;
+             var reader = new CSVReaderBuilder(
+                     new InputStreamReader(stream, StandardCharsets.UTF_8))
+                     .withCSVParser(parser)
+                     .build()) {
 
             return Optional.ofNullable(reader.readAll())
                     .filter(lines -> !lines.isEmpty())
@@ -228,22 +256,23 @@ public class CsvDataLoader implements CommandLineRunner {
     /**
      * Parses all CSV lines using functional approach.
      * Skips header (first line) and processes data lines.
+     * Creates MovieEntity with IDs from CSV.
      *
      * @param allLines All CSV lines including header
-     * @return List of parsed Movie domain models
+     * @return List of parsed MovieEntity with IDs from CSV
      */
-    private List<Movie> parseAllLines(List<String[]> allLines) {
+    private List<MovieEntity> parseAllLines(
+            List<String[]> allLines) {
         return IntStream.range(0, allLines.size())
                 .skip(1)
-                .mapToObj(index -> parseLineSafely(allLines.get(index), index + 1))
+                .mapToObj(index -> parseEntityLineSafely(allLines.get(index), index + 1))
                 .flatMap(Optional::stream)
                 .toList();
     }
 
     /**
-     * Safely parses a CSV line using functional approach.
+     * Safely parses a CSV line into MovieEntity with ID from CSV.
      * Returns Optional.empty() if parsing fails.
-     * Uses pattern matching and switch expressions for elegant error handling.
      *
      * <p>Uses Java 21 features EXTREMELY:
      * <ul>
@@ -255,11 +284,12 @@ public class CsvDataLoader implements CommandLineRunner {
      *
      * @param line       CSV line as string array
      * @param lineNumber Line number for error reporting (1-based)
-     * @return Optional containing Movie domain model, or empty if parsing fails
+     * @return Optional containing MovieEntity with ID, or empty if parsing fails
      */
-    private Optional<Movie> parseLineSafely(String[] line, int lineNumber) {
+    private Optional<MovieEntity> parseEntityLineSafely(
+            String[] line, int lineNumber) {
         return validateLine(line, lineNumber)
-                .map(valid -> parseMovieLineSafely(valid.line(), valid.lineNumber(), line))
+                .map(valid -> parseMovieEntityLineSafely(valid.line(), valid.lineNumber(), line))
                 .orElseGet(() -> {
                     logInvalidLine(lineNumber, line);
                     return Optional.empty();
@@ -267,16 +297,17 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Parses a validated CSV line safely, returning Optional.empty() on error.
+     * Parses a validated CSV line safely into MovieEntity, returning Optional.empty() on error.
      *
      * @param line       CSV line as string array (guaranteed valid)
      * @param lineNumber Line number for error reporting
      * @param originalLine Original line for error logging
-     * @return Optional containing Movie domain model, or empty if parsing fails
+     * @return Optional containing MovieEntity with ID, or empty if parsing fails
      */
-    private Optional<Movie> parseMovieLineSafely(String[] line, int lineNumber, String[] originalLine) {
+    private Optional<MovieEntity> parseMovieEntityLineSafely(
+            String[] line, int lineNumber, String[] originalLine) {
         try {
-            return Optional.of(parseMovieLine(line, lineNumber));
+            return Optional.of(parseMovieEntityLine(line, lineNumber));
         } catch (Exception e) {
             logger.warn("""
                     Skipping invalid line {}:
@@ -286,6 +317,7 @@ public class CsvDataLoader implements CommandLineRunner {
             return Optional.empty();
         }
     }
+
 
     /**
      * Logs invalid line information using String Templates.
@@ -355,29 +387,74 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Parses a validated CSV line into a Movie domain model.
-     * Uses functional approach with method references and Stream API.
+     * Parses a validated CSV line into a MovieEntity with ID from CSV.
+     * Used for loading data from CSV where IDs are provided.
      *
+     * <p>CSV format: id;year;title;studios;producers;winner
      * <p>Uses Java 21 features EXTREMELY:
      * <ul>
      *   <li>Method references for field parsing</li>
-     *   <li>Stream API for functional processing</li>
      *   <li>String Templates for error messages</li>
      * </ul>
      *
      * @param line       CSV line as string array (guaranteed valid)
      * @param lineNumber Line number for error reporting
-     * @return Movie domain model
+     * @return MovieEntity with ID from CSV
      * @throws IllegalArgumentException if line cannot be parsed
      */
-    private Movie parseMovieLine(String[] line, int lineNumber) {
-        return new Movie(
-                parseYear(line[0], lineNumber),
-                parseField(line[1], "Title", lineNumber),
-                parseField(line[2], "Studios", lineNumber),
-                parseField(line[3], "Producers", lineNumber),
-                parseWinner(line[4])
+    private MovieEntity parseMovieEntityLine(
+            String[] line, int lineNumber) {
+        return new MovieEntity(
+                parseId(line[0], lineNumber),
+                parseYear(line[1], lineNumber),
+                parseField(line[2], "Title", lineNumber),
+                parseField(line[3], "Studios", lineNumber),
+                parseField(line[4], "Producers", lineNumber),
+                parseWinner(line[5])
         );
+    }
+
+    /**
+     * Parses ID field using functional approach with Optional.
+     *
+     * <p>Uses Java 21 features EXTREMELY:
+     * <ul>
+     *   <li>Optional for null-safe operations</li>
+     *   <li>String Templates for error messages</li>
+     * </ul>
+     *
+     * @param value      String value to parse
+     * @param lineNumber Line number for error reporting
+     * @return Parsed Long ID value
+     * @throws IllegalArgumentException if value is invalid
+     */
+    private Long parseId(String value, int lineNumber) {
+        return Optional.ofNullable(value)
+                .map(String::trim)
+                .filter(Predicate.not(String::isEmpty))
+                .map(trimmed -> parseLongSafely(trimmed, lineNumber))
+                .filter(id -> id > 0)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Line %d: ID cannot be empty or invalid".formatted(lineNumber)
+                ));
+    }
+
+    /**
+     * Parses long safely with error handling.
+     *
+     * @param value      String value to parse
+     * @param lineNumber Line number for error reporting
+     * @return Parsed long value
+     * @throws IllegalArgumentException if value cannot be parsed
+     */
+    private Long parseLongSafely(String value, int lineNumber) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Line %d: Invalid ID format: %s".formatted(lineNumber, value), e
+            );
+        }
     }
 
     /**

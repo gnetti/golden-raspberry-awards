@@ -17,7 +17,6 @@ import java.util.Objects;
 public class MovieEntity {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name = "\"year\"", nullable = false)
@@ -46,6 +45,17 @@ public class MovieEntity {
     public MovieEntity(@NonNull Integer year, @NonNull String title, 
                       @NonNull String studios, @NonNull String producers, 
                       @NonNull Boolean winner) {
+        this.year = Objects.requireNonNull(year, "Year cannot be null");
+        this.title = Objects.requireNonNull(title, "Title cannot be null");
+        this.studios = Objects.requireNonNull(studios, "Studios cannot be null");
+        this.producers = Objects.requireNonNull(producers, "Producers cannot be null");
+        this.winner = winner;
+    }
+
+    public MovieEntity(Long id, @NonNull Integer year, @NonNull String title, 
+                      @NonNull String studios, @NonNull String producers, 
+                      @NonNull Boolean winner) {
+        this.id = id;
         this.year = Objects.requireNonNull(year, "Year cannot be null");
         this.title = Objects.requireNonNull(title, "Title cannot be null");
         this.studios = Objects.requireNonNull(studios, "Studios cannot be null");
