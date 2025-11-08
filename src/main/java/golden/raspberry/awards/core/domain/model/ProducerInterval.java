@@ -1,5 +1,7 @@
 package golden.raspberry.awards.core.domain.model;
 
+import org.springframework.lang.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -119,6 +121,7 @@ public record ProducerInterval(
      * @return Formatted string representation
      */
     @Override
+    @NonNull
     public String toString() {
         return "ProducerInterval{producer='%s', interval=%d years (%d -> %d)}"
                 .formatted(producer, interval, previousWin, followingWin);
