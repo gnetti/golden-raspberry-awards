@@ -7,7 +7,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
  * Global Exception Handler for REST API.
@@ -17,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  *
  * <p><strong>Status Codes:</strong>
  * <ul>
- *   <li>400 Bad Request: IllegalArgumentException, IllegalStateException, NullPointerException</li>
+ *   <li>400 Bad Request: IllegalArgumentException, IllegalStateException, NullPointerException, HttpMessageNotReadableException</li>
  *   <li>500 Internal Server Error: All other exceptions</li>
  * </ul>
  *
@@ -27,13 +26,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @since 1.0.0
  */
 @RestControllerAdvice
-public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+public class ApiExceptionHandler {
 
     /**
      * Handles IllegalArgumentException (400 Bad Request).
      * Used for validation errors.
      *
-     * @param ex Exception thrown
+     * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
      */
@@ -55,7 +54,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
      * Handles IllegalStateException (400 Bad Request).
      * Used for business logic errors.
      *
-     * @param ex Exception thrown
+     * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
      */
@@ -77,7 +76,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
      * Handles NullPointerException (400 Bad Request).
      * Should not occur in production, but handled for safety.
      *
-     * @param ex Exception thrown
+     * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
      */
@@ -104,18 +103,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
      * Occurs when JSON is malformed, missing, or contains type mismatches.
      * Provides FUNDAMENTALS error message.
      *
-     * @param ex Exception thrown
+     * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorDTO> handleHttpMessageNotReadableException(
-            HttpMessageNotReadableException ex, WebRequest request) {
+            HttpMessageNotReadableException ex,
+            WebRequest request) {
 
         var rootCause = ex.getRootCause();
         var message = rootCause != null && rootCause.getMessage() != null
                 ? "Invalid JSON format or type mismatch: %s. Please ensure the request body is valid JSON with correct field types (year: integer, title: string, studios: string, producers: string, winner: boolean)."
-                        .formatted(rootCause.getMessage())
+                .formatted(rootCause.getMessage())
                 : "Invalid JSON format. Please ensure the request body is valid JSON with the following structure: {\"year\": 2024, \"title\": \"string\", \"studios\": \"string\", \"producers\": \"string\", \"winner\": true/false}.";
 
         var error = ApiErrorDTO.of(
@@ -128,31 +128,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    /**
-     * Handles all other exceptions (500 Internal Server Error).
-     * Generic handler for unexpected errors.
-     *
-     * @param ex Exception thrown
-     * @param request Web request
-     * @return ResponseEntity with ApiErrorDTO
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorDTO> handleGenericException(
-            Exception ex, WebRequest request) {
-
-        var message = ex.getMessage() != null && !ex.getMessage().isBlank()
-                ? "An unexpected error occurred: %s".formatted(ex.getMessage())
-                : "An unexpected error occurred";
-
-        var error = ApiErrorDTO.of(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                message,
-                extractPath(request)
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
 
     /**
      * Extracts path from WebRequest description.
