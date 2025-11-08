@@ -1,6 +1,7 @@
 package golden.raspberry.awards.core.application.usecase;
 
 import golden.raspberry.awards.core.application.port.in.CreateMovieUseCase;
+import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
 import golden.raspberry.awards.core.application.validator.MovieValidator;
@@ -43,17 +44,20 @@ import static golden.raspberry.awards.core.application.validator.MovieValidator.
  */
 public record CreateMovieUseCaseImpl(
         SaveMovieWithIdPort saveMovieWithIdPort,
-        IdKeyManagerPort idKeyManagerPort) implements CreateMovieUseCase {
+        IdKeyManagerPort idKeyManagerPort,
+        CsvFileWriterPort csvFileWriterPort) implements CreateMovieUseCase {
 
     /**
      * Constructor for dependency injection.
      *
      * @param saveMovieWithIdPort Port for saving movie with specific ID
      * @param idKeyManagerPort    Port for managing ID keys in XML
+     * @param csvFileWriterPort   Port for writing movies to CSV file
      */
     public CreateMovieUseCaseImpl {
         Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
         Objects.requireNonNull(idKeyManagerPort, "IdKeyManagerPort cannot be null");
+        Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
     }
 
     @Override
@@ -77,7 +81,11 @@ public record CreateMovieUseCaseImpl(
                 winner
         );
 
-        return saveMovieWithIdPort.saveWithId(movie, nextId);
+        var savedMovie = saveMovieWithIdPort.saveWithId(movie, nextId);
+
+        csvFileWriterPort.appendMovie(savedMovie);
+
+        return savedMovie;
     }
 }
 

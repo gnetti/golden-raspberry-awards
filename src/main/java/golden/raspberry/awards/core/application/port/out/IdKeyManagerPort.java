@@ -56,6 +56,21 @@ public interface IdKeyManagerPort {
     Long synchronizeWithDatabase(Long maxIdFromDatabase);
 
     /**
+     * Resets lastId to a specific value, ignoring the current XML value.
+     * This method is used when CSV is reset to original and database is reloaded.
+     * The XML is updated to match the database MAX(id) exactly.
+     *
+     * <p>This method should be used ONLY when reset-to-original=true.
+     *
+     * @param resetValue The value to reset lastId to (typically MAX(id) from database)
+     * @return The reset lastId value
+     * @throws NullPointerException     if resetValue is null
+     * @throws IllegalArgumentException if resetValue is negative
+     * @throws IllegalStateException    if XML cannot be updated
+     */
+    Long resetLastId(Long resetValue);
+
+    /**
      * Gets the next available ID for CREATE operations.
      * Increments lastId by 1 and updates XML.
      *

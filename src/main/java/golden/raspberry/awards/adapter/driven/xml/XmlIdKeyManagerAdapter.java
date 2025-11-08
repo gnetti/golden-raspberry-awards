@@ -227,6 +227,18 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
         return synchronizedId;
     }
 
+    @Override
+    public Long resetLastId(Long resetValue) {
+        validateMaxIdFromDatabase(resetValue);
+        updateLastId(resetValue);
+        logger.info("""
+                Reset lastId in XML (reset-to-original mode):
+                  Reset value: {}
+                  XML updated to: {}
+                """, resetValue, resetValue);
+        return resetValue;
+    }
+
     private void validateMaxIdFromDatabase(Long maxIdFromDatabase) {
         Objects.requireNonNull(maxIdFromDatabase, "maxIdFromDatabase cannot be null");
         Optional.of(maxIdFromDatabase)

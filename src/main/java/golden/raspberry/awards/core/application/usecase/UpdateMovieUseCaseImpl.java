@@ -1,7 +1,9 @@
 package golden.raspberry.awards.core.application.usecase;
 
 import golden.raspberry.awards.core.application.port.in.UpdateMovieUseCase;
+import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
+import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
 import golden.raspberry.awards.core.application.validator.MovieValidator;
 import golden.raspberry.awards.core.domain.model.Movie;
 import golden.raspberry.awards.core.domain.model.MovieWithId;
@@ -35,17 +37,23 @@ import static golden.raspberry.awards.core.application.validator.MovieValidator.
  */
 public record UpdateMovieUseCaseImpl(
         MovieRepositoryPort repository,
-        GetMovieWithIdPort getMovieWithIdPort) implements UpdateMovieUseCase {
+        GetMovieWithIdPort getMovieWithIdPort,
+        SaveMovieWithIdPort saveMovieWithIdPort,
+        CsvFileWriterPort csvFileWriterPort) implements UpdateMovieUseCase {
 
     /**
      * Constructor for dependency injection.
      *
-     * @param repository        Movie repository port (output port)
-     * @param getMovieWithIdPort Port for getting movie with ID
+     * @param repository          Movie repository port (output port)
+     * @param getMovieWithIdPort  Port for getting movie with ID
+     * @param saveMovieWithIdPort Port for saving movie with specific ID
+     * @param csvFileWriterPort   Port for writing movies to CSV file
      */
     public UpdateMovieUseCaseImpl {
         Objects.requireNonNull(repository, "Repository cannot be null");
         Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
+        Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
+        Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
     }
 
     @Override
@@ -73,11 +81,9 @@ public record UpdateMovieUseCaseImpl(
                 winner
         );
 
-        repository.save(updatedMovie);
-        return getMovieWithIdPort.findByIdWithId(id)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Movie with ID %d not found after update".formatted(id)
-                ));
+        var updatedMovieWithId = saveMovieWithIdPort.saveWithId(updatedMovie, id);
+        csvFileWriterPort.updateMovie(updatedMovieWithId);
+        return updatedMovieWithId;
     }
 }
 

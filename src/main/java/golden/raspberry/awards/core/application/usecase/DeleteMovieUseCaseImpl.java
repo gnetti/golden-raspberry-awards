@@ -1,6 +1,7 @@
 package golden.raspberry.awards.core.application.usecase;
 
 import golden.raspberry.awards.core.application.port.in.DeleteMovieUseCase;
+import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 
 import java.util.Objects;
@@ -26,15 +27,19 @@ import java.util.Objects;
  * @author Luiz Generoso
  * @since 1.0.0
  */
-public record DeleteMovieUseCaseImpl(MovieRepositoryPort repository) implements DeleteMovieUseCase {
+public record DeleteMovieUseCaseImpl(
+        MovieRepositoryPort repository,
+        CsvFileWriterPort csvFileWriterPort) implements DeleteMovieUseCase {
 
     /**
      * Constructor for dependency injection.
      *
-     * @param repository Movie repository port (output port)
+     * @param repository      Movie repository port (output port)
+     * @param csvFileWriterPort Port for writing movies to CSV file
      */
     public DeleteMovieUseCaseImpl {
         Objects.requireNonNull(repository, "Repository cannot be null");
+        Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
     }
 
     @Override
@@ -51,6 +56,8 @@ public record DeleteMovieUseCaseImpl(MovieRepositoryPort repository) implements 
                     "Failed to delete movie with ID %d".formatted(id)
             );
         }
+
+        csvFileWriterPort.removeMovie(id);
     }
 }
 

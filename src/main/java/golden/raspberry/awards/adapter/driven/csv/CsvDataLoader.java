@@ -137,10 +137,10 @@ public class CsvDataLoader implements CommandLineRunner {
             saveMoviesWithIds(entities);
 
             // Synchronize XML with database MAX(id)
-            // If resetToOriginal=true, always use MAX(id) from database (recently created)
-            // Otherwise, compare MAX(id) with XML lastId and use the greater value
             var maxIdFromDatabase = jpaRepository.findMaxId().orElse(0L);
-            var synchronizedId = idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase);
+            var synchronizedId = resetToOriginal
+                    ? idKeyManagerPort.resetLastId(maxIdFromDatabase)
+                    : idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase);
 
             logger.info("""
                     ========================================

@@ -5,6 +5,7 @@ import golden.raspberry.awards.core.application.port.in.CreateMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.DeleteMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.GetMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.UpdateMovieUseCase;
+import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import golden.raspberry.awards.core.application.port.out.LoggingPort;
@@ -127,15 +128,18 @@ public class HexagonalConfig {
      *
      * @param saveMovieWithIdPort Port for saving movie with specific ID (automatically injected by Spring)
      * @param idKeyManagerPort    Port for managing ID keys in XML (automatically injected by Spring)
+     * @param csvFileWriterPort   Port for writing movies to CSV file (automatically injected by Spring)
      * @return CreateMovieUseCase bean
      */
     @Bean
     public CreateMovieUseCase createMovieUseCase(
             SaveMovieWithIdPort saveMovieWithIdPort,
-            IdKeyManagerPort idKeyManagerPort) {
+            IdKeyManagerPort idKeyManagerPort,
+            CsvFileWriterPort csvFileWriterPort) {
         Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
         Objects.requireNonNull(idKeyManagerPort, "IdKeyManagerPort cannot be null");
-        return new CreateMovieUseCaseImpl(saveMovieWithIdPort, idKeyManagerPort);
+        Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
+        return new CreateMovieUseCaseImpl(saveMovieWithIdPort, idKeyManagerPort, csvFileWriterPort);
     }
 
     /**
@@ -159,27 +163,37 @@ public class HexagonalConfig {
      *
      * @param repository        Movie repository port (automatically injected by Spring)
      * @param getMovieWithIdPort Port for getting movie with ID (automatically injected by Spring)
+     * @param saveMovieWithIdPort Port for saving movie with specific ID (automatically injected by Spring)
+     * @param csvFileWriterPort Port for writing movies to CSV file (automatically injected by Spring)
      * @return UpdateMovieUseCase bean
      */
     @Bean
     public UpdateMovieUseCase updateMovieUseCase(
             MovieRepositoryPort repository,
-            GetMovieWithIdPort getMovieWithIdPort) {
+            GetMovieWithIdPort getMovieWithIdPort,
+            SaveMovieWithIdPort saveMovieWithIdPort,
+            CsvFileWriterPort csvFileWriterPort) {
         Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
         Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
-        return new UpdateMovieUseCaseImpl(repository, getMovieWithIdPort);
+        Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
+        Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
+        return new UpdateMovieUseCaseImpl(repository, getMovieWithIdPort, saveMovieWithIdPort, csvFileWriterPort);
     }
 
     /**
      * Creates a bean for the DeleteMovieUseCase.
      *
-     * @param repository Movie repository port (automatically injected by Spring)
+     * @param repository      Movie repository port (automatically injected by Spring)
+     * @param csvFileWriterPort Port for writing movies to CSV file (automatically injected by Spring)
      * @return DeleteMovieUseCase bean
      */
     @Bean
-    public DeleteMovieUseCase deleteMovieUseCase(MovieRepositoryPort repository) {
+    public DeleteMovieUseCase deleteMovieUseCase(
+            MovieRepositoryPort repository,
+            CsvFileWriterPort csvFileWriterPort) {
         Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
-        return new DeleteMovieUseCaseImpl(repository);
+        Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
+        return new DeleteMovieUseCaseImpl(repository, csvFileWriterPort);
     }
 }
 
