@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}" lang="en-us">
+<head>
+    <title>Intervalos de Produtores - Golden Raspberry Awards</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h1>
+                    <i class="fa-solid fa-chart-line text-primary"></i>
+                    Intervalos de Produtores
+                </h1>
+                <p class="text-muted">
+                    Produtores com menor e maior intervalo entre prêmios consecutivos
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Menor Intervalo -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fa-solid fa-arrow-down"></i>
+                            Menor Intervalo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Produtor</th>
+                                    <th>Intervalo</th>
+                                    <th>Ano Anterior</th>
+                                    <th>Ano Seguinte</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${intervals.min.isEmpty()}">
+                                    <td colspan="4" class="text-center text-muted">
+                                        Nenhum intervalo mínimo encontrado
+                                    </td>
+                                </tr>
+                                <tr th:each="interval : ${intervals.min}">
+                                    <td th:text="${interval.producer}"></td>
+                                    <td>
+                                        <span class="badge bg-success badge-interval" th:text="${interval.interval} + ' anos'"></span>
+                                    </td>
+                                    <td th:text="${interval.previousWin}"></td>
+                                    <td th:text="${interval.followingWin}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maior Intervalo -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fa-solid fa-arrow-up"></i>
+                            Maior Intervalo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Produtor</th>
+                                    <th>Intervalo</th>
+                                    <th>Ano Anterior</th>
+                                    <th>Ano Seguinte</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${intervals.max.isEmpty()}">
+                                    <td colspan="4" class="text-center text-muted">
+                                        Nenhum intervalo máximo encontrado
+                                    </td>
+                                </tr>
+                                <tr th:each="interval : ${intervals.max}">
+                                    <td th:text="${interval.producer}"></td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark badge-interval" th:text="${interval.interval} + ' anos'"></span>
+                                    </td>
+                                    <td th:text="${interval.previousWin}"></td>
+                                    <td th:text="${interval.followingWin}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
