@@ -8,6 +8,8 @@ import golden.raspberry.awards.core.application.port.in.CreateMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.DeleteMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.GetMovieUseCase;
 import golden.raspberry.awards.core.application.port.in.UpdateMovieUseCase;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +53,7 @@ public class MovieController {
      * Constructor for dependency injection.
      *
      * @param createMovieUseCase Use case for creating movies
-     * @param getMovieUseCase Use case for getting movies
+     * @param getMovieUseCase    Use case for getting movies
      * @param updateMovieUseCase Use case for updating movies
      * @param deleteMovieUseCase Use case for deleting movies
      */
@@ -60,7 +62,7 @@ public class MovieController {
             GetMovieUseCase getMovieUseCase,
             UpdateMovieUseCase updateMovieUseCase,
             DeleteMovieUseCase deleteMovieUseCase) {
-        
+
         this.createMovieUseCase = Objects.requireNonNull(createMovieUseCase, "CreateMovieUseCase cannot be null");
         this.getMovieUseCase = Objects.requireNonNull(getMovieUseCase, "GetMovieUseCase cannot be null");
         this.updateMovieUseCase = Objects.requireNonNull(updateMovieUseCase, "UpdateMovieUseCase cannot be null");
@@ -83,12 +85,13 @@ public class MovieController {
      * }
      * </pre>
      *
-     * @param createDTO Request DTO with movie data
+     * @param createDTO Request DTO with movie data (validated with @Valid and Jakarta Validation)
      * @return ResponseEntity with created MovieDTO (201 Created)
      * @apiNote Status Code: 201 Created (success) or 400 Bad Request (via exception handler)
      */
     @PostMapping
-    public ResponseEntity<MovieDTO> createMovie(@RequestBody CreateMovieDTO createDTO) {
+    public ResponseEntity<MovieDTO> createMovie(@RequestBody @Valid CreateMovieDTO createDTO) {
+        Objects.requireNonNull(createDTO, "Request body cannot be null");
         var movieWithId = createMovieUseCase.execute(
                 createDTO.year(),
                 createDTO.title(),
@@ -110,12 +113,12 @@ public class MovieController {
      *
      * <p>Endpoint: GET /api/movies/{id}
      *
-     * @param id Movie ID (path variable)
+     * @param id Movie ID (path variable, must be >= 1)
      * @return ResponseEntity with MovieDTO (200 OK)
-     * @apiNote Status Code: 200 OK (success) or 404 Not Found (via exception handler)
+     * @apiNote Status Code: 200 OK (success) or 400 Bad Request (invalid ID), 404 Not Found (via exception handler)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<MovieDTO> getMovie(@PathVariable Long id) {
+    public ResponseEntity<MovieDTO> getMovie(@PathVariable @Min(value = 1, message = "Path variable 'id' must be a positive integer (>= 1)") Long id) {
         var movieWithId = getMovieUseCase.execute(id);
         var movieDTO = MovieDTOMapper.toDTO(movieWithId)
                 .orElseThrow(() -> new IllegalStateException(
@@ -140,13 +143,16 @@ public class MovieController {
      * }
      * </pre>
      *
-     * @param id Movie ID (path variable)
-     * @param updateDTO Request DTO with updated movie data
+     * @param id Movie ID (path variable, must be >= 1)
+     * @param updateDTO Request DTO with updated movie data (validated with @Valid and Jakarta Validation)
      * @return ResponseEntity with updated MovieDTO (200 OK)
      * @apiNote Status Code: 200 OK (success) or 400 Bad Request, 404 Not Found (via exception handler)
      */
     @PutMapping("/{id}")
-    public ResponseEntity<MovieDTO> updateMovie(@PathVariable Long id, @RequestBody UpdateMovieDTO updateDTO) {
+    public ResponseEntity<MovieDTO> updateMovie(
+            @PathVariable @Min(value = 1, message = "Path variable 'id' must be a positive integer (>= 1)") Long id,
+            @RequestBody @Valid UpdateMovieDTO updateDTO) {
+        Objects.requireNonNull(updateDTO, "Request body cannot be null");
         var movieWithId = updateMovieUseCase.execute(
                 id,
                 updateDTO.year(),
@@ -169,12 +175,12 @@ public class MovieController {
      *
      * <p>Endpoint: DELETE /api/movies/{id}
      *
-     * @param id Movie ID (path variable)
+     * @param id Movie ID (path variable, must be >= 1)
      * @return ResponseEntity with no content (204 No Content)
-     * @apiNote Status Code: 204 No Content (success) or 404 Not Found (via exception handler)
+     * @apiNote Status Code: 204 No Content (success) or 400 Bad Request (invalid ID), 404 Not Found (via exception handler)
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteMovie(@PathVariable @Min(value = 1, message = "Path variable 'id' must be a positive integer (>= 1)") Long id) {
         deleteMovieUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
