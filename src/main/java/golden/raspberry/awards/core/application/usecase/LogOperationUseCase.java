@@ -14,7 +14,7 @@ import java.util.UUID;
  *
  * <p>Uses Java 21 features: var, String Templates, Objects.requireNonNull.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 public class LogOperationUseCase {

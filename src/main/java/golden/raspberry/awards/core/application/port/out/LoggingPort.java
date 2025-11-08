@@ -9,7 +9,7 @@ package golden.raspberry.awards.core.application.port.out;
  *
  * <p>Uses Java 21 features: clean interfaces, Records for data transfer.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 public interface LoggingPort {

@@ -21,7 +21,7 @@ import java.util.Objects;
  * @param interval     Interval in years between consecutive wins (non-null, non-negative)
  * @param previousWin  Year of the previous win (non-null)
  * @param followingWin Year of the following win (non-null, must be greater than previousWin)
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 public record ProducerInterval(

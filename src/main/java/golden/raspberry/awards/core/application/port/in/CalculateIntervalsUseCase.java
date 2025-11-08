@@ -12,7 +12,7 @@ import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
  *
  * <p>Uses Java 21 features: clean interfaces, Records for responses.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 public interface CalculateIntervalsUseCase {

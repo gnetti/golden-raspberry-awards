@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
  *   <li>Method references for cleaner code</li>
  * </ul>
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 @Component

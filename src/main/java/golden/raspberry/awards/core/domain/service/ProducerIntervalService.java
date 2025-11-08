@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  *
  * <p>Uses Java 21 features: Records, Pattern Matching, Streams.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 public record ProducerIntervalService(MovieRepositoryPort repository) {

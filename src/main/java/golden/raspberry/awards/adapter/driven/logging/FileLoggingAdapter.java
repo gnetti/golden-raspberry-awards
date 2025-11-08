@@ -26,7 +26,7 @@ import java.util.Objects;
  *
  * <p>Uses Java 21 features: Records, var, String Templates, Text Blocks.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 @Component

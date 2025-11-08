@@ -21,7 +21,7 @@ import java.util.Objects;
  *
  * <p>Uses Java 21 features: var, Pattern Matching (future enhancement).
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 @Aspect

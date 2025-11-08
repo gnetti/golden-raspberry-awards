@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * <p>Methods annotated with @Loggable will be intercepted by LoggingAspect
  * and logged automatically using the custom logging service.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 @Target(ElementType.METHOD)

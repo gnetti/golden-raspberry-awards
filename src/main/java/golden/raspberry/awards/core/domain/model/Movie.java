@@ -9,7 +9,7 @@ import java.util.Objects;
  * Pure Java Record (Java 21) - no Spring dependencies.
  * Uses Java 21 features: Records, String Templates for toString.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
 public record Movie(Integer year, String title, String studios, String producers, Boolean winner) {
