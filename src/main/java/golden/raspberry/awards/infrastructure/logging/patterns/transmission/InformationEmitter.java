@@ -1,26 +1,41 @@
 package golden.raspberry.awards.infrastructure.logging.patterns.transmission;
 
+import golden.raspberry.awards.core.application.port.out.InformationEmissionPort;
+import org.springframework.stereotype.Component;
+
+import java.util.Objects;
+
 /**
- * Transmission Pattern - InformationEmitter.
- * Emits information reactively to various targets for logging purposes.
+ * Output Adapter for emitting information reactively to various targets.
+ * Implements InformationEmissionPort following hexagonal architecture principles.
  *
- * <p>Part of the 5 orchestration patterns selected for Golden Raspberry Awards project.
+ * <p>This adapter is part of the 5 orchestration patterns selected for Golden Raspberry Awards project.
  * Focused on emitting logs with sessionId and correlation for CREATE, UPDATE, DELETE operations.
+ *
+ * <p><strong>Hexagonal Architecture:</strong>
+ * <ul>
+ *   <li>Implements Port defined by Application layer</li>
+ *   <li>Handles information emission (Infrastructure concern)</li>
+ *   <li>No business logic - pure adapter</li>
+ * </ul>
  *
  * <p>Uses Java 21 features elegantly and robustly.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
-public final class InformationEmitter {
+@Component
+public class InformationEmitterAdapter implements InformationEmissionPort {
     
     /**
      * Emits information to targets.
      *
      * @param information Information to emit
      */
+    @Override
     public void emit(Object information) {
-        //todo Implementation for information emission pattern
+        Objects.requireNonNull(information, "Information cannot be null");
+        // TODO: Implementation for information emission pattern
     }
     
     /**
@@ -29,8 +44,11 @@ public final class InformationEmitter {
      * @param information Information to emit
      * @param correlationId Correlation identifier
      */
+    @Override
     public void withCorrelation(Object information, String correlationId) {
-        //todo Implementation for correlated emission
+        Objects.requireNonNull(information, "Information cannot be null");
+        Objects.requireNonNull(correlationId, "CorrelationId cannot be null");
+        // TODO: Implementation for correlated emission
     }
     
     /**
@@ -39,8 +57,11 @@ public final class InformationEmitter {
      * @param information Information to emit
      * @param sessionId Session identifier
      */
+    @Override
     public void withSession(Object information, String sessionId) {
-        //todo Implementation for session-based emission
+        Objects.requireNonNull(information, "Information cannot be null");
+        Objects.requireNonNull(sessionId, "SessionId cannot be null");
+        // TODO: Implementation for session-based emission
     }
 }
 

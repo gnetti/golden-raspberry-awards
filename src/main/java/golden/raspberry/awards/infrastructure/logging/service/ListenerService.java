@@ -1,10 +1,13 @@
 package golden.raspberry.awards.infrastructure.logging.service;
 
-import golden.raspberry.awards.infrastructure.logging.patterns.monitoring.ProcessObserver;
-import golden.raspberry.awards.infrastructure.logging.patterns.observation.ChangeDetector;
-import golden.raspberry.awards.infrastructure.logging.patterns.recording.DataArchivist;
-import golden.raspberry.awards.infrastructure.logging.patterns.recording.ResultRecorder;
-import golden.raspberry.awards.infrastructure.logging.patterns.transmission.InformationEmitter;
+import golden.raspberry.awards.core.application.port.out.ChangeDetectionPort;
+import golden.raspberry.awards.core.application.port.out.DataArchivingPort;
+import golden.raspberry.awards.core.application.port.out.InformationEmissionPort;
+import golden.raspberry.awards.core.application.port.out.ProcessObservationPort;
+import golden.raspberry.awards.core.application.port.out.ResultRecordingPort;
+import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * Main logging service based on LISTENER_ORCHESTRATION_PATTERNS.md.
@@ -12,13 +15,21 @@ import golden.raspberry.awards.infrastructure.logging.patterns.transmission.Info
  *
  * <p><strong>Important:</strong> Custom service - NO external logging dependencies.
  *
+ * <p><strong>Hexagonal Architecture:</strong>
+ * <ul>
+ *   <li>Service in Infrastructure layer</li>
+ *   <li>Uses Ports defined by Application layer (dependency inversion)</li>
+ *   <li>Adapters implement Ports and are injected via Spring</li>
+ *   <li>No direct access to Adapters - only through Ports</li>
+ * </ul>
+ *
  * <p><strong>Selected Patterns (5 total):</strong>
  * <ul>
- *   <li><strong>ResultRecorder</strong> - Records results and outcomes of operations</li>
- *   <li><strong>DataArchivist</strong> - Archives data and maintains historical records</li>
- *   <li><strong>ChangeDetector</strong> - Detects changes and variations (for UPDATE operations)</li>
- *   <li><strong>ProcessObserver</strong> - Observes process execution and state changes</li>
- *   <li><strong>InformationEmitter</strong> - Emits information reactively with session correlation</li>
+ *   <li><strong>ResultRecordingPort</strong> - Records results and outcomes of operations</li>
+ *   <li><strong>DataArchivingPort</strong> - Archives data and maintains historical records</li>
+ *   <li><strong>ChangeDetectionPort</strong> - Detects changes and variations (for UPDATE operations)</li>
+ *   <li><strong>ProcessObservationPort</strong> - Observes process execution and state changes</li>
+ *   <li><strong>InformationEmissionPort</strong> - Emits information reactively with session correlation</li>
  * </ul>
  *
  * <p>These 5 patterns cover all needs for logging CREATE, UPDATE, DELETE operations
@@ -26,47 +37,84 @@ import golden.raspberry.awards.infrastructure.logging.patterns.transmission.Info
  *
  * <p>Uses Java 21 features: Records, Pattern Matching, clean code.
  *
- * @author Golden Raspberry Awards Team
+ * @author Luiz Generoso
  * @since 1.0.0
  */
-public final class ListenerService {
+@Service
+public class ListenerService {
+
+    private final ResultRecordingPort resultRecordingPort;
+    private final DataArchivingPort dataArchivingPort;
+    private final ChangeDetectionPort changeDetectionPort;
+    private final ProcessObservationPort processObservationPort;
+    private final InformationEmissionPort informationEmissionPort;
 
     /**
-     * Records results and outcomes of operations.
-     * Used for logging CREATE, UPDATE, DELETE operation results.
+     * Constructor for dependency injection.
+     * All Ports are automatically injected by Spring.
+     *
+     * @param resultRecordingPort Port for recording results
+     * @param dataArchivingPort Port for archiving data
+     * @param changeDetectionPort Port for detecting changes
+     * @param processObservationPort Port for observing processes
+     * @param informationEmissionPort Port for emitting information
      */
-    public static final ResultRecorder resultRecorder = new ResultRecorder();
+    public ListenerService(
+            ResultRecordingPort resultRecordingPort,
+            DataArchivingPort dataArchivingPort,
+            ChangeDetectionPort changeDetectionPort,
+            ProcessObservationPort processObservationPort,
+            InformationEmissionPort informationEmissionPort) {
+        this.resultRecordingPort = Objects.requireNonNull(resultRecordingPort, "ResultRecordingPort cannot be null");
+        this.dataArchivingPort = Objects.requireNonNull(dataArchivingPort, "DataArchivingPort cannot be null");
+        this.changeDetectionPort = Objects.requireNonNull(changeDetectionPort, "ChangeDetectionPort cannot be null");
+        this.processObservationPort = Objects.requireNonNull(processObservationPort, "ProcessObservationPort cannot be null");
+        this.informationEmissionPort = Objects.requireNonNull(informationEmissionPort, "InformationEmissionPort cannot be null");
+    }
 
     /**
-     * Archives data and maintains historical records.
-     * Used for storing before/after data in UPDATE and DELETE operations.
+     * Gets the result recording port.
+     *
+     * @return ResultRecordingPort
      */
-    public static final DataArchivist dataArchivist = new DataArchivist();
+    public ResultRecordingPort getResultRecordingPort() {
+        return resultRecordingPort;
+    }
 
     /**
-     * Detects changes and variations.
-     * Used for detecting changes between before/after states in UPDATE operations.
+     * Gets the data archiving port.
+     *
+     * @return DataArchivingPort
      */
-    public static final ChangeDetector changeDetector = new ChangeDetector();
+    public DataArchivingPort getDataArchivingPort() {
+        return dataArchivingPort;
+    }
 
     /**
-     * Observes process execution and state changes.
-     * Used for monitoring the flow of CREATE, UPDATE, DELETE operations.
+     * Gets the change detection port.
+     *
+     * @return ChangeDetectionPort
      */
-    public static final ProcessObserver processObserver = new ProcessObserver();
+    public ChangeDetectionPort getChangeDetectionPort() {
+        return changeDetectionPort;
+    }
 
     /**
-     * Emits information reactively to various targets.
-     * Used for emitting logs with sessionId and correlation.
+     * Gets the process observation port.
+     *
+     * @return ProcessObservationPort
      */
-    public static final InformationEmitter informationEmitter = new InformationEmitter();
+    public ProcessObservationPort getProcessObservationPort() {
+        return processObservationPort;
+    }
 
     /**
-     * Private constructor to prevent instantiation.
-     * This is a utility class providing static access to orchestration patterns.
+     * Gets the information emission port.
+     *
+     * @return InformationEmissionPort
      */
-    private ListenerService() {
-        throw new UnsupportedOperationException("ListenerService is a utility class and cannot be instantiated");
+    public InformationEmissionPort getInformationEmissionPort() {
+        return informationEmissionPort;
     }
 }
 
