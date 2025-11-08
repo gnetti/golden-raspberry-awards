@@ -1,6 +1,7 @@
 package golden.raspberry.awards.adapter.driving.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.*;
 
 import static golden.raspberry.awards.adapter.driving.rest.dto.MovieDTOValidator.ValidationResult;
 import static golden.raspberry.awards.adapter.driving.rest.dto.MovieDTOValidator.validateAll;
@@ -27,18 +28,30 @@ import static golden.raspberry.awards.adapter.driving.rest.dto.MovieDTOValidator
  */
 public record UpdateMovieDTO(
         @JsonProperty("year")
+        @NotNull(message = "Field 'year' is required and cannot be null")
+        @Min(value = 1900, message = "Field 'year' must be at least 1900")
         Integer year,
 
         @JsonProperty("title")
+        @NotNull(message = "Field 'title' is required and cannot be null")
+        @NotBlank(message = "Field 'title' cannot be empty or contain only whitespace")
+        @Size(min = 2, max = 255, message = "Field 'title' must be between 2 and 255 characters")
         String title,
 
         @JsonProperty("studios")
+        @NotNull(message = "Field 'studios' is required and cannot be null")
+        @NotBlank(message = "Field 'studios' cannot be empty or contain only whitespace")
+        @Size(min = 2, max = 255, message = "Field 'studios' must be between 2 and 255 characters")
         String studios,
 
         @JsonProperty("producers")
+        @NotNull(message = "Field 'producers' is required and cannot be null")
+        @NotBlank(message = "Field 'producers' cannot be empty or contain only whitespace")
+        @Size(min = 2, max = 255, message = "Field 'producers' must be between 2 and 255 characters")
         String producers,
 
         @JsonProperty("winner")
+        @NotNull(message = "Field 'winner' is required and cannot be null")
         Boolean winner
 ) {
     /**
