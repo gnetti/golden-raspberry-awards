@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 @Component
 public class ProcessObserverAdapter implements ProcessObservationPort {
-    
+
     /**
      * Observes a process execution.
      *
@@ -35,9 +35,8 @@ public class ProcessObserverAdapter implements ProcessObservationPort {
     @Override
     public void observe(Object process) {
         Objects.requireNonNull(process, "Process cannot be null");
-        // TODO: Implementation for process observation pattern
     }
-    
+
     /**
      * Watches process state changes.
      *
@@ -46,9 +45,8 @@ public class ProcessObserverAdapter implements ProcessObservationPort {
     @Override
     public void watch(Object process) {
         Objects.requireNonNull(process, "Process cannot be null");
-        // TODO: Implementation for process observation pattern
     }
-    
+
     /**
      * Monitors process execution.
      *
@@ -57,7 +55,5 @@ public class ProcessObserverAdapter implements ProcessObservationPort {
     @Override
     public void monitor(Object process) {
         Objects.requireNonNull(process, "Process cannot be null");
-        // TODO: Implementation for process observation pattern
     }
 }
-

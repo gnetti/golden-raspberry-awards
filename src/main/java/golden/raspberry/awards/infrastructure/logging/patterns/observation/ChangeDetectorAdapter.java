@@ -26,22 +26,21 @@ import java.util.Objects;
  */
 @Component
 public class ChangeDetectorAdapter implements ChangeDetectionPort {
-    
+
     /**
      * Detects changes between two states.
      *
      * @param before State before change
-     * @param after State after change
+     * @param after  State after change
      * @return Detected changes
      */
     @Override
     public Object detect(Object before, Object after) {
         Objects.requireNonNull(before, "Before state cannot be null");
         Objects.requireNonNull(after, "After state cannot be null");
-        // TODO: Implementation for change detection pattern
         return null;
     }
-    
+
     /**
      * Identifies variations in data.
      *
@@ -51,10 +50,9 @@ public class ChangeDetectorAdapter implements ChangeDetectionPort {
     @Override
     public Object identify(Object data) {
         Objects.requireNonNull(data, "Data cannot be null");
-        // TODO: Implementation for change detection pattern
         return null;
     }
-    
+
     /**
      * Monitors changes over time.
      *
@@ -63,7 +61,5 @@ public class ChangeDetectorAdapter implements ChangeDetectionPort {
     @Override
     public void monitor(Object data) {
         Objects.requireNonNull(data, "Data cannot be null");
-        // TODO: Implementation for change detection pattern
     }
 }
-

@@ -43,6 +43,7 @@ import java.util.Objects;
 @Service
 public class ListenerService {
 
+   //todo These methods will be implemented in the near future.
     private final ResultRecordingPort resultRecordingPort;
     private final DataArchivingPort dataArchivingPort;
     private final ChangeDetectionPort changeDetectionPort;
@@ -72,49 +73,5 @@ public class ListenerService {
         this.informationEmissionPort = Objects.requireNonNull(informationEmissionPort, "InformationEmissionPort cannot be null");
     }
 
-    /**
-     * Gets the result recording port.
-     *
-     * @return ResultRecordingPort
-     */
-    public ResultRecordingPort getResultRecordingPort() {
-        return resultRecordingPort;
-    }
-
-    /**
-     * Gets the data archiving port.
-     *
-     * @return DataArchivingPort
-     */
-    public DataArchivingPort getDataArchivingPort() {
-        return dataArchivingPort;
-    }
-
-    /**
-     * Gets the change detection port.
-     *
-     * @return ChangeDetectionPort
-     */
-    public ChangeDetectionPort getChangeDetectionPort() {
-        return changeDetectionPort;
-    }
-
-    /**
-     * Gets the process observation port.
-     *
-     * @return ProcessObservationPort
-     */
-    public ProcessObservationPort getProcessObservationPort() {
-        return processObservationPort;
-    }
-
-    /**
-     * Gets the information emission port.
-     *
-     * @return InformationEmissionPort
-     */
-    public InformationEmissionPort getInformationEmissionPort() {
-        return informationEmissionPort;
-    }
 }
 

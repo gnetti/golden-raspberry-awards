@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 @Component
 public class DataArchivistAdapter implements DataArchivingPort {
-    
+
     /**
      * Archives data for historical record keeping.
      *
@@ -35,9 +35,8 @@ public class DataArchivistAdapter implements DataArchivingPort {
     @Override
     public void archive(Object data) {
         Objects.requireNonNull(data, "Data cannot be null");
-        // TODO: Implementation for data archiving pattern
     }
-    
+
     /**
      * Stores data for persistence.
      *
@@ -46,9 +45,8 @@ public class DataArchivistAdapter implements DataArchivingPort {
     @Override
     public void store(Object data) {
         Objects.requireNonNull(data, "Data cannot be null");
-        // TODO: Implementation for storing data
     }
-    
+
     /**
      * Preserves data for long-term storage.
      *
@@ -57,7 +55,5 @@ public class DataArchivistAdapter implements DataArchivingPort {
     @Override
     public void preserve(Object data) {
         Objects.requireNonNull(data, "Data cannot be null");
-        // TODO: Implementation for preserving data
     }
 }
-

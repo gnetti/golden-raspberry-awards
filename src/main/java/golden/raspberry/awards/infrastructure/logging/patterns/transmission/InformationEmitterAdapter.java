@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 @Component
 public class InformationEmitterAdapter implements InformationEmissionPort {
-    
+
     /**
      * Emits information to targets.
      *
@@ -35,33 +35,29 @@ public class InformationEmitterAdapter implements InformationEmissionPort {
     @Override
     public void emit(Object information) {
         Objects.requireNonNull(information, "Information cannot be null");
-        // TODO: Implementation for information emission pattern
     }
-    
+
     /**
      * Emits information with correlation ID.
      *
-     * @param information Information to emit
+     * @param information   Information to emit
      * @param correlationId Correlation identifier
      */
     @Override
     public void withCorrelation(Object information, String correlationId) {
         Objects.requireNonNull(information, "Information cannot be null");
         Objects.requireNonNull(correlationId, "CorrelationId cannot be null");
-        // TODO: Implementation for correlated emission
     }
-    
+
     /**
      * Emits information with session ID.
      *
      * @param information Information to emit
-     * @param sessionId Session identifier
+     * @param sessionId   Session identifier
      */
     @Override
     public void withSession(Object information, String sessionId) {
         Objects.requireNonNull(information, "Information cannot be null");
         Objects.requireNonNull(sessionId, "SessionId cannot be null");
-        // TODO: Implementation for session-based emission
     }
 }
-

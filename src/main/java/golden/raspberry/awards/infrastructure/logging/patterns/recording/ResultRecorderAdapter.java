@@ -17,7 +17,11 @@ import java.util.Objects;
  *   <li>Implements Port defined by Application layer</li>
  *   <li>Handles result recording (Infrastructure concern)</li>
  *   <li>No business logic - pure adapter</li>
+ *   <li>Will use LogOperationUseCase when implementation is added</li>
  * </ul>
+ *
+ * <p><strong>Note:</strong> Implementation will be added when specific result recording logic is needed.
+ * Currently, logging is handled automatically by LoggingAspect.
  *
  * <p>Uses Java 21 features elegantly and robustly.
  *
@@ -26,7 +30,14 @@ import java.util.Objects;
  */
 @Component
 public class ResultRecorderAdapter implements ResultRecordingPort {
-    
+
+    /**
+     * Default constructor.
+     * LogOperationUseCase will be injected when implementation is added.
+     */
+    public ResultRecorderAdapter() {
+    }
+
     /**
      * Records a result for logging.
      *
@@ -35,22 +46,20 @@ public class ResultRecorderAdapter implements ResultRecordingPort {
     @Override
     public void record(Object result) {
         Objects.requireNonNull(result, "Result cannot be null");
-        // TODO: Implementation for result recording pattern
     }
-    
+
     /**
      * Logs an operation result.
      *
      * @param operation Operation name
-     * @param result Result to log
+     * @param result    Result to log
      */
     @Override
     public void log(String operation, Object result) {
         Objects.requireNonNull(operation, "Operation cannot be null");
         Objects.requireNonNull(result, "Result cannot be null");
-        // TODO: Implementation for logging operation results
     }
-    
+
     /**
      * Stores a result for persistence.
      *
@@ -59,7 +68,5 @@ public class ResultRecorderAdapter implements ResultRecordingPort {
     @Override
     public void store(Object result) {
         Objects.requireNonNull(result, "Result cannot be null");
-        // TODO: Implementation for storing results
     }
 }
-
