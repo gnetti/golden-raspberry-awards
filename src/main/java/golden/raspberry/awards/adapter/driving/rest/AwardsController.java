@@ -1,0 +1,129 @@
+package golden.raspberry.awards.adapter.driving.rest;
+
+import golden.raspberry.awards.adapter.driving.rest.dto.ProducerIntervalDTO;
+import golden.raspberry.awards.adapter.driving.rest.dto.ProducerIntervalResponseDTO;
+import golden.raspberry.awards.core.application.port.in.CalculateIntervalsUseCase;
+import golden.raspberry.awards.core.domain.model.ProducerInterval;
+import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * REST Controller for Golden Raspberry Awards.
+ *
+ * <p>Implements Richardson Maturity Level 2:
+ * <ul>
+ *   <li><strong>Resources:</strong> /api/movies/producers/intervals</li>
+ *   <li><strong>HTTP Verbs:</strong> GET</li>
+ *   <li><strong>Status Codes:</strong> 200 OK, 400 Bad Request, 500 Internal Server Error</li>
+ *   <li><strong>Structured Error Messages:</strong> via ApiExceptionHandler</li>
+ * </ul>
+ *
+ * <p><strong>Hexagonal Architecture:</strong>
+ * <ul>
+ *   <li>Input Adapter (Primary) - receives HTTP requests</li>
+ *   <li>Calls Use Case (Application layer)</li>
+ *   <li>Converts Domain models to DTOs</li>
+ *   <li>Returns JSON responses</li>
+ * </ul>
+ *
+ * <p>Uses Java 21 features: Records, Streams, Method References.
+ *
+ * @author Luiz Generoso
+ * @since 1.0.0
+ */
+@RestController
+@RequestMapping("/api/movies")
+public class AwardsController {
+
+    private final CalculateIntervalsUseCase calculateIntervalsUseCase;
+
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param calculateIntervalsUseCase Use case for calculating intervals
+     */
+    public AwardsController(CalculateIntervalsUseCase calculateIntervalsUseCase) {
+        this.calculateIntervalsUseCase = Objects.requireNonNull(
+                calculateIntervalsUseCase,
+                "CalculateIntervalsUseCase cannot be null"
+        );
+    }
+
+    /**
+     * Gets producer intervals (minimum and maximum).
+     *
+     * <p>Endpoint: GET /api/movies/producers/intervals
+     *
+     * <p>Response format (Richardson Level 2):
+     * <pre>
+     * {
+     *   "min": [
+     *     {
+     *       "producer": "Producer 1",
+     *       "interval": 1,
+     *       "previousWin": 2008,
+     *       "followingWin": 2009
+     *     }
+     *   ],
+     *   "max": [
+     *     {
+     *       "producer": "Producer 2",
+     *       "interval": 99,
+     *       "previousWin": 1900,
+     *       "followingWin": 1999
+     *     }
+     *   ]
+     * }
+     * </pre>
+     *
+     * @return ResponseEntity with ProducerIntervalResponseDTO
+     * @apiNote Status Code: 200 OK (success) or 500 Internal Server Error (via exception handler)
+     */
+    @GetMapping("/producers/intervals")
+    public ResponseEntity<ProducerIntervalResponseDTO> getIntervals() {
+        ProducerIntervalResponse response = calculateIntervalsUseCase.execute();
+        ProducerIntervalResponseDTO dto = toDTO(response);
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Converts Domain model (ProducerIntervalResponse) to DTO.
+     *
+     * @param response Domain model response
+     * @return DTO response
+     */
+    private ProducerIntervalResponseDTO toDTO(ProducerIntervalResponse response) {
+        List<ProducerIntervalDTO> minDTOs = response.min().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+
+        List<ProducerIntervalDTO> maxDTOs = response.max().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+
+        return new ProducerIntervalResponseDTO(minDTOs, maxDTOs);
+    }
+
+    /**
+     * Converts Domain model (ProducerInterval) to DTO.
+     *
+     * @param interval Domain model interval
+     * @return DTO interval
+     */
+    private ProducerIntervalDTO toDTO(ProducerInterval interval) {
+        return new ProducerIntervalDTO(
+                interval.producer(),
+                interval.interval(),
+                interval.previousWin(),
+                interval.followingWin()
+        );
+    }
+}
+
