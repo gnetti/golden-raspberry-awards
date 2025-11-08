@@ -1,9 +1,18 @@
 package golden.raspberry.awards.infrastructure.config;
 
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsUseCase;
+import golden.raspberry.awards.core.application.port.in.CreateMovieUseCase;
+import golden.raspberry.awards.core.application.port.in.DeleteMovieUseCase;
+import golden.raspberry.awards.core.application.port.in.GetMovieUseCase;
+import golden.raspberry.awards.core.application.port.in.UpdateMovieUseCase;
+import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
 import golden.raspberry.awards.core.application.port.out.LoggingPort;
 import golden.raspberry.awards.core.application.usecase.CalculateIntervalsUseCaseImpl;
+import golden.raspberry.awards.core.application.usecase.CreateMovieUseCaseImpl;
+import golden.raspberry.awards.core.application.usecase.DeleteMovieUseCaseImpl;
+import golden.raspberry.awards.core.application.usecase.GetMovieUseCaseImpl;
 import golden.raspberry.awards.core.application.usecase.LogOperationUseCase;
+import golden.raspberry.awards.core.application.usecase.UpdateMovieUseCaseImpl;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 import golden.raspberry.awards.core.domain.service.ProducerIntervalService;
 import org.springframework.context.annotation.Bean;
@@ -109,6 +118,66 @@ public class HexagonalConfig {
     public LogOperationUseCase logOperationUseCase(LoggingPort loggingPort) {
         Objects.requireNonNull(loggingPort, "LoggingPort cannot be null");
         return new LogOperationUseCase(loggingPort);
+    }
+
+    /**
+     * Creates a bean for the CreateMovieUseCase.
+     *
+     * @param repository        Movie repository port (automatically injected by Spring)
+     * @param getMovieWithIdPort Port for getting movie with ID (automatically injected by Spring)
+     * @return CreateMovieUseCase bean
+     */
+    @Bean
+    public CreateMovieUseCase createMovieUseCase(
+            MovieRepositoryPort repository,
+            GetMovieWithIdPort getMovieWithIdPort) {
+        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
+        Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
+        return new CreateMovieUseCaseImpl(repository, getMovieWithIdPort);
+    }
+
+    /**
+     * Creates a bean for the GetMovieUseCase.
+     *
+     * @param repository        Movie repository port (automatically injected by Spring)
+     * @param getMovieWithIdPort Port for getting movie with ID (automatically injected by Spring)
+     * @return GetMovieUseCase bean
+     */
+    @Bean
+    public GetMovieUseCase getMovieUseCase(
+            MovieRepositoryPort repository,
+            GetMovieWithIdPort getMovieWithIdPort) {
+        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
+        Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
+        return new GetMovieUseCaseImpl(repository, getMovieWithIdPort);
+    }
+
+    /**
+     * Creates a bean for the UpdateMovieUseCase.
+     *
+     * @param repository        Movie repository port (automatically injected by Spring)
+     * @param getMovieWithIdPort Port for getting movie with ID (automatically injected by Spring)
+     * @return UpdateMovieUseCase bean
+     */
+    @Bean
+    public UpdateMovieUseCase updateMovieUseCase(
+            MovieRepositoryPort repository,
+            GetMovieWithIdPort getMovieWithIdPort) {
+        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
+        Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
+        return new UpdateMovieUseCaseImpl(repository, getMovieWithIdPort);
+    }
+
+    /**
+     * Creates a bean for the DeleteMovieUseCase.
+     *
+     * @param repository Movie repository port (automatically injected by Spring)
+     * @return DeleteMovieUseCase bean
+     */
+    @Bean
+    public DeleteMovieUseCase deleteMovieUseCase(MovieRepositoryPort repository) {
+        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
+        return new DeleteMovieUseCaseImpl(repository);
     }
 }
 
