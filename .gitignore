@@ -72,5 +72,9 @@ application-dev.properties
 
 # Documentation
 /docs
+
+# Log directories
+log/
+**/log/
 /src/main/resources/log/
 
