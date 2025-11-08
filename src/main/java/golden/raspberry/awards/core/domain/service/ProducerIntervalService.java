@@ -81,9 +81,10 @@ public record ProducerIntervalService(MovieRepositoryPort repository) {
     /**
      * Groups winning movies by producer.
      * Handles multiple producers per movie (comma and "and" separated).
+     * Removes duplicate years for the same producer (when a producer wins multiple times in the same year).
      *
      * @param winningMovies List of winning movies
-     * @return Map of producer names to their winning years
+     * @return Map of producer names to their unique winning years (sorted)
      */
     private Map<String, List<Integer>> groupWinsByProducer(List<Movie> winningMovies) {
         Map<String, List<Integer>> producerWins = new HashMap<>();
@@ -98,7 +99,8 @@ public record ProducerIntervalService(MovieRepositoryPort repository) {
         }
 
         producerWins.replaceAll((producer, years) -> {
-            List<Integer> sortedYears = new ArrayList<>(years);
+            var uniqueYears = new LinkedHashSet<>(years);
+            var sortedYears = new ArrayList<>(uniqueYears);
             Collections.sort(sortedYears);
             return sortedYears;
         });
