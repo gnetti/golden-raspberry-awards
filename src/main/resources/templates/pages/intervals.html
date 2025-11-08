@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}" lang="en-us">
 <head>
-    <title>Intervalos de Produtores - Golden Raspberry Awards</title>
+    <title>Producer Intervals - Golden Raspberry Awards</title>
 </head>
 <body>
     <div layout:fragment="content">
@@ -11,44 +11,44 @@
             <div class="col-md-12">
                 <h1>
                     <i class="fa-solid fa-chart-line text-primary"></i>
-                    Intervalos de Produtores
+                    Producer Intervals
                 </h1>
                 <p class="text-muted">
-                    Produtores com menor e maior intervalo entre prêmios consecutivos
+                    Producers with shortest and longest intervals between consecutive awards
                 </p>
             </div>
         </div>
 
         <div class="row">
-            <!-- Menor Intervalo -->
+            <!-- Shortest Interval -->
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">
                             <i class="fa-solid fa-arrow-down"></i>
-                            Menor Intervalo
+                            Shortest Interval
                         </h5>
                     </div>
                     <div class="card-body">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Produtor</th>
-                                    <th>Intervalo</th>
-                                    <th>Ano Anterior</th>
-                                    <th>Ano Seguinte</th>
+                                    <th>Producer</th>
+                                    <th>Interval</th>
+                                    <th>Previous Year</th>
+                                    <th>Following Year</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:if="${intervals.min.isEmpty()}">
                                     <td colspan="4" class="text-center text-muted">
-                                        Nenhum intervalo mínimo encontrado
+                                        No minimum interval found
                                     </td>
                                 </tr>
                                 <tr th:each="interval : ${intervals.min}">
                                     <td th:text="${interval.producer}"></td>
                                     <td>
-                                        <span class="badge bg-success badge-interval" th:text="${interval.interval} + ' anos'"></span>
+                                        <span class="badge bg-success badge-interval" th:text="${interval.interval} + ' years'"></span>
                                     </td>
                                     <td th:text="${interval.previousWin}"></td>
                                     <td th:text="${interval.followingWin}"></td>
@@ -59,35 +59,35 @@
                 </div>
             </div>
 
-            <!-- Maior Intervalo -->
+            <!-- Longest Interval -->
             <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-header bg-warning text-dark">
                         <h5 class="mb-0">
                             <i class="fa-solid fa-arrow-up"></i>
-                            Maior Intervalo
+                            Longest Interval
                         </h5>
                     </div>
                     <div class="card-body">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Produtor</th>
-                                    <th>Intervalo</th>
-                                    <th>Ano Anterior</th>
-                                    <th>Ano Seguinte</th>
+                                    <th>Producer</th>
+                                    <th>Interval</th>
+                                    <th>Previous Year</th>
+                                    <th>Following Year</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:if="${intervals.max.isEmpty()}">
                                     <td colspan="4" class="text-center text-muted">
-                                        Nenhum intervalo máximo encontrado
+                                        No maximum interval found
                                     </td>
                                 </tr>
                                 <tr th:each="interval : ${intervals.max}">
                                     <td th:text="${interval.producer}"></td>
                                     <td>
-                                        <span class="badge bg-warning text-dark badge-interval" th:text="${interval.interval} + ' anos'"></span>
+                                        <span class="badge bg-warning text-dark badge-interval" th:text="${interval.interval} + ' years'"></span>
                                     </td>
                                     <td th:text="${interval.previousWin}"></td>
                                     <td th:text="${interval.followingWin}"></td>
