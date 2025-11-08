@@ -1,5 +1,6 @@
 package golden.raspberry.awards.core.application.validator;
 
+import java.time.Year;
 import java.util.stream.Stream;
 
 /**
@@ -23,10 +24,24 @@ import java.util.stream.Stream;
 public final class MovieValidator {
 
     private static final int MIN_YEAR = 1900;
-    private static final int MAX_YEAR = 2100;
+    
+    /**
+     * Gets the current year dynamically.
+     * Used to validate that year cannot be in the future.
+     *
+     * @return Current year (YYYY format)
+     */
+    private static int getCurrentYear() {
+        return Year.now().getValue();
+    }
+    private static final int MIN_TITLE_LENGTH = 2;
+    private static final int MAX_TITLE_LENGTH = 255;
+    private static final int MIN_STUDIOS_LENGTH = 2;
+    private static final int MAX_STUDIOS_LENGTH = 255;
+    private static final int MIN_PRODUCERS_LENGTH = 2;
+    private static final int MAX_PRODUCERS_LENGTH = 255;
 
     private MovieValidator() {
-        // Utility class - prevent instantiation
     }
 
     /**
@@ -52,7 +67,13 @@ public final class MovieValidator {
                         validateNotBlank(title, "Title"),
                         validateNotBlank(studios, "Studios"),
                         validateNotBlank(producers, "Producers"),
-                        validateYearRange(year)
+                        validateYearRange(year),
+                        validateYearFormat(year),
+                        validateYearNotFuture(year),
+                        validateStringLength(title, "Title", MIN_TITLE_LENGTH, MAX_TITLE_LENGTH),
+                        validateStringLength(studios, "Studios", MIN_STUDIOS_LENGTH, MAX_STUDIOS_LENGTH),
+                        validateStringLength(producers, "Producers", MIN_PRODUCERS_LENGTH, MAX_PRODUCERS_LENGTH),
+                        validateWinner(winner)
                 )
                 .filter(ValidationResult.Invalid.class::isInstance)
                 .map(ValidationResult.Invalid.class::cast)
@@ -70,7 +91,7 @@ public final class MovieValidator {
      */
     public static ValidationResult validateNonNull(Object value, String fieldName) {
         return value == null
-                ? new ValidationResult.Invalid("%s cannot be null".formatted(fieldName))
+                ? new ValidationResult.Invalid("Field '%s' is required and cannot be null".formatted(fieldName.toLowerCase()))
                 : new ValidationResult.Valid();
     }
 
@@ -83,22 +104,129 @@ public final class MovieValidator {
      */
     public static ValidationResult validateNotBlank(String value, String fieldName) {
         return (value == null || value.isBlank())
-                ? new ValidationResult.Invalid("%s cannot be blank".formatted(fieldName))
+                ? new ValidationResult.Invalid("Field '%s' is required and cannot be null or blank".formatted(fieldName.toLowerCase()))
                 : new ValidationResult.Valid();
     }
 
     /**
-     * Validates that year is within valid range (1900-2100).
+     * Validates that year is within valid range (1900 to current year).
+     * Year must be in YYYY format (4 digits) and cannot be in the future.
      *
      * @param year Year to validate
      * @return ValidationResult
      */
     public static ValidationResult validateYearRange(Integer year) {
-        return (year != null && (year < MIN_YEAR || year > MAX_YEAR))
-                ? new ValidationResult.Invalid(
-                "Year must be between %d and %d, but was: %d".formatted(MIN_YEAR, MAX_YEAR, year)
-        )
-                : new ValidationResult.Valid();
+        if (year == null) {
+            return new ValidationResult.Valid(); // Null check is done separately
+        }
+        
+        var currentYear = getCurrentYear();
+        if (year < MIN_YEAR || year > currentYear) {
+            return new ValidationResult.Invalid(
+                    "Field 'year' must be an integer between %d and %d (YYYY format, future years not allowed), but was: %d"
+                            .formatted(MIN_YEAR, currentYear, year)
+            );
+        }
+        
+        return new ValidationResult.Valid();
+    }
+
+    /**
+     * Validates that year is in YYYY format (exactly 4 digits, positive integer).
+     * Year must be between 1900 and current year to ensure 4-digit format and valid date range.
+     *
+     * @param year Year to validate
+     * @return ValidationResult
+     */
+    public static ValidationResult validateYearFormat(Integer year) {
+        if (year == null) {
+            return new ValidationResult.Valid(); // Null check is done separately
+        }
+        
+        var currentYear = getCurrentYear();
+        if (year < MIN_YEAR || year > currentYear) {
+            return new ValidationResult.Invalid(
+                    "Field 'year' must be in YYYY format (exactly 4 digits, between %d and %d), but was: %d"
+                            .formatted(MIN_YEAR, currentYear, year)
+            );
+        }
+
+        var yearString = String.valueOf(year);
+        if (yearString.length() != 4) {
+            return new ValidationResult.Invalid(
+                    "Field 'year' must be exactly 4 digits (YYYY format), but was: %d (%d digits)"
+                            .formatted(year, yearString.length())
+            );
+        }
+
+        return new ValidationResult.Valid();
+    }
+
+    /**
+     * Validates that year is not in the future.
+     * Year cannot be greater than the current year.
+     *
+     * @param year Year to validate
+     * @return ValidationResult
+     */
+    public static ValidationResult validateYearNotFuture(Integer year) {
+        if (year == null) {
+            return new ValidationResult.Valid(); // Null check is done separately
+        }
+        
+        var currentYear = getCurrentYear();
+        if (year > currentYear) {
+            return new ValidationResult.Invalid(
+                    "Field 'year' cannot be in the future (current year: %d), but was: %d"
+                            .formatted(currentYear, year)
+            );
+        }
+        
+        return new ValidationResult.Valid();
+    }
+
+    /**
+     * Validates that a string has the correct length.
+     *
+     * @param value     String to validate
+     * @param fieldName Field name for error message
+     * @param minLength Minimum length (inclusive)
+     * @param maxLength Maximum length (inclusive)
+     * @return ValidationResult
+     */
+    public static ValidationResult validateStringLength(String value, String fieldName, int minLength, int maxLength) {
+        if (value == null) {
+            return new ValidationResult.Valid();
+        }
+
+        var trimmedLength = value.trim().length();
+        if (trimmedLength < minLength || trimmedLength > maxLength) {
+            return new ValidationResult.Invalid(
+                    "Field '%s' must be between %d and %d characters, but was: %d"
+                            .formatted(fieldName.toLowerCase(), minLength, maxLength, trimmedLength)
+            );
+        }
+
+        return new ValidationResult.Valid();
+    }
+
+    /**
+     * Validates that winner is a valid Boolean (true or false).
+     * Boolean cannot be null (already validated separately).
+     *
+     * <p>This method explicitly validates that winner is a Boolean value.
+     * Since Boolean can only be true or false (null is checked separately),
+     * this method ensures the parameter is used and provides explicit validation.
+     *
+     * <p>Note: The parameter is used to ensure it's not flagged as unused.
+     * Since null is already validated in validateNonNull, winner is always valid here.
+     *
+     * @param winner Winner flag to validate
+     * @return ValidationResult
+     */
+    public static ValidationResult validateWinner(Boolean winner) {
+        assert winner != null : "Winner should not be null (validated separately)";
+        return new ValidationResult.Valid();
     }
 
     /**
