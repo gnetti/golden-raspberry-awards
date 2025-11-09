@@ -10,7 +10,7 @@ import java.util.Objects;
  * Implements ResultRecordingPort following hexagonal architecture principles.
  *
  * <p>This adapter is part of the 5 orchestration patterns selected for Golden Raspberry Awards project.
- * Focused on logging CREATE, UPDATE, DELETE operations.
+ * Focused on listener CREATE, UPDATE, DELETE operations.
  *
  * <p><strong>Hexagonal Architecture:</strong>
  * <ul>
@@ -39,7 +39,7 @@ public class ResultRecorderAdapter implements ResultRecordingPort {
     }
 
     /**
-     * Records a result for logging.
+     * Records a result for listener.
      *
      * @param result Result to record
      */
@@ -49,10 +49,10 @@ public class ResultRecorderAdapter implements ResultRecordingPort {
     }
 
     /**
-     * Logs an operation result.
+     * Records an operation result.
      *
      * @param operation Operation name
-     * @param result    Result to log
+     * @param result    Result to record
      */
     @Override
     public void log(String operation, Object result) {

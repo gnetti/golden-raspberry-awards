@@ -15,17 +15,17 @@ package golden.raspberry.awards.core.application.port.out;
 public interface ResultRecordingPort {
 
     /**
-     * Records a result for logging.
+     * Records a result for listener.
      *
      * @param result Result to record
      */
     void record(Object result);
 
     /**
-     * Logs an operation result.
+     * Records an operation result.
      *
      * @param operation Operation name
-     * @param result Result to log
+     * @param result Result to record
      */
     void log(String operation, Object result);
 
