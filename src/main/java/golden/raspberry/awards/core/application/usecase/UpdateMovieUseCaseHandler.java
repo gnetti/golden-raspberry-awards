@@ -4,14 +4,11 @@ import golden.raspberry.awards.core.application.port.in.UpdateMovieUseCase;
 import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
-import golden.raspberry.awards.core.application.validator.MovieValidator;
 import golden.raspberry.awards.core.domain.model.Movie;
 import golden.raspberry.awards.core.domain.model.MovieWithId;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 
 import java.util.Objects;
-
-import static golden.raspberry.awards.core.application.validator.MovieValidator.ValidationResult;
 
 /**
  * Use Case implementation for updating an existing movie.
@@ -59,15 +56,6 @@ public record UpdateMovieUseCaseHandler(
     @Override
     public MovieWithId execute(Long id, Integer year, String title, String studios, String producers, Boolean winner) {
         Objects.requireNonNull(id, "ID cannot be null");
-        var validationResult = MovieValidator.validateAll(year, title, studios, producers, winner);
-        switch (validationResult) {
-            case ValidationResult.Valid ignored -> {
-            }
-            case ValidationResult.Invalid invalid -> throw new IllegalArgumentException(
-                    "Validation failed: %s".formatted(invalid.message())
-            );
-        }
-
         repository.findById(id)
                 .orElseThrow(() -> new IllegalStateException(
                         "Movie with ID %d not found".formatted(id)

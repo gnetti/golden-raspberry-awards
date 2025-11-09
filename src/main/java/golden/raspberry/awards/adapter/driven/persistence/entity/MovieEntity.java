@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
  * Represents the database table structure.
  * Schema is created automatically via JPA (ddl-auto=create-drop).
  *
- * <p>All validations are performed in Application Layer (MovieValidator) BEFORE reaching this entity.
+ * <p>All validations are performed in Driving Adapters (DTOs with Jakarta Validation) BEFORE reaching this entity.
  *
  * <p>Uses Java 21 features: String Templates for toString.
  *

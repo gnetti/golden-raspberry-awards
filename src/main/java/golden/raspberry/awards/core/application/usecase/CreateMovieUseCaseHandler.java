@@ -4,13 +4,10 @@ import golden.raspberry.awards.core.application.port.in.CreateMovieUseCase;
 import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
-import golden.raspberry.awards.core.application.validator.MovieValidator;
 import golden.raspberry.awards.core.domain.model.Movie;
 import golden.raspberry.awards.core.domain.model.MovieWithId;
 
 import java.util.Objects;
-
-import static golden.raspberry.awards.core.application.validator.MovieValidator.ValidationResult;
 
 /**
  * Use Case implementation for creating a new movie.
@@ -62,15 +59,6 @@ public record CreateMovieUseCaseHandler(
 
     @Override
     public MovieWithId execute(Integer year, String title, String studios, String producers, Boolean winner) {
-        var validationResult = MovieValidator.validateAll(year, title, studios, producers, winner);
-        switch (validationResult) {
-            case ValidationResult.Valid ignored -> {
-            }
-            case ValidationResult.Invalid invalid -> throw new IllegalArgumentException(
-                    "Validation failed: %s".formatted(invalid.message())
-            );
-        }
-
         var nextId = idKeyManagerPort.getNextId();
 
         var movie = new Movie(
