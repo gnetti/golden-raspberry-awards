@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * Main logging service based on LISTENER_ORCHESTRATION_PATTERNS.md.
+ * Main listener service based on LISTENER_ORCHESTRATION_PATTERNS.md.
  * Provides access to 5 selected orchestration patterns focused on the project needs.
  *
- * <p><strong>Important:</strong> Custom service - NO external logging dependencies.
+ * <p><strong>Important:</strong> Custom service - NO external listener dependencies.
  *
  * <p><strong>Hexagonal Architecture:</strong>
  * <ul>
@@ -32,7 +32,7 @@ import java.util.Objects;
  *   <li><strong>InformationEmissionPort</strong> - Emits information reactively with session correlation</li>
  * </ul>
  *
- * <p>These 5 patterns cover all needs for logging CREATE, UPDATE, DELETE operations
+ * <p>These 5 patterns cover all needs for listener CREATE, UPDATE, DELETE operations
  * with before/after data and session-specific tracking.
  *
  * <p>Uses Java 21 features: Records, Pattern Matching, clean code.
@@ -43,7 +43,6 @@ import java.util.Objects;
 @Service
 public class ListenerService {
 
-   //todo These methods will be implemented in the near future.
     private final ResultRecordingPort resultRecordingPort;
     private final DataArchivingPort dataArchivingPort;
     private final ChangeDetectionPort changeDetectionPort;
@@ -73,5 +72,85 @@ public class ListenerService {
         this.informationEmissionPort = Objects.requireNonNull(informationEmissionPort, "InformationEmissionPort cannot be null");
     }
 
+    /**
+     * Records a result using ResultRecordingPort.
+     *
+     * @param result Result to record
+     */
+    public void recordResult(Object result) {
+        if (result != null) {
+            resultRecordingPort.record(result);
+        }
+    }
+
+    /**
+     * Archives data using DataArchivingPort.
+     *
+     * @param data Data to archive
+     */
+    public void archiveData(Object data) {
+        if (data != null) {
+            dataArchivingPort.archive(data);
+        }
+    }
+
+    /**
+     * Preserves data using DataArchivingPort.
+     *
+     * @param data Data to preserve
+     */
+    public void preserveData(Object data) {
+        if (data != null) {
+            dataArchivingPort.preserve(data);
+        }
+    }
+
+    /**
+     * Detects changes between before and after states using ChangeDetectionPort.
+     *
+     * @param before State before change
+     * @param after State after change
+     * @return Detected changes
+     */
+    public Object detectChanges(Object before, Object after) {
+        if (before != null && after != null) {
+            return changeDetectionPort.detect(before, after);
+        }
+        return null;
+    }
+
+    /**
+     * Observes a process execution using ProcessObservationPort.
+     *
+     * @param process Process to observe
+     */
+    public void observeProcess(Object process) {
+        if (process != null) {
+            processObservationPort.observe(process);
+        }
+    }
+
+    /**
+     * Emits information with session ID using InformationEmissionPort.
+     *
+     * @param information Information to emit
+     * @param sessionId Session identifier
+     */
+    public void emitWithSession(Object information, String sessionId) {
+        if (information != null && sessionId != null && !sessionId.isBlank()) {
+            informationEmissionPort.withSession(information, sessionId);
+        }
+    }
+
+    /**
+     * Stores data using ResultRecordingPort.
+     *
+     * @param data Data to store
+     */
+    public void storeData(Object data) {
+        if (data != null) {
+            resultRecordingPort.store(data);
+        }
+    }
 }
 

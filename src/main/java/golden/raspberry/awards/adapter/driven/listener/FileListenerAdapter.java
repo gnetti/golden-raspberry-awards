@@ -2,6 +2,7 @@ package golden.raspberry.awards.adapter.driven.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import golden.raspberry.awards.core.application.port.out.ListenerPort;
+import golden.raspberry.awards.infrastructure.logging.service.ListenerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -51,6 +52,7 @@ import java.util.stream.Stream;
 public class FileListenerAdapter implements ListenerPort {
 
     private final ObjectMapper objectMapper;
+    private final ListenerService listenerService;
     private final boolean enabled;
     private final String basePath;
     private final String prefix;
@@ -62,6 +64,7 @@ public class FileListenerAdapter implements ListenerPort {
      * Constructor for dependency injection.
      *
      * @param objectMapper ObjectMapper for JSON serialization
+     * @param listenerService Listener service for orchestration patterns
      * @param enabled Whether listener is enabled
      * @param basePath Base path for listener files
      * @param prefix Prefix for file names
@@ -71,6 +74,7 @@ public class FileListenerAdapter implements ListenerPort {
      */
     public FileListenerAdapter(
             ObjectMapper objectMapper,
+            ListenerService listenerService,
             @Value("${listener.enabled:true}") boolean enabled,
             @Value("${listener.base-path:src/main/resources/listener}") String basePath,
             @Value("${listener.prefix:listener}") String prefix,
@@ -79,6 +83,7 @@ public class FileListenerAdapter implements ListenerPort {
             @Value("${listener.retention-days:7}") int retentionDays) {
         
         this.objectMapper = Objects.requireNonNull(objectMapper, "ObjectMapper cannot be null");
+        this.listenerService = Objects.requireNonNull(listenerService, "ListenerService cannot be null");
         this.enabled = enabled;
         this.basePath = Objects.requireNonNull(basePath, "Base path cannot be null");
         this.prefix = Objects.requireNonNull(prefix, "Prefix cannot be null");
@@ -95,6 +100,10 @@ public class FileListenerAdapter implements ListenerPort {
                        String entityType, String entityId, Object responseData, String error) {
         if (!enabled) return;
         
+        listenerService.observeProcess("GET operation: %s %s".formatted(httpMethod, endpoint));
+        listenerService.emitWithSession(responseData, sessionId);
+        listenerService.recordResult(responseData);
+        
         var listenerMessage = buildListenerMessage(
                 "GET", sessionId, httpMethod, endpoint, statusCode,
                 entityType, entityId, null, responseData, error
@@ -106,6 +115,13 @@ public class FileListenerAdapter implements ListenerPort {
     public void listenPut(String sessionId, String httpMethod, String endpoint, Integer statusCode,
                        String entityType, String entityId, Object dataBefore, Object dataAfter, String error) {
         if (!enabled) return;
+        
+        listenerService.observeProcess("PUT operation: %s %s".formatted(httpMethod, endpoint));
+        listenerService.archiveData(dataBefore);
+        listenerService.archiveData(dataAfter);
+        var changes = listenerService.detectChanges(dataBefore, dataAfter);
+        listenerService.emitWithSession(changes, sessionId);
+        listenerService.recordResult(dataAfter);
         
         var listenerMessage = buildListenerMessage(
                 "PUT", sessionId, httpMethod, endpoint, statusCode,
@@ -119,6 +135,12 @@ public class FileListenerAdapter implements ListenerPort {
                           String entityType, String entityId, Object dataBefore, String error) {
         if (!enabled) return;
         
+        listenerService.observeProcess("DELETE operation: %s %s".formatted(httpMethod, endpoint));
+        listenerService.archiveData(dataBefore);
+        listenerService.preserveData(dataBefore);
+        listenerService.emitWithSession(dataBefore, sessionId);
+        listenerService.recordResult(dataBefore);
+        
         var listenerMessage = buildListenerMessage(
                 "DELETE", sessionId, httpMethod, endpoint, statusCode,
                 entityType, entityId, dataBefore, null, error
@@ -130,6 +152,12 @@ public class FileListenerAdapter implements ListenerPort {
     public void listenPost(String sessionId, String httpMethod, String endpoint, Integer statusCode,
                         String entityType, String entityId, Object requestData, Object responseData, String error) {
         if (!enabled) return;
+        
+        listenerService.observeProcess("POST operation: %s %s".formatted(httpMethod, endpoint));
+        listenerService.emitWithSession(requestData, sessionId);
+        listenerService.emitWithSession(responseData, sessionId);
+        listenerService.storeData(responseData);
+        listenerService.recordResult(responseData);
         
         var listenerMessage = buildListenerMessage(
                 "POST", sessionId, httpMethod, endpoint, statusCode,
