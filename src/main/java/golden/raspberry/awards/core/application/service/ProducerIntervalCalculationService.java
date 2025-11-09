@@ -42,10 +42,8 @@ import java.util.stream.Collectors;
  * @author Luiz Generoso
  * @since 1.0.0
  */
-public class ProducerIntervalCalculationService {
-
-    private final MovieRepositoryPort repository;
-    private final ProducerIntervalCalculator calculator;
+public record ProducerIntervalCalculationService(MovieRepositoryPort repository,
+                                                 ProducerIntervalCalculator calculator) {
 
     /**
      * Constructor for dependency injection.
