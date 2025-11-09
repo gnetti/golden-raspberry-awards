@@ -10,12 +10,14 @@ import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import golden.raspberry.awards.core.application.port.out.ListenerPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
+import golden.raspberry.awards.core.application.service.ProducerIntervalCalculationService;
 import golden.raspberry.awards.core.application.usecase.CalculateIntervalsUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.CreateMovieUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.DeleteMovieUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.GetMovieUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.UpdateMovieUseCaseHandler;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
+import golden.raspberry.awards.core.domain.service.ProducerIntervalCalculator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,10 +47,53 @@ import java.util.Objects;
 public class HexagonalConfig {
 
     /**
+     * Creates a bean for the ProducerIntervalCalculator domain service.
+     *
+     * <p>This bean creates the domain service that contains ALL business rules
+     * for interval calculations, following hexagonal architecture principles.
+     *
+     * @return ProducerIntervalCalculator bean
+     */
+    @Bean
+    public ProducerIntervalCalculator producerIntervalCalculator() {
+        return new ProducerIntervalCalculator();
+    }
+
+    /**
+     * Creates a bean for the ProducerIntervalCalculationService application service.
+     *
+     * <p>This bean wires the application service that orchestrates interval calculations
+     * by coordinating repository calls and domain service calls.
+     *
+     * <p><strong>Flow:</strong>
+     * <pre>
+     * Application Service (this bean)
+     *     ↓
+     * MovieRepositoryPort (Domain - Port OUT)
+     *     ↓
+     * ProducerIntervalCalculator (Domain - Service)
+     * </pre>
+     *
+     * @param repository Movie repository port (automatically injected by Spring)
+     * @param calculator Domain service for interval calculations (automatically injected by Spring)
+     * @return ProducerIntervalCalculationService bean
+     * @throws NullPointerException if repository or calculator is null
+     */
+    @Bean
+    public ProducerIntervalCalculationService producerIntervalCalculationService(
+            MovieRepositoryPort repository,
+            ProducerIntervalCalculator calculator) {
+        
+        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
+        Objects.requireNonNull(calculator, "ProducerIntervalCalculator cannot be null");
+        return new ProducerIntervalCalculationService(repository, calculator);
+    }
+
+    /**
      * Creates a bean for the CalculateIntervalsUseCase.
      *
      * <p>This bean wires the application use case handler (CalculateIntervalsUseCaseHandler) with
-     * the repository port. The handler orchestrates the use case,
+     * the application service. The handler delegates to the service,
      * following hexagonal architecture principles.
      *
      * <p><strong>Flow:</strong>
@@ -57,21 +102,21 @@ public class HexagonalConfig {
      *                                    ↓
      *                    CalculateIntervalsUseCaseHandler (Application - Handler)
      *                                    ↓
-     *                    MovieRepositoryPort (Domain - Port OUT)
+     *                    ProducerIntervalCalculationService (Application - Service)
      *                                    ↓
-     *                    MovieRepositoryAdapter (Infrastructure - Adapter OUT)
+     *                    ProducerIntervalCalculator (Domain - Service)
      * </pre>
      *
-     * @param repository Movie repository port (automatically injected by Spring)
+     * @param calculationService Application service for orchestrating interval calculations (automatically injected by Spring)
      * @return CalculateIntervalsUseCase bean
-     * @throws NullPointerException if repository is null
+     * @throws NullPointerException if calculationService is null
      */
     @Bean
     public CalculateIntervalsUseCase calculateIntervalsUseCase(
-            MovieRepositoryPort repository) {
+            ProducerIntervalCalculationService calculationService) {
         
-        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
-        return new CalculateIntervalsUseCaseHandler(repository);
+        Objects.requireNonNull(calculationService, "ProducerIntervalCalculationService cannot be null");
+        return new CalculateIntervalsUseCaseHandler(calculationService);
     }
     
 

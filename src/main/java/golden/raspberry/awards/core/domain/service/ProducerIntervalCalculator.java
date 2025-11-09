@@ -26,9 +26,9 @@ import java.util.*;
  * @author Luiz Generoso
  * @since 1.0.0
  */
-public final class ProducerIntervalCalculator {
+public class ProducerIntervalCalculator {
 
-    private ProducerIntervalCalculator() {
+    public ProducerIntervalCalculator() {
     }
 
     /**
@@ -39,7 +39,7 @@ public final class ProducerIntervalCalculator {
      * @param winningMovies List of winning movies
      * @return Map of producer names to their unique winning years (sorted)
      */
-    public static Map<String, List<Integer>> groupWinsByProducer(List<Movie> winningMovies) {
+    public Map<String, List<Integer>> groupWinsByProducer(List<Movie> winningMovies) {
         Objects.requireNonNull(winningMovies, "Winning movies cannot be null");
         
         Map<String, List<Integer>> producerWins = new HashMap<>();
@@ -69,7 +69,7 @@ public final class ProducerIntervalCalculator {
      * @param producerWins Map of producer names to their winning years
      * @return List of intervals for all producers
      */
-    public static List<ProducerInterval> calculateIntervals(Map<String, List<Integer>> producerWins) {
+    public List<ProducerInterval> calculateIntervals(Map<String, List<Integer>> producerWins) {
         Objects.requireNonNull(producerWins, "Producer wins cannot be null");
         
         List<ProducerInterval> intervals = new ArrayList<>();
