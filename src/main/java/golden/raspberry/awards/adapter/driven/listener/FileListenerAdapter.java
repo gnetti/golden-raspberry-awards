@@ -2,7 +2,6 @@ package golden.raspberry.awards.adapter.driven.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import golden.raspberry.awards.core.application.port.out.ListenerPort;
-import golden.raspberry.awards.infrastructure.listener.service.ListenerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +63,7 @@ public class FileListenerAdapter implements ListenerPort {
      * Constructor for dependency injection.
      *
      * @param objectMapper ObjectMapper for JSON serialization
-     * @param listenerService Listener service for orchestration patterns
+     * @param listenerAdapter Listener adapter for orchestration patterns
      * @param enabled Whether listener is enabled
      * @param basePath Base path for listener files
      * @param prefix Prefix for file names
@@ -119,7 +118,7 @@ public class FileListenerAdapter implements ListenerPort {
         listenerAdapter.observeProcess("PUT operation: %s %s".formatted(httpMethod, endpoint));
         listenerAdapter.archiveData(dataBefore);
         listenerAdapter.archiveData(dataAfter);
-        var changes = listenerService.detectChanges(dataBefore, dataAfter);
+        var changes = listenerAdapter.detectChanges(dataBefore, dataAfter);
         listenerAdapter.emitWithSession(changes, sessionId);
         listenerAdapter.recordResult(dataAfter);
         
