@@ -96,31 +96,31 @@ public class HexagonalConfig {
     }
     
     /**
-     * Creates a bean for the LogOperationUseCase.
+     * Creates a bean for the ListenerOperationUseCase.
      *
-     * <p>This bean wires the application use case (LogOperationUseCase) with
-     * the logging adapter (LoggingPort). The adapter is automatically
+     * <p>This bean wires the application use case (ListenerOperationUseCase) with
+     * the listener adapter (ListenerPort). The adapter is automatically
      * injected by Spring, maintaining the hexagonal architecture pattern.
      *
      * <p><strong>Flow:</strong>
      * <pre>
-     * Application → LogOperationUseCase (this bean)
+     * Application → ListenerOperationUseCase (this bean)
      *                                    ↓
-     *                    LoggingPort (adapter implementation)
+     *                    ListenerPort (adapter implementation)
      *                                    ↓
-     *                    FileLoggingAdapter (file adapter)
+     *                    FileListenerAdapter (file adapter)
      *                                    ↓
-     *                    File System (resources/log)
+     *                    File System (resources/listener)
      * </pre>
      *
-     * @param loggingPort Logging port (automatically injected by Spring)
-     * @return LogOperationUseCase bean
-     * @throws NullPointerException if loggingPort is null
+     * @param listenerPort Listener port (automatically injected by Spring)
+     * @return ListenerOperationUseCase bean
+     * @throws NullPointerException if listenerPort is null
      */
     @Bean
-    public LogOperationUseCase logOperationUseCase(LoggingPort loggingPort) {
-        Objects.requireNonNull(loggingPort, "LoggingPort cannot be null");
-        return new LogOperationUseCase(loggingPort);
+    public ListenerOperationUseCase listenerOperationUseCase(ListenerPort listenerPort) {
+        Objects.requireNonNull(listenerPort, "ListenerPort cannot be null");
+        return new ListenerOperationUseCase(listenerPort);
     }
 
     /**
