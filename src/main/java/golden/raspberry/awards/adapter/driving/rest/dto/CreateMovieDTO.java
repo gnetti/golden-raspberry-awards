@@ -3,9 +3,6 @@ package golden.raspberry.awards.adapter.driving.rest.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 
-import static golden.raspberry.awards.adapter.driving.rest.dto.MovieDTOValidator.ValidationResult;
-import static golden.raspberry.awards.adapter.driving.rest.dto.MovieDTOValidator.validateAll;
-
 /**
  * DTO for creating a new movie (request body).
  * Using Java 21 record for immutability and extreme elegance.
@@ -55,28 +52,24 @@ public record CreateMovieDTO(
         Boolean winner
 ) {
     /**
-     * Compact constructor with EXTREME Java 21 elegance.
-     * Uses sealed interfaces, pattern matching, and functional validation.
+     * Compact constructor with Java 21 features.
+     * Trims string fields automatically.
      *
-     * @param year      Movie release year (non-null, 1900-2100)
-     * @param title     Movie title (non-null, non-blank)
-     * @param studios   Movie studios (non-null, non-blank)
-     * @param producers Movie producers (non-null, non-blank)
-     * @param winner    Whether the movie is a winner (non-null)
-     * @throws IllegalArgumentException if validation fails
+     * @param year      Movie release year (validated by Jakarta Validation)
+     * @param title     Movie title (validated by Jakarta Validation)
+     * @param studios   Movie studios (validated by Jakarta Validation)
+     * @param producers Movie producers (validated by Jakarta Validation)
+     * @param winner    Whether the movie is a winner (validated by Jakarta Validation)
      */
     public CreateMovieDTO {
-        var validationResult = validateAll(year, title, studios, producers, winner);
-
-        switch (validationResult) {
-            case ValidationResult.Valid ignored -> {
-                title = title.trim();
-                studios = studios.trim();
-                producers = producers.trim();
-            }
-            case ValidationResult.Invalid invalid -> throw new IllegalArgumentException(
-                    "Validation failed: %s".formatted(invalid.message())
-            );
+        if (title != null) {
+            title = title.trim();
+        }
+        if (studios != null) {
+            studios = studios.trim();
+        }
+        if (producers != null) {
+            producers = producers.trim();
         }
     }
 

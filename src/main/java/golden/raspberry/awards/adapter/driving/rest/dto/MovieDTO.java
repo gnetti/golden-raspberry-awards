@@ -2,9 +2,6 @@ package golden.raspberry.awards.adapter.driving.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import static golden.raspberry.awards.adapter.driving.rest.dto.MovieDTOValidator.ValidationResult;
-import static golden.raspberry.awards.adapter.driving.rest.dto.MovieDTOValidator.validateAll;
-
 /**
  * DTO for Movie in REST API.
  * Using Java 21 record for immutability and extreme elegance.
@@ -45,26 +42,18 @@ public record MovieDTO(
         Boolean winner
 ) {
     /**
-     * Compact constructor with EXTREME Java 21 elegance.
-     * Uses sealed interfaces, pattern matching, and functional validation.
+     * Compact constructor.
+     * MovieDTO is a response DTO created from validated domain models.
+     * No validation needed as it's created from already validated data.
      *
-     * @param id        Movie ID (can be null for new movies)
-     * @param year      Movie release year (non-null, 1900-2100)
-     * @param title     Movie title (non-null, non-blank)
-     * @param studios   Movie studios (non-null, non-blank)
-     * @param producers Movie producers (non-null, non-blank)
-     * @param winner    Whether the movie is a winner (non-null)
-     * @throws IllegalArgumentException if validation fails
+     * @param id        Movie ID
+     * @param year      Movie release year
+     * @param title     Movie title
+     * @param studios   Movie studios
+     * @param producers Movie producers
+     * @param winner    Whether the movie is a winner
      */
     public MovieDTO {
-        var validationResult = validateAll(year, title, studios, producers, winner);
-        switch (validationResult) {
-            case ValidationResult.Valid ignored -> {
-            }
-            case ValidationResult.Invalid invalid -> throw new IllegalArgumentException(
-                    "Validation failed: %s".formatted(invalid.message())
-            );
-        }
     }
 
 }
