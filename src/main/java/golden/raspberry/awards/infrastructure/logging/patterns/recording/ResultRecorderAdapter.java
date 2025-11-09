@@ -17,11 +17,11 @@ import java.util.Objects;
  *   <li>Implements Port defined by Application layer</li>
  *   <li>Handles result recording (Infrastructure concern)</li>
  *   <li>No business logic - pure adapter</li>
- *   <li>Will use LogOperationUseCase when implementation is added</li>
+ *   <li>Will use ListenerOperationUseCase when implementation is added</li>
  * </ul>
  *
  * <p><strong>Note:</strong> Implementation will be added when specific result recording logic is needed.
- * Currently, logging is handled automatically by LoggingAspect.
+ * Currently, listening is handled automatically by ListenerAspect.
  *
  * <p>Uses Java 21 features elegantly and robustly.
  *
@@ -33,7 +33,7 @@ public class ResultRecorderAdapter implements ResultRecordingPort {
 
     /**
      * Default constructor.
-     * LogOperationUseCase will be injected when implementation is added.
+     * ListenerOperationUseCase will be injected when implementation is added.
      */
     public ResultRecorderAdapter() {
     }
