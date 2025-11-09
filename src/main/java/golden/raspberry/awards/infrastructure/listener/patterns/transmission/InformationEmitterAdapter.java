@@ -1,4 +1,4 @@
-package golden.raspberry.awards.infrastructure.logging.patterns.transmission;
+package golden.raspberry.awards.infrastructure.listener.patterns.transmission;
 
 import golden.raspberry.awards.core.application.port.out.InformationEmissionPort;
 import org.springframework.stereotype.Component;

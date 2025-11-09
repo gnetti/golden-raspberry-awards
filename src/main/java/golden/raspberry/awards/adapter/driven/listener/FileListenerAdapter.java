@@ -2,7 +2,7 @@ package golden.raspberry.awards.adapter.driven.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import golden.raspberry.awards.core.application.port.out.ListenerPort;
-import golden.raspberry.awards.infrastructure.logging.service.ListenerService;
+import golden.raspberry.awards.infrastructure.listener.service.ListenerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

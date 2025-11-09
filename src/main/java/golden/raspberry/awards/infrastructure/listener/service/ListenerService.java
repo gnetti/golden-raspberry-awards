@@ -1,4 +1,4 @@
-package golden.raspberry.awards.infrastructure.logging.service;
+package golden.raspberry.awards.infrastructure.listener.service;
 
 import golden.raspberry.awards.core.application.port.out.ChangeDetectionPort;
 import golden.raspberry.awards.core.application.port.out.DataArchivingPort;

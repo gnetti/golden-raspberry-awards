@@ -1,4 +1,4 @@
-package golden.raspberry.awards.infrastructure.logging.patterns.monitoring;
+package golden.raspberry.awards.infrastructure.listener.patterns.monitoring;
 
 import golden.raspberry.awards.core.application.port.out.ProcessObservationPort;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,6 @@
 package golden.raspberry.awards.adapter.driving.web;
 
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsUseCase;
-import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,7 +62,7 @@ public class ProducerWebController {
      */
     @GetMapping("/intervals")
     public String intervals(Model model) {
-        ProducerIntervalResponse response = calculateIntervalsUseCase.execute();
+        var response = calculateIntervalsUseCase.execute();
         model.addAttribute("intervals", response);
         model.addAttribute("title", "Producer Intervals");
         return "pages/intervals";

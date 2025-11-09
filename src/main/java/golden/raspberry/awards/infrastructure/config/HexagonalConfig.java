@@ -17,7 +17,6 @@ import golden.raspberry.awards.core.application.usecase.GetMovieUseCaseImpl;
 import golden.raspberry.awards.core.application.usecase.ListenerOperationUseCase;
 import golden.raspberry.awards.core.application.usecase.UpdateMovieUseCaseImpl;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
-import golden.raspberry.awards.core.domain.service.ProducerIntervalService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -47,28 +46,11 @@ import java.util.Objects;
 public class HexagonalConfig {
 
     /**
-     * Creates a bean for the ProducerIntervalService (Domain Service).
-     *
-     * <p>This bean wires the domain service with the repository adapter.
-     * The adapter is automatically injected by Spring, maintaining the
-     * hexagonal architecture pattern.
-     *
-     * @param repository Movie repository port (automatically injected by Spring)
-     * @return ProducerIntervalService bean
-     * @throws NullPointerException if repository is null
-     */
-    @Bean
-    public ProducerIntervalService producerIntervalService(MovieRepositoryPort repository) {
-        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
-        return new ProducerIntervalService(repository);
-    }
-    
-    /**
      * Creates a bean for the CalculateIntervalsUseCase.
      *
      * <p>This bean wires the application use case (CalculateIntervalsUseCaseImpl) with
-     * the domain service (ProducerIntervalService). The domain service is automatically
-     * injected by Spring, maintaining the hexagonal architecture pattern.
+     * the repository port. The use case implements the business logic directly,
+     * following hexagonal architecture principles.
      *
      * <p><strong>Flow:</strong>
      * <pre>
@@ -76,23 +58,21 @@ public class HexagonalConfig {
      *                                    ↓
      *                    CalculateIntervalsUseCaseImpl (Application - Use Case)
      *                                    ↓
-     *                    ProducerIntervalService (Domain - Service)
-     *                                    ↓
      *                    MovieRepositoryPort (Domain - Port OUT)
      *                                    ↓
      *                    MovieRepositoryAdapter (Infrastructure - Adapter OUT)
      * </pre>
      *
-     * @param producerIntervalService Domain service (automatically injected by Spring)
+     * @param repository Movie repository port (automatically injected by Spring)
      * @return CalculateIntervalsUseCase bean
-     * @throws NullPointerException if producerIntervalService is null
+     * @throws NullPointerException if repository is null
      */
     @Bean
     public CalculateIntervalsUseCase calculateIntervalsUseCase(
-            ProducerIntervalService producerIntervalService) {
+            MovieRepositoryPort repository) {
         
-        Objects.requireNonNull(producerIntervalService, "ProducerIntervalService cannot be null");
-        return new CalculateIntervalsUseCaseImpl(producerIntervalService);
+        Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
+        return new CalculateIntervalsUseCaseImpl(repository);
     }
     
     /**

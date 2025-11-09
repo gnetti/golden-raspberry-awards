@@ -1,18 +1,14 @@
 package golden.raspberry.awards.adapter.driving.rest;
 
-import golden.raspberry.awards.adapter.driving.rest.dto.ProducerIntervalDTO;
 import golden.raspberry.awards.adapter.driving.rest.dto.ProducerIntervalResponseDTO;
+import golden.raspberry.awards.adapter.driving.rest.mapper.ProducerIntervalDTOMapper;
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsUseCase;
-import golden.raspberry.awards.core.domain.model.ProducerInterval;
-import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * REST Controller for Golden Raspberry Awards.
@@ -88,42 +84,9 @@ public class AwardsController {
      */
     @GetMapping("/producers/intervals")
     public ResponseEntity<ProducerIntervalResponseDTO> getIntervals() {
-        ProducerIntervalResponse response = calculateIntervalsUseCase.execute();
-        ProducerIntervalResponseDTO dto = toDTO(response);
+        var response = calculateIntervalsUseCase.execute();
+        var dto = ProducerIntervalDTOMapper.toDTO(response);
         return ResponseEntity.ok(dto);
-    }
-
-    /**
-     * Converts Domain model (ProducerIntervalResponse) to DTO.
-     *
-     * @param response Domain model response
-     * @return DTO response
-     */
-    private ProducerIntervalResponseDTO toDTO(ProducerIntervalResponse response) {
-        List<ProducerIntervalDTO> minDTOs = response.min().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-
-        List<ProducerIntervalDTO> maxDTOs = response.max().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-
-        return new ProducerIntervalResponseDTO(minDTOs, maxDTOs);
-    }
-
-    /**
-     * Converts Domain model (ProducerInterval) to DTO.
-     *
-     * @param interval Domain model interval
-     * @return DTO interval
-     */
-    private ProducerIntervalDTO toDTO(ProducerInterval interval) {
-        return new ProducerIntervalDTO(
-                interval.producer(),
-                interval.interval(),
-                interval.previousWin(),
-                interval.followingWin()
-        );
     }
 }
 

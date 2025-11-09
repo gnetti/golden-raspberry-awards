@@ -1,4 +1,4 @@
-package golden.raspberry.awards.infrastructure.logging.patterns.recording;
+package golden.raspberry.awards.infrastructure.listener.patterns.recording;
 
 import golden.raspberry.awards.core.application.port.out.ResultRecordingPort;
 import org.springframework.stereotype.Component;
