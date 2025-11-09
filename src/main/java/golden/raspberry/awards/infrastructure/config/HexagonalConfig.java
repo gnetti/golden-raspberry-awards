@@ -10,12 +10,12 @@ import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import golden.raspberry.awards.core.application.port.out.ListenerPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
-import golden.raspberry.awards.core.application.usecase.CalculateIntervalsUseCaseImpl;
-import golden.raspberry.awards.core.application.usecase.CreateMovieUseCaseImpl;
-import golden.raspberry.awards.core.application.usecase.DeleteMovieUseCaseImpl;
-import golden.raspberry.awards.core.application.usecase.GetMovieUseCaseImpl;
-import golden.raspberry.awards.core.application.usecase.ListenerOperationUseCase;
-import golden.raspberry.awards.core.application.usecase.UpdateMovieUseCaseImpl;
+import golden.raspberry.awards.core.application.usecase.CalculateIntervalsUseCaseHandler;
+import golden.raspberry.awards.core.application.usecase.CreateMovieUseCaseHandler;
+import golden.raspberry.awards.core.application.usecase.DeleteMovieUseCaseHandler;
+import golden.raspberry.awards.core.application.usecase.GetMovieUseCaseHandler;
+import golden.raspberry.awards.infrastructure.listener.ListenerOperationService;
+import golden.raspberry.awards.core.application.usecase.UpdateMovieUseCaseHandler;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,15 +48,15 @@ public class HexagonalConfig {
     /**
      * Creates a bean for the CalculateIntervalsUseCase.
      *
-     * <p>This bean wires the application use case (CalculateIntervalsUseCaseImpl) with
-     * the repository port. The use case implements the business logic directly,
+     * <p>This bean wires the application use case handler (CalculateIntervalsUseCaseHandler) with
+     * the repository port. The handler orchestrates the use case,
      * following hexagonal architecture principles.
      *
      * <p><strong>Flow:</strong>
      * <pre>
      * REST Controller → CalculateIntervalsUseCase (this bean)
      *                                    ↓
-     *                    CalculateIntervalsUseCaseImpl (Application - Use Case)
+     *                    CalculateIntervalsUseCaseHandler (Application - Handler)
      *                                    ↓
      *                    MovieRepositoryPort (Domain - Port OUT)
      *                                    ↓
@@ -72,19 +72,19 @@ public class HexagonalConfig {
             MovieRepositoryPort repository) {
         
         Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
-        return new CalculateIntervalsUseCaseImpl(repository);
+        return new CalculateIntervalsUseCaseHandler(repository);
     }
     
     /**
-     * Creates a bean for the ListenerOperationUseCase.
+     * Creates a bean for the ListenerOperationService.
      *
-     * <p>This bean wires the application use case (ListenerOperationUseCase) with
+     * <p>This bean wires the infrastructure service (ListenerOperationService) with
      * the listener adapter (ListenerPort). The adapter is automatically
      * injected by Spring, maintaining the hexagonal architecture pattern.
      *
      * <p><strong>Flow:</strong>
      * <pre>
-     * Application → ListenerOperationUseCase (this bean)
+     * Infrastructure → ListenerOperationService (this bean)
      *                                    ↓
      *                    ListenerPort (adapter implementation)
      *                                    ↓
@@ -94,13 +94,13 @@ public class HexagonalConfig {
      * </pre>
      *
      * @param listenerPort Listener port (automatically injected by Spring)
-     * @return ListenerOperationUseCase bean
+     * @return ListenerOperationService bean
      * @throws NullPointerException if listenerPort is null
      */
     @Bean
-    public ListenerOperationUseCase listenerOperationUseCase(ListenerPort listenerPort) {
+    public ListenerOperationService listenerOperationService(ListenerPort listenerPort) {
         Objects.requireNonNull(listenerPort, "ListenerPort cannot be null");
-        return new ListenerOperationUseCase(listenerPort);
+        return new ListenerOperationService(listenerPort);
     }
 
     /**
@@ -119,7 +119,7 @@ public class HexagonalConfig {
         Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
         Objects.requireNonNull(idKeyManagerPort, "IdKeyManagerPort cannot be null");
         Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
-        return new CreateMovieUseCaseImpl(saveMovieWithIdPort, idKeyManagerPort, csvFileWriterPort);
+        return new CreateMovieUseCaseHandler(saveMovieWithIdPort, idKeyManagerPort, csvFileWriterPort);
     }
 
     /**
@@ -135,7 +135,7 @@ public class HexagonalConfig {
             GetMovieWithIdPort getMovieWithIdPort) {
         Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
         Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
-        return new GetMovieUseCaseImpl(repository, getMovieWithIdPort);
+        return new GetMovieUseCaseHandler(repository, getMovieWithIdPort);
     }
 
     /**
@@ -157,7 +157,7 @@ public class HexagonalConfig {
         Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
         Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
         Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
-        return new UpdateMovieUseCaseImpl(repository, getMovieWithIdPort, saveMovieWithIdPort, csvFileWriterPort);
+        return new UpdateMovieUseCaseHandler(repository, getMovieWithIdPort, saveMovieWithIdPort, csvFileWriterPort);
     }
 
     /**
@@ -173,7 +173,7 @@ public class HexagonalConfig {
             CsvFileWriterPort csvFileWriterPort) {
         Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
         Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
-        return new DeleteMovieUseCaseImpl(repository, csvFileWriterPort);
+        return new DeleteMovieUseCaseHandler(repository, csvFileWriterPort);
     }
 }
 
