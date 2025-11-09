@@ -5,8 +5,6 @@ import com.opencsv.CSVReaderBuilder;
 import golden.raspberry.awards.adapter.driven.persistence.entity.MovieEntity;
 import golden.raspberry.awards.adapter.driven.persistence.repository.MovieJpaRepository;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
@@ -53,8 +51,6 @@ import java.util.stream.IntStream;
  */
 @Component
 public class CsvDataLoader implements CommandLineRunner {
-
-    private static final Logger logger = LoggerFactory.getLogger(CsvDataLoader.class);
 
     private final MovieJpaRepository jpaRepository;
     private final IdKeyManagerPort idKeyManagerPort;
@@ -114,51 +110,19 @@ public class CsvDataLoader implements CommandLineRunner {
      */
     @Override
     public void run(String... args) {
-        logger.info("""
-                ========================================
-                Starting CSV Data Load
-                ========================================
-                File: {}
-                Database: H2 (in-memory)
-                Schema: Auto-created by JPA (ddl-auto=create-drop)
-                Data Source: CSV (sole source - no SQL files)
-                Reset to Original: {}
-                ========================================
-                """, csvFile, resetToOriginal);
-
         try {
-            // Reset CSV to original FIRST if configured
             if (resetToOriginal) {
                 resetCsvToOriginal();
             }
 
-            // Load movies AFTER reset (if reset was done, reads from overwritten file)
             var entities = loadMoviesFromCsv();
             saveMoviesWithIds(entities);
 
-            // Synchronize XML with database MAX(id)
             var maxIdFromDatabase = jpaRepository.findMaxId().orElse(0L);
             var synchronizedId = resetToOriginal
                     ? idKeyManagerPort.resetLastId(maxIdFromDatabase)
                     : idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase);
-
-            logger.info("""
-                    ========================================
-                    CSV Data Load Completed Successfully
-                    ========================================
-                    Total movies loaded: {}
-                    Database MAX(id): {}
-                    Synchronized lastId: {}
-                    ========================================
-                    """, entities.size(), maxIdFromDatabase, synchronizedId);
         } catch (Exception e) {
-            logger.error("""
-                    ========================================
-                    CSV Data Load Failed
-                    ========================================
-                    Error: {}
-                    ========================================
-                    """, e.getMessage(), e);
             throw new RuntimeException("Failed to load CSV data: %s".formatted(e.getMessage()), e);
         }
     }
@@ -176,8 +140,6 @@ public class CsvDataLoader implements CommandLineRunner {
      * @throws Exception if original CSV file cannot be read or target file cannot be written
      */
     private void resetCsvToOriginal() throws Exception {
-        logger.info("Resetting CSV to original file from primary-base...");
-
         var originalResource = new ClassPathResource(csvOriginalFile);
         if (!originalResource.exists()) {
             throw new IllegalStateException(
@@ -192,8 +154,6 @@ public class CsvDataLoader implements CommandLineRunner {
              var outputStream = Files.newOutputStream(targetPath)) {
             inputStream.transferTo(outputStream);
         }
-
-        logger.info("Successfully reset CSV file: {} -> {}", csvOriginalFile, targetPath);
     }
 
     /**
@@ -259,10 +219,7 @@ public class CsvDataLoader implements CommandLineRunner {
             return Optional.ofNullable(reader.readAll())
                     .filter(lines -> !lines.isEmpty())
                     .map(this::parseAllLines)
-                    .orElseGet(() -> {
-                        logger.warn("CSV file is empty: {}", csvFile);
-                        return List.of();
-                    });
+                    .orElse(List.of());
         }
     }
 
@@ -303,10 +260,7 @@ public class CsvDataLoader implements CommandLineRunner {
             String[] line, int lineNumber) {
         return validateLine(line, lineNumber)
                 .map(valid -> parseMovieEntityLineSafely(valid.line(), valid.lineNumber(), line))
-                .orElseGet(() -> {
-                    logInvalidLine(lineNumber, line);
-                    return Optional.empty();
-                });
+                .orElse(Optional.empty());
     }
 
     /**
@@ -322,25 +276,8 @@ public class CsvDataLoader implements CommandLineRunner {
         try {
             return Optional.of(parseMovieEntityLine(line, lineNumber));
         } catch (Exception e) {
-            logger.warn("""
-                    Skipping invalid line {}:
-                      Reason: {}
-                      Data: {}
-                    """, lineNumber, e.getMessage(), String.join(";", originalLine));
             return Optional.empty();
         }
-    }
-
-
-    /**
-     * Logs invalid line information using String Templates.
-     * Uses functional approach to determine error reason.
-     *
-     * @param lineNumber Line number for error reporting
-     * @param line       CSV line that failed validation
-     */
-    private void logInvalidLine(int lineNumber, String[] line) {
-        logValidationError(line, lineNumber);
     }
 
     /**
@@ -376,28 +313,6 @@ public class CsvDataLoader implements CommandLineRunner {
         return line -> line.length >= minColumns;
     }
 
-    /**
-     * Logs validation error using functional approach.
-     *
-     * @param line       CSV line that failed validation
-     * @param lineNumber Line number for error reporting
-     */
-    private void logValidationError(String[] line, int lineNumber) {
-        var reason = Optional.ofNullable(line)
-                .map(l -> "Insufficient columns")
-                .orElse("Line is null");
-        
-        var actualColumns = Optional.ofNullable(line)
-                .map(l -> l.length)
-                .orElse(0);
-
-        logger.warn("""
-                Skipping invalid line {}:
-                  Reason: {}
-                  Expected columns: {}
-                  Got: {}
-                """, lineNumber, reason, minColumns, actualColumns);
-    }
 
     /**
      * Parses a validated CSV line into a MovieEntity with ID from CSV.

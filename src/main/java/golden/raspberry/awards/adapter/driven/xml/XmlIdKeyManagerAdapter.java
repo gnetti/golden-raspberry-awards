@@ -1,8 +1,6 @@
 package golden.raspberry.awards.adapter.driven.xml;
 
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -48,7 +46,6 @@ import java.util.function.Predicate;
 @Component
 public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
 
-    private static final Logger logger = LoggerFactory.getLogger(XmlIdKeyManagerAdapter.class);
     private static final String XML_ROOT_ELEMENT = "keys";
     private static final String XML_LAST_ID_ELEMENT = "lastId";
 
@@ -71,8 +68,7 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
                 .flatMap(this::parseXmlSafely)
                 .flatMap(this::extractLastIdNode)
                 .map(this::extractLastIdValue)
-                .flatMap(this::parseLastId)
-                .map(this::logAndReturnLastId);
+                .flatMap(this::parseLastId);
     }
 
     private Optional<InputStream> createInputStream() {
@@ -80,11 +76,7 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
         return Optional.of(fileSystemPath)
                 .filter(Files::exists)
                 .map(this::readFromFileSystem)
-                .or(this::readFromClasspath)
-                .or(() -> {
-                    logger.warn("XML key file not found: {}", xmlFilePath);
-                    return Optional.empty();
-                });
+                .or(this::readFromClasspath);
     }
 
     private InputStream readFromFileSystem(Path path) {
@@ -115,41 +107,27 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
         try (var stream = inputStream) {
             return Optional.of(parseXml(stream));
         } catch (Exception e) {
-            logger.error("Error parsing XML: {}", xmlFilePath, e);
             return Optional.empty();
         }
     }
 
     private Optional<org.w3c.dom.Node> extractLastIdNode(org.w3c.dom.Document document) {
-        return Optional.ofNullable(document.getElementsByTagName(XML_LAST_ID_ELEMENT).item(0))
-                .or(() -> {
-                    logger.warn("lastId element not found in XML: {}", xmlFilePath);
-                    return Optional.empty();
-                });
+        return Optional.ofNullable(document.getElementsByTagName(XML_LAST_ID_ELEMENT).item(0));
     }
 
     private String extractLastIdValue(org.w3c.dom.Node lastIdNode) {
         return Optional.ofNullable(lastIdNode.getTextContent())
                 .map(String::trim)
                 .filter(Predicate.not(String::isEmpty))
-                .orElseThrow(() -> {
-                    logger.warn("lastId element is empty in XML: {}", xmlFilePath);
-                    return new IllegalStateException("lastId element is empty");
-                });
+                .orElseThrow(() -> new IllegalStateException("lastId element is empty"));
     }
 
     private Optional<Long> parseLastId(String lastIdText) {
         try {
             return Optional.of(Long.parseLong(lastIdText));
         } catch (NumberFormatException e) {
-            logger.error("Invalid lastId format in XML: {} (value: '{}')", xmlFilePath, lastIdText, e);
             return Optional.empty();
         }
-    }
-
-    private Long logAndReturnLastId(Long lastId) {
-        logger.debug("Read lastId from XML: {}", lastId);
-        return lastId;
     }
 
     @Override
@@ -173,10 +151,7 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
 
             var document = createXmlDocument(lastId);
             writeXmlDocument(document, fileSystemPath);
-
-            logger.info("Updated lastId in XML: {} -> {}", xmlFilePath, lastId);
         } catch (Exception e) {
-            logger.error("Error updating lastId in XML: {}", xmlFilePath, e);
             throw new IllegalStateException(
                     "Failed to update lastId in XML: %s".formatted(e.getMessage()), e);
         }
@@ -219,10 +194,7 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
 
         Optional.of(synchronizedId)
                 .filter(id -> !id.equals(lastIdFromXml))
-                .ifPresentOrElse(
-                        id -> updateAndLogSynchronization(id, maxIdFromDatabase, lastIdFromXml),
-                        () -> logAlreadySynchronized(maxIdFromDatabase, lastIdFromXml, synchronizedId)
-                );
+                .ifPresent(this::updateLastId);
 
         return synchronizedId;
     }
@@ -231,11 +203,6 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
     public Long resetLastId(Long resetValue) {
         validateMaxIdFromDatabase(resetValue);
         updateLastId(resetValue);
-        logger.info("""
-                Reset lastId in XML (reset-to-original mode):
-                  Reset value: {}
-                  XML updated to: {}
-                """, resetValue, resetValue);
         return resetValue;
     }
 
@@ -247,31 +214,12 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
                         "maxIdFromDatabase cannot be negative: %d".formatted(maxIdFromDatabase)));
     }
 
-    private void updateAndLogSynchronization(Long synchronizedId, Long maxIdFromDatabase, Long lastIdFromXml) {
-        updateLastId(synchronizedId);
-        logger.info("""
-                Synchronized lastId:
-                  Database MAX(id): {}
-                  XML lastId: {}
-                  Using: {}
-                """, maxIdFromDatabase, lastIdFromXml, synchronizedId);
-    }
-
-    private void logAlreadySynchronized(Long maxIdFromDatabase, Long lastIdFromXml, Long synchronizedId) {
-        logger.debug("""
-                lastId already synchronized:
-                  Database MAX(id): {}
-                  XML lastId: {}
-                  Using: {}
-                """, maxIdFromDatabase, lastIdFromXml, synchronizedId);
-    }
 
     @Override
     public Long getNextId() {
         var currentLastId = getLastId().orElse(0L);
         var nextId = currentLastId + 1;
         updateLastId(nextId);
-        logger.debug("Generated next ID: {} (previous: {})", nextId, currentLastId);
         return nextId;
     }
 

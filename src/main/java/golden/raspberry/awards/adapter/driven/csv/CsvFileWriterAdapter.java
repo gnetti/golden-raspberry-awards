@@ -3,8 +3,6 @@ package golden.raspberry.awards.adapter.driven.csv;
 import com.opencsv.CSVWriter;
 import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.domain.model.MovieWithId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -49,7 +47,6 @@ import java.util.stream.Stream;
 @Component
 public class CsvFileWriterAdapter implements CsvFileWriterPort {
 
-    private static final Logger logger = LoggerFactory.getLogger(CsvFileWriterAdapter.class);
     private static final String CSV_HEADER = "id;year;title;studios;producers;winner;;";
     private static final int ID_COLUMN_INDEX = 0;
 
@@ -78,7 +75,6 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
     @Override
     public void appendMovie(MovieWithId movie) {
         Objects.requireNonNull(movie, "Movie cannot be null");
-        logger.debug("Appending movie to CSV: id={}, title={}", movie.id(), movie.title());
 
         var csvData = readCsvData();
         var newLine = convertMovieToCsvLine(movie);
@@ -88,13 +84,11 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                 .toList();
 
         writeCsvData(new CsvData(csvData.headerLine(), updatedDataLines));
-        logger.info("Successfully appended movie to CSV: id={}, title={}", movie.id(), movie.title());
     }
 
     @Override
     public void updateMovie(MovieWithId movie) {
         Objects.requireNonNull(movie, "Movie cannot be null");
-        logger.debug("Updating movie in CSV: id={}, title={}", movie.id(), movie.title());
 
         var csvData = readCsvData();
         var movieId = String.valueOf(movie.id());
@@ -105,13 +99,11 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
 
         validateMovieExists(updatedDataLines, movieId, csvData.dataLines());
         writeCsvData(new CsvData(csvData.headerLine(), updatedDataLines));
-        logger.info("Successfully updated movie in CSV: id={}, title={}", movie.id(), movie.title());
     }
 
     @Override
     public void removeMovie(Long id) {
         Objects.requireNonNull(id, "ID cannot be null");
-        logger.debug("Removing movie from CSV: id={}", id);
 
         var csvData = readCsvData();
         var movieId = String.valueOf(id);
@@ -122,7 +114,6 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
 
         validateMovieExistsBeforeRemoval(updatedDataLines, movieId, csvData.dataLines());
         writeCsvData(new CsvData(csvData.headerLine(), updatedDataLines));
-        logger.info("Successfully removed movie from CSV: id={}", id);
     }
 
     private CsvData readCsvData() {
@@ -133,10 +124,7 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                         .filter(Files::exists)
                         .map(this::readFromFileSystem))
                 .or(this::readFromClasspath)
-                .orElseGet(() -> {
-                    logger.warn("CSV file not found, creating new file: {}", csvFile);
-                    return List.<String[]>of(CSV_HEADER.split(String.valueOf(csvSeparator)));
-                });
+                .orElseGet(() -> List.<String[]>of(CSV_HEADER.split(String.valueOf(csvSeparator))));
 
         return separateHeaderAndData(allLines);
     }
@@ -152,10 +140,7 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                             .toList();
                     return new CsvData(headerLine, dataLines);
                 })
-                .orElseGet(() -> {
-                    logger.warn("CSV file is empty, using default header: {}", csvFile);
-                    return new CsvData(CSV_HEADER.split(String.valueOf(csvSeparator)), List.of());
-                });
+                .orElseGet(() -> new CsvData(CSV_HEADER.split(String.valueOf(csvSeparator)), List.of()));
     }
 
     private boolean isValidDataLine(String[] line) {
@@ -177,9 +162,8 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
 
             return Optional.ofNullable(csvReader.readAll())
                     .filter(lines -> !lines.isEmpty())
-                    .orElseGet(this::getDefaultHeaderWithLog);
+                    .orElseGet(() -> List.<String[]>of(CSV_HEADER.split(String.valueOf(csvSeparator))));
         } catch (Exception e) {
-            logger.error("Error reading CSV from file system: {}", csvFile, e);
             throw new IllegalStateException(
                     "Failed to read CSV file: %s".formatted(csvFile), e);
         }
@@ -202,9 +186,8 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
 
             return Optional.ofNullable(csvReader.readAll())
                     .filter(lines -> !lines.isEmpty())
-                    .orElseGet(this::getDefaultHeaderWithLog);
+                    .orElseGet(() -> List.<String[]>of(CSV_HEADER.split(String.valueOf(csvSeparator))));
         } catch (Exception e) {
-            logger.error("Error reading CSV from classpath: {}", csvFile, e);
             throw new IllegalStateException(
                     "Failed to read CSV file from classpath: %s".formatted(csvFile), e);
         }
@@ -225,10 +208,7 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                 csvData.dataLines().forEach(csvWriter::writeNext);
                 csvWriter.flush();
             }
-
-            logger.debug("Successfully wrote {} data lines to CSV: {}", csvData.dataLines().size(), csvFile);
         } catch (Exception e) {
-            logger.error("Error writing CSV file: {}", csvFile, e);
             throw new IllegalStateException(
                     "Failed to write CSV file: %s".formatted(csvFile), e);
         }
@@ -298,18 +278,6 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         }
     }
 
-    /**
-     * Returns default CSV header with logging.
-     * Helper method to eliminate code duplication.
-     *
-     * <p>Uses Java 21 features: String Templates for logging.
-     *
-     * @return List containing only the CSV header line
-     */
-    private List<String[]> getDefaultHeaderWithLog() {
-        logger.warn("CSV file is empty, using header only: {}", csvFile);
-        return List.<String[]>of(CSV_HEADER.split(String.valueOf(csvSeparator)));
-    }
 
     /**
      * Internal record for separating CSV header from data lines.
