@@ -1,0 +1,48 @@
+package golden.raspberry.awards.core.domain.model.valueobject;
+
+import java.util.Objects;
+
+/**
+ * Value object representing a movie title.
+ * Immutable value object with business rules.
+ *
+ * <p>This value object is part of the Domain layer and encapsulates
+ * the concept of a movie title following hexagonal architecture principles.
+ *
+ * <p>Uses Java 21 features: Records, Objects.requireNonNull.
+ *
+ * @author Luiz Generoso
+ * @since 1.0.0
+ */
+public record Title(String value) {
+    private static final int MIN_LENGTH = 2;
+    private static final int MAX_LENGTH = 255;
+
+    /**
+     * Compact constructor for validation.
+     */
+    public Title {
+        Objects.requireNonNull(value, "Title value cannot be null");
+        var trimmed = value.trim();
+        if (trimmed.isBlank()) {
+            throw new IllegalArgumentException("Title cannot be blank");
+        }
+        if (trimmed.length() < MIN_LENGTH) {
+            throw new IllegalArgumentException("Title must be at least %d characters".formatted(MIN_LENGTH));
+        }
+        if (trimmed.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException("Title must be at most %d characters".formatted(MAX_LENGTH));
+        }
+    }
+
+    /**
+     * Factory method to create a Title.
+     *
+     * @param value String value
+     * @return Title instance
+     */
+    public static Title of(String value) {
+        return new Title(value);
+    }
+}
+
