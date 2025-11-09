@@ -1,6 +1,6 @@
 package golden.raspberry.awards.infrastructure.listener;
 
-import golden.raspberry.awards.core.application.usecase.ListenerOperationUseCase;
+import golden.raspberry.awards.infrastructure.listener.ListenerOperationService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,7 +22,7 @@ import java.util.UUID;
  * <p><strong>Important:</strong> Uses custom listener use case - NO external listener dependencies.
  *
  * <p>This aspect intercepts REST controller methods and listens to them automatically
- * using the ListenerOperationUseCase. Follows hexagonal architecture principles:
+ * using the ListenerOperationService. Follows hexagonal architecture principles:
  * - Aspect (Infrastructure) calls Use Case (Application)
  * - Use Case orchestrates through Port (ListenerPort)
  * - Adapter (FileListenerAdapter) implements Port and writes to file
@@ -140,15 +140,15 @@ public class ListenerAspect {
         }
     }
 
-    private final ListenerOperationUseCase listenerOperationUseCase;
+    private final ListenerOperationService listenerOperationService;
 
     /**
      * Constructor for dependency injection.
      *
-     * @param listenerOperationUseCase Listener use case (Application layer)
+     * @param listenerOperationService Listener service (Infrastructure layer)
      */
-    public ListenerAspect(ListenerOperationUseCase listenerOperationUseCase) {
-        this.listenerOperationUseCase = Objects.requireNonNull(listenerOperationUseCase, "ListenerOperationUseCase cannot be null");
+    public ListenerAspect(ListenerOperationService listenerOperationService) {
+        this.listenerOperationService = Objects.requireNonNull(listenerOperationService, "ListenerOperationService cannot be null");
     }
 
     /**
@@ -329,7 +329,7 @@ public class ListenerAspect {
     }
 
     /**
-     * Listens to the operation using ListenerOperationUseCase.
+     * Listens to the operation using ListenerOperationService.
      * Uses Switch Expression for elegant method dispatch.
      * Passes sessionId extracted from HTTP request.
      *
@@ -338,22 +338,22 @@ public class ListenerAspect {
      */
     private void listenOperationData(OperationData operationData, String sessionId) {
         switch (operationData.httpMethod()) {
-            case "GET" -> listenerOperationUseCase.listenGet(
+            case "GET" -> listenerOperationService.listenGet(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.dataAfter(), operationData.error()
             );
-            case "PUT" -> listenerOperationUseCase.listenPut(
+            case "PUT" -> listenerOperationService.listenPut(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.dataBefore(), operationData.dataAfter(), operationData.error()
             );
-            case "DELETE" -> listenerOperationUseCase.listenDelete(
+            case "DELETE" -> listenerOperationService.listenDelete(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.dataBefore(), operationData.error()
             );
-            case "POST" -> listenerOperationUseCase.listenPost(
+            case "POST" -> listenerOperationService.listenPost(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.requestData(), operationData.dataAfter(), operationData.error()
