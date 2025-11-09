@@ -1,4 +1,4 @@
-package golden.raspberry.awards.infrastructure.listener.aspect;
+package golden.raspberry.awards.infrastructure.listener;
 
 import golden.raspberry.awards.core.application.usecase.ListenerOperationUseCase;
 import org.aspectj.lang.ProceedingJoinPoint;
