@@ -1,9 +1,9 @@
 package golden.raspberry.awards.core.application.service;
 
-import golden.raspberry.awards.core.domain.model.Movie;
-import golden.raspberry.awards.core.domain.model.ProducerInterval;
+import golden.raspberry.awards.core.domain.model.aggregate.Movie;
+import golden.raspberry.awards.core.domain.model.valueobject.ProducerInterval;
 import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
-import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
+import golden.raspberry.awards.core.domain.repository.MovieRepositoryPort;
 import golden.raspberry.awards.core.domain.service.ProducerIntervalCalculator;
 
 import java.util.List;

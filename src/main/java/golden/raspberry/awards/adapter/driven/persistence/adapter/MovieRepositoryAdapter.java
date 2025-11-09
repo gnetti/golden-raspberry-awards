@@ -5,10 +5,11 @@ import golden.raspberry.awards.adapter.driven.persistence.mapper.MovieMapper;
 import golden.raspberry.awards.adapter.driven.persistence.mapper.MovieWithIdMapper;
 import golden.raspberry.awards.adapter.driven.persistence.repository.MovieJpaRepository;
 import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
+import golden.raspberry.awards.core.application.port.out.MovieQueryPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
-import golden.raspberry.awards.core.domain.model.Movie;
-import golden.raspberry.awards.core.domain.model.MovieWithId;
-import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
+import golden.raspberry.awards.core.domain.model.aggregate.Movie;
+import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
+import golden.raspberry.awards.core.domain.repository.MovieRepositoryPort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.Optional;
  * Uses Spring for dependency injection.
  */
 @Component
-public class MovieRepositoryAdapter implements MovieRepositoryPort, GetMovieWithIdPort, SaveMovieWithIdPort {
+public class MovieRepositoryAdapter implements MovieRepositoryPort, GetMovieWithIdPort, SaveMovieWithIdPort, MovieQueryPort {
 
     private final MovieJpaRepository jpaRepository;
 
@@ -103,6 +104,57 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, GetMovieWith
         }
         jpaRepository.deleteById(id);
         return true;
+    }
+
+    @Override
+    public List<Movie> findAll() {
+        var entities = jpaRepository.findAll();
+        return MovieMapper.toDomainList(entities);
+    }
+
+    @Override
+    public List<MovieWithId> findAllWithId() {
+        var entities = jpaRepository.findAll();
+        return entities.stream()
+                .flatMap(MovieWithIdMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Movie> findByYear(Integer year) {
+        Objects.requireNonNull(year, "Year cannot be null");
+        var entities = jpaRepository.findAll().stream()
+                .filter(entity -> entity.getYear().equals(year))
+                .toList();
+        return MovieMapper.toDomainList(entities);
+    }
+
+    @Override
+    public Optional<Movie> findByYearAndTitle(Integer year, String title) {
+        Objects.requireNonNull(year, "Year cannot be null");
+        Objects.requireNonNull(title, "Title cannot be null");
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity.getYear().equals(year) && entity.getTitle().equals(title))
+                .findFirst()
+                .map(MovieMapper::toDomain);
+    }
+
+    @Override
+    public Optional<MovieWithId> findByYearAndTitleWithId(Integer year, String title) {
+        return findByYearAndTitle(year, title);
+    }
+
+    @Override
+    public List<Movie> findWinners() {
+        return findByWinnerTrue();
+    }
+
+    @Override
+    public List<MovieWithId> findWinnersWithId() {
+        var entities = jpaRepository.findByWinnerTrue();
+        return entities.stream()
+                .flatMap(MovieWithIdMapper::toDomain)
+                .toList();
     }
 }
 

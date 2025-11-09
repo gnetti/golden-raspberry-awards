@@ -1,9 +1,8 @@
 package golden.raspberry.awards.core.application.usecase;
 
 import golden.raspberry.awards.core.application.port.in.GetMovieUseCase;
-import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
-import golden.raspberry.awards.core.domain.model.MovieWithId;
-import golden.raspberry.awards.core.domain.repository.MovieRepositoryPort;
+import golden.raspberry.awards.core.application.port.out.MovieQueryPort;
+import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 
 import java.util.Objects;
 
@@ -29,29 +28,21 @@ import java.util.Objects;
  * @since 1.0.0
  */
 public record GetMovieUseCaseHandler(
-        MovieRepositoryPort repository,
-        GetMovieWithIdPort getMovieWithIdPort) implements GetMovieUseCase {
+        MovieQueryPort movieQueryPort) implements GetMovieUseCase {
 
     /**
      * Constructor for dependency injection.
      *
-     * @param repository        Movie repository port (output port)
-     * @param getMovieWithIdPort Port for getting movie with ID
+     * @param movieQueryPort Port for querying movies (output port)
      */
     public GetMovieUseCaseHandler {
-        Objects.requireNonNull(repository, "Repository cannot be null");
-        Objects.requireNonNull(getMovieWithIdPort, "GetMovieWithIdPort cannot be null");
+        Objects.requireNonNull(movieQueryPort, "MovieQueryPort cannot be null");
     }
 
     @Override
     public MovieWithId execute(Long id) {
         Objects.requireNonNull(id, "ID cannot be null");
-        repository.findById(id)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Movie with ID %d not found".formatted(id)
-                ));
-
-        return getMovieWithIdPort.findByIdWithId(id)
+        return movieQueryPort.findByIdWithId(id)
                 .orElseThrow(() -> new IllegalStateException(
                         "Movie with ID %d not found".formatted(id)
                 ));

@@ -16,7 +16,7 @@ import golden.raspberry.awards.core.application.usecase.CreateMovieUseCaseHandle
 import golden.raspberry.awards.core.application.usecase.DeleteMovieUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.GetMovieUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.UpdateMovieUseCaseHandler;
-import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
+import golden.raspberry.awards.core.domain.repository.MovieRepositoryPort;
 import golden.raspberry.awards.core.domain.service.ProducerIntervalCalculator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
