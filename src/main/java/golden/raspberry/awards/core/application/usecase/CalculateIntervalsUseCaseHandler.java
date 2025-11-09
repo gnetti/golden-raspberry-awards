@@ -2,17 +2,19 @@ package golden.raspberry.awards.core.application.usecase;
 
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsUseCase;
 import golden.raspberry.awards.core.domain.model.Movie;
-import golden.raspberry.awards.core.domain.model.Producer;
 import golden.raspberry.awards.core.domain.model.ProducerInterval;
 import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
+import golden.raspberry.awards.core.domain.service.ProducerIntervalCalculator;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
  * Use Case for calculating producer intervals.
- * Implements the business logic for calculating intervals directly in the use case.
+ * Orchestrates the calculation by delegating business logic to domain service.
  *
  * <p>This use case is part of the Application layer and orchestrates
  * the calculation of producer intervals following hexagonal architecture principles.
@@ -51,9 +53,9 @@ public record CalculateIntervalsUseCaseHandler(
             return new ProducerIntervalResponse(List.of(), List.of());
         }
 
-        Map<String, List<Integer>> producerWins = groupWinsByProducer(winningMovies);
+        Map<String, List<Integer>> producerWins = ProducerIntervalCalculator.groupWinsByProducer(winningMovies);
 
-        List<ProducerInterval> allIntervals = calculateIntervals(producerWins);
+        List<ProducerInterval> allIntervals = ProducerIntervalCalculator.calculateIntervals(producerWins);
 
         if (allIntervals.isEmpty()) {
             return new ProducerIntervalResponse(List.of(), List.of());
@@ -78,64 +80,6 @@ public record CalculateIntervalsUseCaseHandler(
                 .collect(Collectors.toList());
 
         return new ProducerIntervalResponse(minIntervals, maxIntervals);
-    }
-
-    /**
-     * Groups winning movies by producer.
-     * Handles multiple producers per movie (comma and "and" separated).
-     * Removes duplicate years for the same producer (when a producer wins multiple times in the same year).
-     *
-     * @param winningMovies List of winning movies
-     * @return Map of producer names to their unique winning years (sorted)
-     */
-    private Map<String, List<Integer>> groupWinsByProducer(List<Movie> winningMovies) {
-        Map<String, List<Integer>> producerWins = new HashMap<>();
-
-        for (Movie movie : winningMovies) {
-            List<Producer> producers = Producer.parseMultiple(movie.producers());
-
-            for (Producer producer : producers) {
-                producerWins.computeIfAbsent(producer.name(), k -> new ArrayList<>())
-                        .add(movie.year());
-            }
-        }
-
-        producerWins.replaceAll((producer, years) -> {
-            var uniqueYears = new LinkedHashSet<>(years);
-            var sortedYears = new ArrayList<>(uniqueYears);
-            Collections.sort(sortedYears);
-            return sortedYears;
-        });
-
-        return producerWins;
-    }
-
-    /**
-     * Calculates intervals between consecutive wins for each producer.
-     *
-     * @param producerWins Map of producer names to their winning years
-     * @return List of intervals for all producers
-     */
-    private List<ProducerInterval> calculateIntervals(Map<String, List<Integer>> producerWins) {
-        List<ProducerInterval> intervals = new ArrayList<>();
-
-        for (Map.Entry<String, List<Integer>> entry : producerWins.entrySet()) {
-            String producer = entry.getKey();
-            List<Integer> years = entry.getValue();
-
-            if (years.size() < 2) {
-                continue;
-            }
-
-            for (int i = 0; i < years.size() - 1; i++) {
-                Integer previousWin = years.get(i);
-                Integer followingWin = years.get(i + 1);
-
-                intervals.add(ProducerInterval.of(producer, previousWin, followingWin));
-            }
-        }
-
-        return intervals;
     }
 }
 
