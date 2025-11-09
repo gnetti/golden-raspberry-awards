@@ -1,6 +1,6 @@
 package golden.raspberry.awards.infrastructure.listener;
 
-import golden.raspberry.awards.infrastructure.listener.ListenerOperationService;
+import golden.raspberry.awards.core.application.port.out.ListenerPort;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,9 +22,8 @@ import java.util.UUID;
  * <p><strong>Important:</strong> Uses custom listener use case - NO external listener dependencies.
  *
  * <p>This aspect intercepts REST controller methods and listens to them automatically
- * using the ListenerOperationService. Follows hexagonal architecture principles:
- * - Aspect (Infrastructure) calls Use Case (Application)
- * - Use Case orchestrates through Port (ListenerPort)
+ * using the ListenerPort directly. Follows hexagonal architecture principles:
+ * - Aspect (Infrastructure) calls Port (ListenerPort) directly
  * - Adapter (FileListenerAdapter) implements Port and writes to file
  *
  * <p>Intercepts:
@@ -140,15 +139,15 @@ public class ListenerAspect {
         }
     }
 
-    private final ListenerOperationService listenerOperationService;
+    private final ListenerPort listenerPort;
 
     /**
      * Constructor for dependency injection.
      *
-     * @param listenerOperationService Listener service (Infrastructure layer)
+     * @param listenerPort Listener port (output port)
      */
-    public ListenerAspect(ListenerOperationService listenerOperationService) {
-        this.listenerOperationService = Objects.requireNonNull(listenerOperationService, "ListenerOperationService cannot be null");
+    public ListenerAspect(ListenerPort listenerPort) {
+        this.listenerPort = Objects.requireNonNull(listenerPort, "ListenerPort cannot be null");
     }
 
     /**
@@ -329,7 +328,7 @@ public class ListenerAspect {
     }
 
     /**
-     * Listens to the operation using ListenerOperationService.
+     * Listens to the operation using ListenerPort directly.
      * Uses Switch Expression for elegant method dispatch.
      * Passes sessionId extracted from HTTP request.
      *
@@ -338,22 +337,22 @@ public class ListenerAspect {
      */
     private void listenOperationData(OperationData operationData, String sessionId) {
         switch (operationData.httpMethod()) {
-            case "GET" -> listenerOperationService.listenGet(
+            case "GET" -> listenerPort.listenGet(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.dataAfter(), operationData.error()
             );
-            case "PUT" -> listenerOperationService.listenPut(
+            case "PUT" -> listenerPort.listenPut(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.dataBefore(), operationData.dataAfter(), operationData.error()
             );
-            case "DELETE" -> listenerOperationService.listenDelete(
+            case "DELETE" -> listenerPort.listenDelete(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.dataBefore(), operationData.error()
             );
-            case "POST" -> listenerOperationService.listenPost(
+            case "POST" -> listenerPort.listenPost(
                     sessionId, operationData.httpMethod(), operationData.endpoint(), operationData.statusCode(),
                     operationData.entityType(), operationData.entityId(),
                     operationData.requestData(), operationData.dataAfter(), operationData.error()

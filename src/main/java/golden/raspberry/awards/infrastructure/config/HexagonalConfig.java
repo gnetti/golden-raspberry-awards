@@ -14,7 +14,6 @@ import golden.raspberry.awards.core.application.usecase.CalculateIntervalsUseCas
 import golden.raspberry.awards.core.application.usecase.CreateMovieUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.DeleteMovieUseCaseHandler;
 import golden.raspberry.awards.core.application.usecase.GetMovieUseCaseHandler;
-import golden.raspberry.awards.infrastructure.listener.ListenerOperationService;
 import golden.raspberry.awards.core.application.usecase.UpdateMovieUseCaseHandler;
 import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
 import org.springframework.context.annotation.Bean;
@@ -75,33 +74,6 @@ public class HexagonalConfig {
         return new CalculateIntervalsUseCaseHandler(repository);
     }
     
-    /**
-     * Creates a bean for the ListenerOperationService.
-     *
-     * <p>This bean wires the infrastructure service (ListenerOperationService) with
-     * the listener adapter (ListenerPort). The adapter is automatically
-     * injected by Spring, maintaining the hexagonal architecture pattern.
-     *
-     * <p><strong>Flow:</strong>
-     * <pre>
-     * Infrastructure → ListenerOperationService (this bean)
-     *                                    ↓
-     *                    ListenerPort (adapter implementation)
-     *                                    ↓
-     *                    FileListenerAdapter (file adapter)
-     *                                    ↓
-     *                    File System (resources/listener)
-     * </pre>
-     *
-     * @param listenerPort Listener port (automatically injected by Spring)
-     * @return ListenerOperationService bean
-     * @throws NullPointerException if listenerPort is null
-     */
-    @Bean
-    public ListenerOperationService listenerOperationService(ListenerPort listenerPort) {
-        Objects.requireNonNull(listenerPort, "ListenerPort cannot be null");
-        return new ListenerOperationService(listenerPort);
-    }
 
     /**
      * Creates a bean for the CreateMovieUseCase.
