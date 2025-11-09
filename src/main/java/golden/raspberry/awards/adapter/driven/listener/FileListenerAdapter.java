@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 public class FileListenerAdapter implements ListenerPort {
 
     private final ObjectMapper objectMapper;
-    private final ListenerService listenerService;
+    private final ListenerAdapter listenerAdapter;
     private final boolean enabled;
     private final String basePath;
     private final String prefix;
@@ -74,7 +74,7 @@ public class FileListenerAdapter implements ListenerPort {
      */
     public FileListenerAdapter(
             ObjectMapper objectMapper,
-            ListenerService listenerService,
+            ListenerAdapter listenerAdapter,
             @Value("${listener.enabled:true}") boolean enabled,
             @Value("${listener.base-path:src/main/resources/listener}") String basePath,
             @Value("${listener.prefix:listener}") String prefix,
@@ -83,7 +83,7 @@ public class FileListenerAdapter implements ListenerPort {
             @Value("${listener.retention-days:7}") int retentionDays) {
         
         this.objectMapper = Objects.requireNonNull(objectMapper, "ObjectMapper cannot be null");
-        this.listenerService = Objects.requireNonNull(listenerService, "ListenerService cannot be null");
+        this.listenerAdapter = Objects.requireNonNull(listenerAdapter, "ListenerAdapter cannot be null");
         this.enabled = enabled;
         this.basePath = Objects.requireNonNull(basePath, "Base path cannot be null");
         this.prefix = Objects.requireNonNull(prefix, "Prefix cannot be null");
@@ -100,9 +100,9 @@ public class FileListenerAdapter implements ListenerPort {
                        String entityType, String entityId, Object responseData, String error) {
         if (!enabled) return;
         
-        listenerService.observeProcess("GET operation: %s %s".formatted(httpMethod, endpoint));
-        listenerService.emitWithSession(responseData, sessionId);
-        listenerService.recordResult(responseData);
+        listenerAdapter.observeProcess("GET operation: %s %s".formatted(httpMethod, endpoint));
+        listenerAdapter.emitWithSession(responseData, sessionId);
+        listenerAdapter.recordResult(responseData);
         
         var listenerMessage = buildListenerMessage(
                 "GET", sessionId, httpMethod, endpoint, statusCode,
@@ -116,12 +116,12 @@ public class FileListenerAdapter implements ListenerPort {
                        String entityType, String entityId, Object dataBefore, Object dataAfter, String error) {
         if (!enabled) return;
         
-        listenerService.observeProcess("PUT operation: %s %s".formatted(httpMethod, endpoint));
-        listenerService.archiveData(dataBefore);
-        listenerService.archiveData(dataAfter);
+        listenerAdapter.observeProcess("PUT operation: %s %s".formatted(httpMethod, endpoint));
+        listenerAdapter.archiveData(dataBefore);
+        listenerAdapter.archiveData(dataAfter);
         var changes = listenerService.detectChanges(dataBefore, dataAfter);
-        listenerService.emitWithSession(changes, sessionId);
-        listenerService.recordResult(dataAfter);
+        listenerAdapter.emitWithSession(changes, sessionId);
+        listenerAdapter.recordResult(dataAfter);
         
         var listenerMessage = buildListenerMessage(
                 "PUT", sessionId, httpMethod, endpoint, statusCode,
@@ -135,11 +135,11 @@ public class FileListenerAdapter implements ListenerPort {
                           String entityType, String entityId, Object dataBefore, String error) {
         if (!enabled) return;
         
-        listenerService.observeProcess("DELETE operation: %s %s".formatted(httpMethod, endpoint));
-        listenerService.archiveData(dataBefore);
-        listenerService.preserveData(dataBefore);
-        listenerService.emitWithSession(dataBefore, sessionId);
-        listenerService.recordResult(dataBefore);
+        listenerAdapter.observeProcess("DELETE operation: %s %s".formatted(httpMethod, endpoint));
+        listenerAdapter.archiveData(dataBefore);
+        listenerAdapter.preserveData(dataBefore);
+        listenerAdapter.emitWithSession(dataBefore, sessionId);
+        listenerAdapter.recordResult(dataBefore);
         
         var listenerMessage = buildListenerMessage(
                 "DELETE", sessionId, httpMethod, endpoint, statusCode,
@@ -153,11 +153,11 @@ public class FileListenerAdapter implements ListenerPort {
                         String entityType, String entityId, Object requestData, Object responseData, String error) {
         if (!enabled) return;
         
-        listenerService.observeProcess("POST operation: %s %s".formatted(httpMethod, endpoint));
-        listenerService.emitWithSession(requestData, sessionId);
-        listenerService.emitWithSession(responseData, sessionId);
-        listenerService.storeData(responseData);
-        listenerService.recordResult(responseData);
+        listenerAdapter.observeProcess("POST operation: %s %s".formatted(httpMethod, endpoint));
+        listenerAdapter.emitWithSession(requestData, sessionId);
+        listenerAdapter.emitWithSession(responseData, sessionId);
+        listenerAdapter.storeData(responseData);
+        listenerAdapter.recordResult(responseData);
         
         var listenerMessage = buildListenerMessage(
                 "POST", sessionId, httpMethod, endpoint, statusCode,
