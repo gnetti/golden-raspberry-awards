@@ -3,7 +3,7 @@ package golden.raspberry.awards.core.application.usecase;
 import golden.raspberry.awards.core.application.port.in.GetMovieUseCase;
 import golden.raspberry.awards.core.application.port.out.GetMovieWithIdPort;
 import golden.raspberry.awards.core.domain.model.MovieWithId;
-import golden.raspberry.awards.core.domain.port.out.MovieRepositoryPort;
+import golden.raspberry.awards.core.domain.repository.MovieRepositoryPort;
 
 import java.util.Objects;
 
