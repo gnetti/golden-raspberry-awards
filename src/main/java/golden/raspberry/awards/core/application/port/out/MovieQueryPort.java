@@ -2,6 +2,7 @@ package golden.raspberry.awards.core.application.port.out;
 
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,5 +20,12 @@ public interface MovieQueryPort {
      * @return Optional containing MovieWithId if found, empty otherwise
      */
     Optional<MovieWithId> findByIdWithId(Long id);
+
+    /**
+     * Finds all movies with ID.
+     *
+     * @return List of all MovieWithId
+     */
+    List<MovieWithId> findAll();
 }
 

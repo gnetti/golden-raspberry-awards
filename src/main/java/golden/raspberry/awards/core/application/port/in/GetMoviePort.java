@@ -2,8 +2,10 @@ package golden.raspberry.awards.core.application.port.in;
 
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 
+import java.util.List;
+
 /**
- * Input Port for getting a movie by ID.
+ * Input Port for getting movies.
  *
  * @author Luiz Generoso
  * @since 1.0.0
@@ -18,5 +20,12 @@ public interface GetMoviePort {
      * @throws IllegalStateException if movie not found
      */
     MovieWithId execute(Long id);
+
+    /**
+     * Gets all movies.
+     *
+     * @return List of all MovieWithId
+     */
+    List<MovieWithId> executeAll();
 }
 

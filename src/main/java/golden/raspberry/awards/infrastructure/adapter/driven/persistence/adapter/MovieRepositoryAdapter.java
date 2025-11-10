@@ -116,5 +116,16 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, SaveMovieWit
         return true;
     }
 
+    /**
+     * Finds all movies with ID.
+     *
+     * @return List of all MovieWithId
+     */
+    @Override
+    public List<MovieWithId> findAll() {
+        var entities = jpaRepository.findAll();
+        return MovieWithIdMapper.toDomainList(entities);
+    }
+
 }
 

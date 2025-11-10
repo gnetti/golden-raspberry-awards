@@ -3,6 +3,7 @@ package golden.raspberry.awards.infrastructure.adapter.driven.persistence.mapper
 import golden.raspberry.awards.infrastructure.adapter.driven.persistence.entity.MovieEntity;
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,6 +45,18 @@ public final class MovieWithIdMapper {
                 entity.getProducers(),
                 entity.getWinner()
         );
+    }
+
+    /**
+     * Converts a list of MovieEntity to a list of MovieWithId.
+     *
+     * @param entities List of MovieEntity
+     * @return List of MovieWithId
+     */
+    public static List<MovieWithId> toDomainList(List<MovieEntity> entities) {
+        return entities.stream()
+                .map(MovieWithIdMapper::mapToDomain)
+                .toList();
     }
 }
 

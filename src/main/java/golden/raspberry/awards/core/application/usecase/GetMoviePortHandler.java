@@ -5,6 +5,7 @@ import golden.raspberry.awards.core.application.port.out.MovieQueryPort;
 import golden.raspberry.awards.core.application.usecase.validation.MovieValidation;
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,6 +42,16 @@ public record GetMoviePortHandler(
                 .orElseThrow(() -> new IllegalStateException(
                         "Movie with ID %d not found".formatted(id)
                 ));
+    }
+
+    /**
+     * Executes use case to get all movies.
+     *
+     * @return List of all MovieWithId
+     */
+    @Override
+    public List<MovieWithId> executeAll() {
+        return movieQueryPort.findAll();
     }
 }
 
