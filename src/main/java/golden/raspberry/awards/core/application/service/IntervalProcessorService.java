@@ -2,9 +2,8 @@ package golden.raspberry.awards.core.application.service;
 
 import golden.raspberry.awards.core.domain.model.aggregate.Movie;
 import golden.raspberry.awards.core.domain.model.valueobject.ProducerInterval;
-import golden.raspberry.awards.core.domain.model.ProducerIntervalResponse;
-import golden.raspberry.awards.core.domain.repository.MovieRepositoryPort;
-import golden.raspberry.awards.core.domain.service.ProducerIntervalCalculator;
+import golden.raspberry.awards.core.domain.model.valueobject.ProducerIntervalResponse;
+import golden.raspberry.awards.core.application.port.out.MovieRepositoryPort;
 
 import java.util.List;
 import java.util.Map;
@@ -13,54 +12,28 @@ import java.util.stream.Collectors;
 
 /**
  * Application service for orchestrating producer interval calculations.
- * Orchestrates the flow between repository, domain service, and response.
- *
- * <p>This service is part of the Application layer and orchestrates
- * the calculation of producer intervals following hexagonal architecture principles.
- *
- * <p><strong>Application Service Rules:</strong>
- * <ul>
- *   <li>Orchestrates flow between domain and ports</li>
- *   <li>NO business logic (delegates to domain service)</li>
- *   <li>Coordinates repository calls and domain service calls</li>
- *   <li>Depends only on ports and domain services</li>
- * </ul>
- *
- * <p><strong>Flow:</strong>
- * <pre>
- * Application Service (this)
- *     ↓
- * MovieRepositoryPort (Domain - Port OUT)
- *     ↓
- * ProducerIntervalCalculator (Domain - Service)
- *     ↓
- * ProducerIntervalResponse
- * </pre>
- *
- * <p>Uses Java 21 features: var, Objects.requireNonNull, Streams.
  *
  * @author Luiz Generoso
  * @since 1.0.0
  */
-public record ProducerIntervalCalculationService(MovieRepositoryPort repository,
-                                                 ProducerIntervalCalculator calculator) {
+public record IntervalProcessorService(MovieRepositoryPort repository,
+                                       golden.raspberry.awards.core.domain.service.IntervalProcessorService calculator) {
 
     /**
      * Constructor for dependency injection.
      *
-     * @param repository Movie repository port (output port)
+     * @param repository Movie repository port
      * @param calculator Domain service for interval calculations
      */
-    public ProducerIntervalCalculationService(
+    public IntervalProcessorService(
             MovieRepositoryPort repository,
-            ProducerIntervalCalculator calculator) {
+            golden.raspberry.awards.core.domain.service.IntervalProcessorService calculator) {
         this.repository = Objects.requireNonNull(repository, "MovieRepositoryPort cannot be null");
-        this.calculator = Objects.requireNonNull(calculator, "ProducerIntervalCalculator cannot be null");
+        this.calculator = Objects.requireNonNull(calculator, "IntervalProcessorService cannot be null");
     }
 
     /**
      * Orchestrates the calculation of producer intervals.
-     * Coordinates repository calls and domain service calls.
      *
      * @return ProducerIntervalResponse with min and max intervals
      */
