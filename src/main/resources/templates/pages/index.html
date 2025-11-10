@@ -8,47 +8,130 @@
 <body>
 <div layout:fragment="content">
     <div class="row">
-        <div class="col-md-12 text-center mb-4">
-            <h1 class="display-4">
+        <div class="col-md-12 text-center mb-3">
+            <h2 class="mb-2">
                 <i class="fa-solid fa-trophy text-warning"></i>
                 Golden Raspberry Awards
-            </h1>
-            <p class="lead">Awards Management System</p>
+            </h2>
+            <p class="small mb-0">Awards Management System</p>
         </div>
     </div>
 
-        <div class="row mt-5">
-            <div class="col-md-6 mb-4 d-flex">
-                <div class="card w-100">
-                    <div class="card-body text-center d-flex flex-column">
-                        <i class="fa-solid fa-chart-line fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Producer Intervals</h5>
-                        <p class="card-text flex-grow-1">
-                            Visualize the producers with the longest and shortest intervals between consecutive awards.
-                        </p>
-                        <a th:href="@{/intervals}" class="btn btn-primary mt-auto">
-                            <i class="fa-solid fa-arrow-right"></i> View Intervals
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6 mb-4 d-flex">
-                <div class="card w-100">
-                    <div class="card-body text-center d-flex flex-column">
-                        <i class="fa-solid fa-film fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">API REST</h5>
-                        <p class="card-text flex-grow-1">
-                           Access the REST API documentation via Swagger UI.
-                        </p>
-                        <a href="/swagger-ui.html" class="btn btn-success mt-auto" target="_blank">
-                            <i class="fa-solid fa-book"></i> Swagger UI
-                        </a>
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-body compact-info-card">
+                    <h6 class="card-title mb-2">
+                        <i class="fas fa-info-circle text-primary"></i> About This API
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1 small"><strong>Version:</strong> <span th:text="${apiVersion}">1.0.0</span></p>
+                            <p class="mb-1 small"><strong>Base URL:</strong> <code th:text="${baseUrl}">http://localhost:8080</code></p>
+                            <p class="mb-1 small"><strong>Author:</strong> <span th:text="${author}">Luiz Generoso</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 small"><strong>Description:</strong> <span th:text="${description}">RESTful API for managing Golden Raspberry Awards movie data</span></p>
+                            <p class="mb-1 small"><strong>Architecture:</strong> <span th:text="${architecture}">Hexagonal Architecture</span></p>
+                            <p class="mb-1 small"><strong>Maturity Level:</strong> <span th:text="${maturityLevel}">Richardson Level 2</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="row g-2">
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100 border-primary compact-card">
+                <div class="card-body text-center d-flex flex-column">
+                    <i class="fa-solid fa-chart-line fa-2x text-primary mb-2"></i>
+                    <h6 class="card-title mb-2">Producer Intervals</h6>
+                    <p class="card-text flex-grow-1 small">
+                        Visualize the producers with the longest and shortest intervals between consecutive awards.
+                    </p>
+                    <a th:href="@{/intervals}" class="btn btn-primary btn-sm mt-auto">
+                        <i class="fa-solid fa-arrow-right"></i> View Intervals
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100 border-success compact-card">
+                <div class="card-body text-center d-flex flex-column">
+                    <i class="fas fa-tools fa-2x text-success mb-2"></i>
+                    <h6 class="card-title mb-2">Swagger UI</h6>
+                    <p class="card-text flex-grow-1 small">
+                        Interactive API documentation with live testing capabilities. Try out all endpoints directly from your browser.
+                    </p>
+                    <a th:href="@{/swagger-ui.html}" class="btn btn-success btn-sm mt-auto" target="_blank">
+                        <i class="fa-solid fa-book"></i> Open Swagger
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100 border-info compact-card">
+                <div class="card-body text-center d-flex flex-column">
+                    <i class="fas fa-book-open fa-2x text-info mb-2"></i>
+                    <h6 class="card-title mb-2">JavaDoc</h6>
+                    <p class="card-text flex-grow-1 small">
+                        Complete API reference documentation generated from JavaDoc comments.
+                    </p>
+                    <a th:href="@{/docs/index.html}" class="btn btn-info btn-sm mt-auto" target="_blank">
+                        <i class="fa-solid fa-book-open"></i> View JavaDoc
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100 border-warning compact-card">
+                <div class="card-body text-center d-flex flex-column">
+                    <i class="fas fa-file-code fa-2x text-warning mb-2"></i>
+                    <h6 class="card-title mb-2">OpenAPI Spec</h6>
+                    <p class="card-text flex-grow-1 small">
+                        Raw OpenAPI 3.0 JSON specification. Use this to import into API clients like Postman or generate SDKs.
+                    </p>
+                    <a th:href="@{/api-docs}" class="btn btn-warning btn-sm mt-auto" target="_blank">
+                        <i class="fa-solid fa-file-code"></i> View Spec
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100 border-danger compact-card">
+                <div class="card-body text-center d-flex flex-column">
+                    <i class="fas fa-film fa-2x text-danger mb-2"></i>
+                    <h6 class="card-title mb-2">Movies API</h6>
+                    <p class="card-text flex-grow-1 small">
+                        RESTful endpoints for movie CRUD operations. Create, read, update, and delete movie records.
+                    </p>
+                    <a th:href="@{/api/movies}" class="btn btn-danger btn-sm mt-auto" target="_blank">
+                        <i class="fa-solid fa-film"></i> View API
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100 border-secondary compact-card">
+                <div class="card-body text-center d-flex flex-column">
+                    <i class="fas fa-database fa-2x text-secondary mb-2"></i>
+                    <h6 class="card-title mb-2">H2 Console</h6>
+                    <p class="card-text flex-grow-1 small">
+                        Access the in-memory H2 database console. JDBC URL: jdbc:h2:~/test
+                    </p>
+                    <a th:href="@{/h2-console}" class="btn btn-secondary btn-sm mt-auto" target="_blank">
+                        <i class="fa-solid fa-database"></i> Open Console
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
-
