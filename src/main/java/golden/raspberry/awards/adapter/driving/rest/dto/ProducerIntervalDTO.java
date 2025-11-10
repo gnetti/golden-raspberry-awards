@@ -1,6 +1,7 @@
 package golden.raspberry.awards.adapter.driving.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Objects;
 
@@ -11,27 +12,24 @@ import java.util.Objects;
  * @author Luiz Generoso
  * @since 1.0.0
  */
+@Schema(description = "Data Transfer Object for producer interval information")
 public record ProducerIntervalDTO(
         @JsonProperty("producer")
+        @Schema(description = "Producer name", example = "Joel Silver")
         String producer,
 
         @JsonProperty("interval")
+        @Schema(description = "Interval in years between consecutive wins", example = "1", minimum = "0")
         Integer interval,
 
         @JsonProperty("previousWin")
+        @Schema(description = "Year of the previous win", example = "1990")
         Integer previousWin,
 
         @JsonProperty("followingWin")
+        @Schema(description = "Year of the following win", example = "1991")
         Integer followingWin
 ) {
-    /**
-     * Compact constructor for validation.
-     * @param producer Producer name (non-null, non-blank)
-     * @param interval Interval in years (non-null, non-negative)
-     * @param previousWin Previous win year (non-null)
-     * @param followingWin Following win year (non-null)
-     * @throws IllegalArgumentException if validation fails
-     */
     public ProducerIntervalDTO {
         Objects.requireNonNull(producer, "Producer cannot be null");
         Objects.requireNonNull(interval, "Interval cannot be null");

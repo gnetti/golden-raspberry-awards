@@ -1,6 +1,7 @@
 package golden.raspberry.awards.adapter.driving.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -17,31 +18,28 @@ import java.util.Objects;
  * @author Luiz Generoso
  * @since 1.0.0
  */
+@Schema(description = "Data Transfer Object for API error responses")
 public record ApiErrorDTO(
         @JsonProperty("timestamp")
+        @Schema(description = "Timestamp when the error occurred", example = "2025-11-10T15:56:31.7641082")
         LocalDateTime timestamp,
 
         @JsonProperty("status")
+        @Schema(description = "HTTP status code", example = "400")
         Integer status,
 
         @JsonProperty("error")
+        @Schema(description = "Error type", example = "Bad Request")
         String error,
 
         @JsonProperty("message")
+        @Schema(description = "Detailed error message", example = "Field 'year' is missing from request body")
         String message,
 
         @JsonProperty("path")
+        @Schema(description = "Request path that caused the error", example = "/api/movies")
         String path
 ) {
-    /**
-     * Compact constructor for validation.
-     * @param timestamp Timestamp (non-null)
-     * @param status HTTP status code (non-null)
-     * @param error Error type (non-null, non-blank)
-     * @param message Error message (non-null, non-blank)
-     * @param path Request path (non-null)
-     * @throws IllegalArgumentException if validation fails
-     */
     public ApiErrorDTO {
         Objects.requireNonNull(timestamp, "Timestamp cannot be null");
         Objects.requireNonNull(status, "Status cannot be null");
