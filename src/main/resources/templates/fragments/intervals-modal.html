@@ -1,0 +1,85 @@
+<div class="row mb-3">
+    <div class="col-12">
+        <p class="text-muted mb-0">
+            Producers with shortest and longest intervals between consecutive awards
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fa-solid fa-arrow-down"></i>
+                    Shortest Interval
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Producer</th>
+                            <th>Interval</th>
+                            <th>Previous Year</th>
+                            <th>Following Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${intervals.min.isEmpty()}">
+                            <td colspan="4" class="text-center text-muted">
+                                No minimum interval found
+                            </td>
+                        </tr>
+                        <tr th:each="interval : ${intervals.min}">
+                            <td th:text="${interval.producer}"></td>
+                            <td>
+                                <span class="badge bg-success badge-interval" th:text="${interval.interval} + ' years'"></span>
+                            </td>
+                            <td th:text="${interval.previousWin}"></td>
+                            <td th:text="${interval.followingWin}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fa-solid fa-arrow-up"></i>
+                    Longest Interval
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Producer</th>
+                            <th>Interval</th>
+                            <th>Previous Year</th>
+                            <th>Following Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${intervals.max.isEmpty()}">
+                            <td colspan="4" class="text-center text-muted">
+                                No maximum interval found
+                            </td>
+                        </tr>
+                        <tr th:each="interval : ${intervals.max}">
+                            <td th:text="${interval.producer}"></td>
+                            <td>
+                                <span class="badge bg-warning text-dark badge-interval" th:text="${interval.interval} + ' years'"></span>
+                            </td>
+                            <td th:text="${interval.previousWin}"></td>
+                            <td th:text="${interval.followingWin}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

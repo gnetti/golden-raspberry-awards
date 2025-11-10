@@ -1,0 +1,236 @@
+html {
+    background-color: #f5f5dc !important;
+}
+
+body {
+    background-color: #f5f5dc !important;
+    color: #212529 !important;
+}
+
+html body {
+    background-color: #f5f5dc !important;
+    color: #212529 !important;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.header {
+    background-color: #e8e8d3 !important;
+    color: #212529 !important;
+    border-bottom: 1px solid #d4d4c4 !important;
+}
+
+.menuBar {
+    background-color: #e8e8d3 !important;
+    border-bottom: 1px solid #d4d4c4 !important;
+}
+
+.menuBar a {
+    color: #0d6efd !important;
+}
+
+.menuBar a:hover {
+    color: #0a58ca !important;
+}
+
+.login {
+    background-color: #fafaf0 !important;
+    border: 1px solid #d4d4c4 !important;
+    color: #212529 !important;
+}
+
+.login input[type="text"],
+.login input[type="password"],
+.login select {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.login input[type="text"]:focus,
+.login input[type="password"]:focus,
+.login select:focus {
+    background-color: #ffffff !important;
+    border-color: #86b7fe !important;
+    outline: none !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.login button {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    border: 1px solid #0d6efd !important;
+}
+
+.login button:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}
+
+.main {
+    background-color: #f5f5dc !important;
+    color: #212529 !important;
+}
+
+.toolbar {
+    background-color: #e8e8d3 !important;
+    border-bottom: 1px solid #d4d4c4 !important;
+}
+
+.toolbar button {
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.toolbar button:hover {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    border-color: #0d6efd !important;
+}
+
+.toolbar input[type="text"],
+.toolbar select {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #ced4da !important;
+}
+
+.sqlArea {
+    background-color: #fafaf0 !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.sqlArea textarea {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.result {
+    background-color: #fafaf0 !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.result table {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+.result table th {
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.result table td {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.result table tr:nth-child(even) {
+    background-color: #f5f5dc !important;
+}
+
+.tree {
+    background-color: #e8e8d3 !important;
+    color: #212529 !important;
+    border-right: 1px solid #d4d4c4 !important;
+}
+
+.tree a {
+    color: #0d6efd !important;
+}
+
+.tree a:hover {
+    color: #0a58ca !important;
+}
+
+.help {
+    background-color: #fafaf0 !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+.help table {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+.help table th {
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+}
+
+.help table td {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+div,
+span,
+p,
+label,
+td,
+th {
+    color: #212529 !important;
+}
+
+div[class*="left"],
+div[class*="right"],
+div[class*="content"],
+div[class*="panel"],
+td[class*="left"],
+td[class*="right"] {
+    background-color: transparent !important;
+    color: #212529 !important;
+}
+
+table {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+table td,
+table th {
+    color: #212529 !important;
+    background-color: #ffffff !important;
+}
+
+table tr:nth-child(even) td {
+    background-color: #f5f5dc !important;
+}
+
+a {
+    color: #0d6efd !important;
+}
+
+a:hover {
+    color: #0a58ca !important;
+}
+
+input[type="text"],
+input[type="password"],
+select,
+textarea {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+button {
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+    border: 1px solid #d4d4c4 !important;
+}
+
+button:hover {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    border-color: #0d6efd !important;
+}
