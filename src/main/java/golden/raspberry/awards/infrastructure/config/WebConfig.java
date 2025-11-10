@@ -8,7 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.File;
 
 /**
- * Web configuration for static resources.
+ * Web configuration for serving JavaDoc documentation.
+ * Configures resource handlers to serve JavaDoc files from the external docs directory.
  *
  * @author Luiz Generoso
  * @since 1.0.0
@@ -17,7 +18,8 @@ import java.io.File;
 public class WebConfig implements WebMvcConfigurer {
 
     /**
-     * Configures resource handlers for static files.
+     * Configures resource handlers for JavaDoc documentation.
+     * Serves JavaDoc files from the external docs directory.
      *
      * @param registry ResourceHandlerRegistry to configure
      */

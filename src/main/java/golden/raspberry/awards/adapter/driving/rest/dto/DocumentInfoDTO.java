@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  */
 @Schema(description = "Documentation information data")
-public record DocumentationInfoDTO(
+public record DocumentInfoDTO(
         @Schema(description = "API version", example = "1.0.0")
         String apiVersion,
 
@@ -23,20 +23,24 @@ public record DocumentationInfoDTO(
         String architecture,
 
         @Schema(description = "Maturity level", example = "Richardson Level 2")
-        String maturityLevel
+        String maturityLevel,
+
+        @Schema(description = "Author name", example = "Luiz Generoso")
+        String author
 ) {
     /**
-     * Creates a DocumentationInfoDTO with default values.
+     * Creates a DocumentInfoDTO with default values.
      *
-     * @return DocumentationInfoDTO with default values
+     * @return DocumentInfoDTO with default values
      */
-    public static DocumentationInfoDTO createDefault() {
-        return new DocumentationInfoDTO(
+    public static DocumentInfoDTO createDefault() {
+        return new DocumentInfoDTO(
                 "1.0.0",
                 "http://localhost:8080",
                 "RESTful API for managing Golden Raspberry Awards movie data",
                 "Hexagonal Architecture (Ports & Adapters)",
-                "Richardson Level 2"
+                "Richardson Level 2",
+                "Luiz Generoso"
         );
     }
 }
