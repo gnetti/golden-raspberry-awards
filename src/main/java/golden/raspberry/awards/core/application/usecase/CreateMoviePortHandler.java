@@ -1,48 +1,25 @@
 package golden.raspberry.awards.core.application.usecase;
 
-import golden.raspberry.awards.core.application.port.in.CreateMovieUseCase;
+import golden.raspberry.awards.core.application.port.in.CreateMoviePort;
 import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
-import golden.raspberry.awards.core.domain.model.Movie;
-import golden.raspberry.awards.core.domain.model.MovieWithId;
+import golden.raspberry.awards.core.application.usecase.validation.MovieValidation;
+import golden.raspberry.awards.core.domain.model.aggregate.Movie;
+import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 
 import java.util.Objects;
 
 /**
  * Use Case implementation for creating a new movie.
- * Orchestrates the creation of a movie through the repository port.
- *
- * <p>This use case is part of the Application layer and orchestrates
- * the creation of movies following hexagonal architecture principles.
- *
- * <p><strong>Flow:</strong>
- * <pre>
- * Adapter IN (Controller)
- *     ↓
- * CreateMovieUseCase (this - Application)
- *     ↓
- * MovieRepositoryPort (Domain - Port OUT)
- * GetMovieWithIdPort (Application - Port OUT)
- * </pre>
- *
- * <p>Uses Java 21 features EXTREMELY:
- * <ul>
- *   <li>Sealed interfaces for validation results</li>
- *   <li>Pattern Matching with switch expressions</li>
- *   <li>Stream API for functional validation</li>
- *   <li>Optional for null-safe operations</li>
- *   <li>String Templates for elegant error messages</li>
- *   <li>Method references for clean code</li>
- * </ul>
  *
  * @author Luiz Generoso
  * @since 1.0.0
  */
-public record CreateMovieUseCaseHandler(
+public record CreateMoviePortHandler(
         SaveMovieWithIdPort saveMovieWithIdPort,
         IdKeyManagerPort idKeyManagerPort,
-        CsvFileWriterPort csvFileWriterPort) implements CreateMovieUseCase {
+        CsvFileWriterPort csvFileWriterPort) implements CreateMoviePort {
 
     /**
      * Constructor for dependency injection.
@@ -51,21 +28,39 @@ public record CreateMovieUseCaseHandler(
      * @param idKeyManagerPort    Port for managing ID keys in XML
      * @param csvFileWriterPort   Port for writing movies to CSV file
      */
-    public CreateMovieUseCaseHandler {
+    public CreateMoviePortHandler {
         Objects.requireNonNull(saveMovieWithIdPort, "SaveMovieWithIdPort cannot be null");
         Objects.requireNonNull(idKeyManagerPort, "IdKeyManagerPort cannot be null");
         Objects.requireNonNull(csvFileWriterPort, "CsvFileWriterPort cannot be null");
     }
 
+    /**
+     * Executes movie creation use case.
+     * Validates all input data before creating domain object.
+     *
+     * @param year      Movie release year
+     * @param title     Movie title
+     * @param studios   Movie studios
+     * @param producers Movie producers
+     * @param winner    Whether the movie is a winner
+     * @return Created movie with ID
+     * @throws IllegalArgumentException if validation fails
+     */
     @Override
     public MovieWithId execute(Integer year, String title, String studios, String producers, Boolean winner) {
+        MovieValidation.validateMovieData(year, title, studios, producers, winner);
+
         var nextId = idKeyManagerPort.getNextId();
+
+        var trimmedTitle = title.trim();
+        var trimmedStudios = studios.trim();
+        var trimmedProducers = producers.trim();
 
         var movie = new Movie(
                 year,
-                title.trim(),
-                studios.trim(),
-                producers.trim(),
+                trimmedTitle,
+                trimmedStudios,
+                trimmedProducers,
                 winner
         );
 
