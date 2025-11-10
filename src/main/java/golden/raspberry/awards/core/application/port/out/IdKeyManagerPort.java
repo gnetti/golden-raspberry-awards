@@ -5,21 +5,6 @@ import java.util.Optional;
 /**
  * Output Port for managing ID keys from XML file.
  *
- * <p>This port is part of the Application layer and defines the contract
- * for managing the last used ID, ensuring data integrity by preventing
- * ID reuse.
- *
- * <p><strong>Key Rules:</strong>
- * <ul>
- *   <li>IDs are NEVER reused (even after DELETE)</li>
- *   <li>lastId is always the maximum ID ever used</li>
- *   <li>On CREATE, lastId is incremented and XML is updated</li>
- *   <li>On DELETE, XML is NOT modified</li>
- *   <li>On startup, lastId is synchronized with MAX(id) from database</li>
- * </ul>
- *
- * <p>Uses Java 21 features: Optional, Records (in implementations).
- *
  * @author Luiz Generoso
  * @since 1.0.0
  */
@@ -34,7 +19,6 @@ public interface IdKeyManagerPort {
 
     /**
      * Updates the lastId in XML file.
-     * If XML doesn't exist, creates it with the provided value.
      *
      * @param lastId The new lastId value to set
      * @throws IllegalStateException if XML file cannot be written
@@ -43,36 +27,23 @@ public interface IdKeyManagerPort {
 
     /**
      * Synchronizes lastId with the maximum ID from database.
-     * Compares MAX(id) from database with lastId from XML:
-     * - If MAX(id) > lastId → uses MAX(id)
-     * - If MAX(id) < lastId → uses lastId
-     * - Updates XML with the greater value
-     *
-     * <p>This method is called on application startup after database is populated.
      *
      * @param maxIdFromDatabase Maximum ID found in database
-     * @return The synchronized lastId value (the greater between XML and database)
      */
-    Long synchronizeWithDatabase(Long maxIdFromDatabase);
+    void synchronizeWithDatabase(Long maxIdFromDatabase);
 
     /**
-     * Resets lastId to a specific value, ignoring the current XML value.
-     * This method is used when CSV is reset to original and database is reloaded.
-     * The XML is updated to match the database MAX(id) exactly.
+     * Resets lastId to a specific value.
      *
-     * <p>This method should be used ONLY when reset-to-original=true.
-     *
-     * @param resetValue The value to reset lastId to (typically MAX(id) from database)
-     * @return The reset lastId value
+     * @param resetValue The value to reset lastId to
      * @throws NullPointerException     if resetValue is null
      * @throws IllegalArgumentException if resetValue is negative
      * @throws IllegalStateException    if XML cannot be updated
      */
-    Long resetLastId(Long resetValue);
+    void resetLastId(Long resetValue);
 
     /**
      * Gets the next available ID for CREATE operations.
-     * Increments lastId by 1 and updates XML.
      *
      * @return The next available ID
      * @throws IllegalStateException if lastId cannot be read or updated
