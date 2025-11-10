@@ -1,8 +1,15 @@
 package golden.raspberry.awards.adapter.driving.rest.controller;
 
+import golden.raspberry.awards.adapter.driving.rest.dto.ApiErrorDTO;
 import golden.raspberry.awards.adapter.driving.rest.dto.ProducerIntervalResponseDTO;
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsPort;
 import golden.raspberry.awards.core.application.port.out.ConverterDtoPort;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +25,7 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/api/movies")
+@Tag(name = "Awards", description = "Producer intervals operations")
 public class AwardsController {
 
     private final CalculateIntervalsPort calculateIntervalsPort;
@@ -47,6 +55,22 @@ public class AwardsController {
      *
      * @return ResponseEntity with ProducerIntervalResponseDTO
      */
+    @Operation(
+            summary = "Get producer intervals",
+            description = "Returns producers with the minimum and maximum intervals between consecutive awards"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved producer intervals",
+                    content = @Content(schema = @Schema(implementation = ProducerIntervalResponseDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+            )
+    })
     @GetMapping("/producers/intervals")
     public ResponseEntity<ProducerIntervalResponseDTO> getIntervals() {
         var response = calculateIntervalsPort.execute();
