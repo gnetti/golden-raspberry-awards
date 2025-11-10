@@ -432,10 +432,10 @@ public class ListenerAspect {
             return null;
         }
 
-        return switch (httpMethod) {
-            case "PUT", "POST" -> args[0];
-            default -> null;
-        };
+            return switch (httpMethod) {
+                case "PUT", "POST" -> args[0];
+                default -> null;
+            };
     }
 
     /**
