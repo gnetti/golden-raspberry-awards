@@ -3,23 +3,13 @@ package golden.raspberry.awards.adapter.driving.rest.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 
+import java.util.Optional;
+
 /**
- * DTO for updating an existing movie (request body).
- * Using Java 21 record for immutability and extreme elegance.
- *
+ * DTO for updating an existing movie (request body). *
  * <p>Follows Richardson Level 2: structured request format.
  * Does not include ID (passed as path variable).
- *
- * <p>Uses Java 21 features EXTREMELY:
- * <ul>
- *   <li>Records with compact constructor</li>
- *   <li>String Templates for elegant error messages</li>
- *   <li>Sealed interfaces for validation results</li>
- *   <li>Pattern Matching for validation</li>
- *   <li>Stream API for functional validation</li>
- *   <li>Method references for clean code</li>
- * </ul>
- *
+ * *
  * @author Luiz Generoso
  * @since 1.0.0
  */
@@ -52,7 +42,6 @@ public record UpdateMovieDTO(
         Boolean winner
 ) {
     /**
-     * Compact constructor with Java 21 features.
      * Trims string fields automatically.
      *
      * @param year      Movie release year (validated by Jakarta Validation)
@@ -62,15 +51,9 @@ public record UpdateMovieDTO(
      * @param winner    Whether the movie is a winner (validated by Jakarta Validation)
      */
     public UpdateMovieDTO {
-        if (title != null) {
-            title = title.trim();
-        }
-        if (studios != null) {
-            studios = studios.trim();
-        }
-        if (producers != null) {
-            producers = producers.trim();
-        }
+        title = Optional.ofNullable(title).map(String::trim).orElse(title);
+        studios = Optional.ofNullable(studios).map(String::trim).orElse(studios);
+        producers = Optional.ofNullable(producers).map(String::trim).orElse(producers);
     }
 
 }

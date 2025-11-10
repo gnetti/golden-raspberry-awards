@@ -5,13 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 /**
- * DTO for ProducerInterval in REST API.
- * Using Java 21 record for immutability.
- *
+ * DTO for ProducerInterval in REST API. *
  * <p>Follows Richardson Level 2: structured response format.
- *
- * <p>Uses Java 21 features: Records, compact constructor for validation.
- *
+ * *
  * @author Luiz Generoso
  * @since 1.0.0
  */
@@ -30,7 +26,6 @@ public record ProducerIntervalDTO(
 ) {
     /**
      * Compact constructor for validation.
-     *
      * @param producer Producer name (non-null, non-blank)
      * @param interval Interval in years (non-null, non-negative)
      * @param previousWin Previous win year (non-null)

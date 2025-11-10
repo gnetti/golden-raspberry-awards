@@ -6,13 +6,9 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * DTO for API error responses.
- * Using Java 21 record for immutability.
- *
+ * DTO for API error responses. *
  * <p>Follows Richardson Level 2: structured and informative error messages.
- *
- * <p>Uses Java 21 features: Records, String Templates, static factory method.
- *
+ * *
  * @param timestamp Timestamp when the error occurred
  * @param status HTTP status code
  * @param error Error type
@@ -39,7 +35,6 @@ public record ApiErrorDTO(
 ) {
     /**
      * Compact constructor for validation.
-     *
      * @param timestamp Timestamp (non-null)
      * @param status HTTP status code (non-null)
      * @param error Error type (non-null, non-blank)
@@ -64,7 +59,6 @@ public record ApiErrorDTO(
 
     /**
      * Static factory method to create ApiErrorDTO with current timestamp.
-     *
      * @param status HTTP status code
      * @param error Error type
      * @param message Error message

@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * DTO for ProducerIntervalResponse in REST API.
- * Using Java 21 record for immutability.
- *
+ * DTO for ProducerIntervalResponse in REST API. *
  * <p>Follows Richardson Level 2: structured response format.
  * Matches the specification format:
  * <pre>
@@ -17,9 +15,7 @@ import java.util.Objects;
  *   "max": [...]
  * }
  * </pre>
- *
- * <p>Uses Java 21 features: Records, compact constructor for validation.
- *
+ * *
  * @author Luiz Generoso
  * @since 1.0.0
  */
@@ -32,7 +28,6 @@ public record ProducerIntervalResponseDTO(
 ) {
     /**
      * Compact constructor for validation.
-     *
      * @param min List of minimum intervals (non-null)
      * @param max List of maximum intervals (non-null)
      * @throws IllegalArgumentException if validation fails
