@@ -1,4 +1,4 @@
-package golden.raspberry.awards.adapter.driven.persistence.entity;
+package golden.raspberry.awards.infrastructure.adapter.driven.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,11 +9,8 @@ import jakarta.persistence.Table;
  * JPA Entity for Movie.
  * Represents the database table structure.
  * Schema is created automatically via JPA (ddl-auto=create-drop).
- *
  * <p>All validations are performed in Driving Adapters (DTOs with Jakarta Validation) BEFORE reaching this entity.
- *
- * <p>Uses Java 21 features: String Templates for toString.
- *
+ * *
  * @author Luiz Generoso
  * @since 1.0.0
  */
@@ -47,7 +44,6 @@ public class MovieEntity {
 
     /**
      * Constructor with all fields.
-     *
      * @param id        Movie ID
      * @param year      Movie release year
      * @param title     Movie title
@@ -67,7 +63,6 @@ public class MovieEntity {
 
     /**
      * Constructor without ID (for new entities).
-     *
      * @param year      Movie release year
      * @param title     Movie title
      * @param studios   Movie studios
@@ -150,3 +145,4 @@ public class MovieEntity {
                 .formatted(id, year, title, winner);
     }
 }
+

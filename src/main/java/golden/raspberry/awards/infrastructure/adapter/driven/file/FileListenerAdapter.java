@@ -1,7 +1,8 @@
-package golden.raspberry.awards.adapter.driven.listener;
+package golden.raspberry.awards.infrastructure.adapter.driven.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import golden.raspberry.awards.core.application.port.out.ListenerPort;
+import golden.raspberry.awards.core.application.service.ListenerAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,33 +17,15 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  * Output Adapter for listener operations.
- * Implements ListenerPort and writes listener files to daily folders in listener directory.
+ * Implements ListenerPort and writes listener files to daily folders.
  *
- * <p><strong>Important:</strong> Custom listener service - NO external listener dependencies.
- *
- * <p>This adapter follows hexagonal architecture principles:
- * - Implements Port defined by Application layer
- * - Handles file system operations (Infrastructure)
- * - Formats listener files with timestamp, sessionId, HTTP method, endpoint, status code, and errors
- *
- * <p>Folder structure: `{base-path}/{yyyy_MM_dd}/`
- * File format: `{prefix}_{sessionId}_{yyyy_MM_dd_HH_mm_ss}.listener`
- * Example: `listener/2025_11_08/listener_abc123_2025_11_08_10_30_45.listener`
- *
- * <p>Listener format includes:
- * - Timestamp
- * - HTTP Method and Endpoint
- * - Status Code (200 OK, 400 Bad Request, 500 Internal Server Error, etc.)
- * - Entity Type and ID
- * - Request/Response data
- * - Errors (if any)
- * - Before/After data for PUT and DELETE operations
- *
- * <p>Uses Java 21 features: Records, var, String Templates, Text Blocks, Stream API.
+ * <p>Folder structure: {base-path}/{yyyy_MM_dd}/
+ * File format: {prefix}_{sessionId}_{yyyy_MM_dd_HH_mm_ss}.log
  *
  * @author Luiz Generoso
  * @since 1.0.0
@@ -56,7 +39,7 @@ public class FileListenerAdapter implements ListenerPort {
     private final String basePath;
     private final String prefix;
     private final DateTimeFormatter folderDateFormatter;
-    private final DateTimeFormatter logDateFormatter;
+    private final DateTimeFormatter recordDateFormatter;
     private final int retentionDays;
 
     /**
@@ -68,7 +51,7 @@ public class FileListenerAdapter implements ListenerPort {
      * @param basePath Base path for listener files
      * @param prefix Prefix for file names
      * @param folderDateFormat Format for folder date (e.g., "yyyy_MM_dd")
-     * @param logDateFormat Format for log date (e.g., "yyyy-MM-dd HH:mm:ss")
+     * @param recordDateFormat Format for record date (e.g., "yyyy-MM-dd HH:mm:ss")
      * @param retentionDays Number of days to retain listener files
      */
     public FileListenerAdapter(
@@ -78,31 +61,43 @@ public class FileListenerAdapter implements ListenerPort {
             @Value("${listener.base-path:src/main/resources/listener}") String basePath,
             @Value("${listener.prefix:listener}") String prefix,
             @Value("${listener.folder-date-format:yyyy_MM_dd}") String folderDateFormat,
-            @Value("${listener.log-date-format:yyyy-MM-dd HH:mm:ss}") String logDateFormat,
+            @Value("${listener.log-date-format:yyyy_MM_dd_HH_mm_ss}") String recordDateFormat,
             @Value("${listener.retention-days:7}") int retentionDays) {
-        
+
         this.objectMapper = Objects.requireNonNull(objectMapper, "ObjectMapper cannot be null");
         this.listenerAdapter = Objects.requireNonNull(listenerAdapter, "ListenerAdapter cannot be null");
         this.enabled = enabled;
         this.basePath = Objects.requireNonNull(basePath, "Base path cannot be null");
         this.prefix = Objects.requireNonNull(prefix, "Prefix cannot be null");
         this.folderDateFormatter = DateTimeFormatter.ofPattern(normalizeDateFormat(folderDateFormat));
-        this.logDateFormatter = DateTimeFormatter.ofPattern(normalizeDateFormat(logDateFormat));
+        this.recordDateFormatter = DateTimeFormatter.ofPattern(recordDateFormat);
         this.retentionDays = retentionDays;
-        
+
         createBaseDirectoryIfNeeded();
         cleanupOldFolders();
     }
 
+    /**
+     * Listens to GET operations and records them to file.
+     *
+     * @param sessionId Session identifier
+     * @param httpMethod HTTP method (e.g., "GET")
+     * @param endpoint Endpoint path
+     * @param statusCode HTTP status code
+     * @param entityType Entity type
+     * @param entityId Entity identifier
+     * @param responseData Response data
+     * @param error Error message (if any)
+     */
     @Override
     public void listenGet(String sessionId, String httpMethod, String endpoint, Integer statusCode,
                        String entityType, String entityId, Object responseData, String error) {
         if (!enabled) return;
-        
+
         listenerAdapter.observeProcess("GET operation: %s %s".formatted(httpMethod, endpoint));
         listenerAdapter.emitWithSession(responseData, sessionId);
         listenerAdapter.recordResult(responseData);
-        
+
         var listenerMessage = buildListenerMessage(
                 "GET", sessionId, httpMethod, endpoint, statusCode,
                 entityType, entityId, null, responseData, error
@@ -110,18 +105,31 @@ public class FileListenerAdapter implements ListenerPort {
         writeToListenerFile(sessionId, listenerMessage);
     }
 
+    /**
+     * Listens to PUT operations and records them to file.
+     *
+     * @param sessionId Session identifier
+     * @param httpMethod HTTP method (e.g., "PUT")
+     * @param endpoint Endpoint path
+     * @param statusCode HTTP status code
+     * @param entityType Entity type
+     * @param entityId Entity identifier
+     * @param dataBefore Data before update
+     * @param dataAfter Data after update
+     * @param error Error message (if any)
+     */
     @Override
     public void listenPut(String sessionId, String httpMethod, String endpoint, Integer statusCode,
                        String entityType, String entityId, Object dataBefore, Object dataAfter, String error) {
         if (!enabled) return;
-        
+
         listenerAdapter.observeProcess("PUT operation: %s %s".formatted(httpMethod, endpoint));
         listenerAdapter.archiveData(dataBefore);
         listenerAdapter.archiveData(dataAfter);
         var changes = listenerAdapter.detectChanges(dataBefore, dataAfter);
         listenerAdapter.emitWithSession(changes, sessionId);
         listenerAdapter.recordResult(dataAfter);
-        
+
         var listenerMessage = buildListenerMessage(
                 "PUT", sessionId, httpMethod, endpoint, statusCode,
                 entityType, entityId, dataBefore, dataAfter, error
@@ -129,17 +137,29 @@ public class FileListenerAdapter implements ListenerPort {
         writeToListenerFile(sessionId, listenerMessage);
     }
 
+    /**
+     * Listens to DELETE operations and records them to file.
+     *
+     * @param sessionId Session identifier
+     * @param httpMethod HTTP method (e.g., "DELETE")
+     * @param endpoint Endpoint path
+     * @param statusCode HTTP status code
+     * @param entityType Entity type
+     * @param entityId Entity identifier
+     * @param dataBefore Data before deletion
+     * @param error Error message (if any)
+     */
     @Override
     public void listenDelete(String sessionId, String httpMethod, String endpoint, Integer statusCode,
                           String entityType, String entityId, Object dataBefore, String error) {
         if (!enabled) return;
-        
+
         listenerAdapter.observeProcess("DELETE operation: %s %s".formatted(httpMethod, endpoint));
         listenerAdapter.archiveData(dataBefore);
         listenerAdapter.preserveData(dataBefore);
         listenerAdapter.emitWithSession(dataBefore, sessionId);
         listenerAdapter.recordResult(dataBefore);
-        
+
         var listenerMessage = buildListenerMessage(
                 "DELETE", sessionId, httpMethod, endpoint, statusCode,
                 entityType, entityId, dataBefore, null, error
@@ -147,17 +167,30 @@ public class FileListenerAdapter implements ListenerPort {
         writeToListenerFile(sessionId, listenerMessage);
     }
 
+    /**
+     * Listens to POST operations and records them to file.
+     *
+     * @param sessionId Session identifier
+     * @param httpMethod HTTP method (e.g., "POST")
+     * @param endpoint Endpoint path
+     * @param statusCode HTTP status code
+     * @param entityType Entity type
+     * @param entityId Entity identifier
+     * @param requestData Request data
+     * @param responseData Response data
+     * @param error Error message (if any)
+     */
     @Override
     public void listenPost(String sessionId, String httpMethod, String endpoint, Integer statusCode,
                         String entityType, String entityId, Object requestData, Object responseData, String error) {
         if (!enabled) return;
-        
+
         listenerAdapter.observeProcess("POST operation: %s %s".formatted(httpMethod, endpoint));
         listenerAdapter.emitWithSession(requestData, sessionId);
         listenerAdapter.emitWithSession(responseData, sessionId);
         listenerAdapter.storeData(responseData);
         listenerAdapter.recordResult(responseData);
-        
+
         var listenerMessage = buildListenerMessage(
                 "POST", sessionId, httpMethod, endpoint, statusCode,
                 entityType, entityId, requestData, responseData, error
@@ -183,7 +216,7 @@ public class FileListenerAdapter implements ListenerPort {
     private String buildListenerMessage(String action, String sessionId, String httpMethod, String endpoint,
                                    Integer statusCode, String entityType, String entityId,
                                    Object dataBefore, Object dataAfter, String error) {
-        var timestamp = LocalDateTime.now().format(logDateFormatter);
+        var timestamp = LocalDateTime.now().format(recordDateFormatter);
         var statusText = getStatusText(statusCode);
         var beforeJson = toJson(dataBefore);
         var afterJson = toJson(dataAfter);
@@ -268,8 +301,7 @@ public class FileListenerAdapter implements ListenerPort {
 
     /**
      * Writes listener message to file in daily folder.
-     * Folder format: {base-path}/{yyyy_MM_dd}/
-     * File format: {prefix}_{sessionId}_{yyyy_MM_dd_HH_mm_ss}.listener
+     * If a file with the same sessionId already exists, it will be reused.
      *
      * @param sessionId      Session identifier
      * @param listenerMessage Listener message to write
@@ -278,16 +310,16 @@ public class FileListenerAdapter implements ListenerPort {
         try {
             var now = LocalDateTime.now();
             var folderName = now.format(folderDateFormatter);
-            var fileName = "%s_%s_%s.listener".formatted(
-                    prefix,
-                    sessionId,
-                    now.format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"))
-            );
-            
             var folderPath = Paths.get(basePath, folderName);
-            var filePath = folderPath.resolve(fileName);
-
             Files.createDirectories(folderPath);
+
+            var existingFile = findExistingLogFile(folderPath, sessionId);
+            var filePath = existingFile.orElseGet(() -> {
+                var timestamp = now.format(recordDateFormatter);
+                var fileName = "%s_%s_%s.log".formatted(prefix, sessionId, timestamp);
+                return folderPath.resolve(fileName);
+            });
+
             Files.writeString(
                     filePath,
                     listenerMessage,
@@ -295,7 +327,36 @@ public class FileListenerAdapter implements ListenerPort {
                     StandardOpenOption.APPEND
             );
         } catch (IOException e) {
-            handleIoError("write listener file", e);
+            handleIoError(e);
+        }
+    }
+
+    /**
+     * Finds existing log file with the same sessionId.
+     *
+     * @param folderPath Folder path to search in
+     * @param sessionId Session identifier to match
+     * @return Optional containing existing file path if found, empty otherwise
+     */
+    private Optional<Path> findExistingLogFile(Path folderPath, String sessionId) {
+        try {
+            if (!Files.exists(folderPath)) {
+                return Optional.empty();
+            }
+
+            var filePrefix = "%s_%s_".formatted(prefix, sessionId);
+            try (Stream<Path> paths = Files.list(folderPath)) {
+                return paths
+                        .filter(Files::isRegularFile)
+                        .filter(path -> {
+                            var fileName = path.getFileName().toString();
+                            return fileName.startsWith(filePrefix) && fileName.endsWith(".log");
+                        })
+                        .findFirst();
+            }
+        } catch (IOException e) {
+            handleIoError(e);
+            return Optional.empty();
         }
     }
 
@@ -326,25 +387,24 @@ public class FileListenerAdapter implements ListenerPort {
                 Files.createDirectories(basePathObj);
             }
         } catch (IOException e) {
-            handleIoError("create base listener directory", e);
+            handleIoError(e);
         }
     }
 
     /**
      * Handles IO errors silently.
-     * Errors are handled silently to avoid violating immutable rules (no System.err).
      *
-     * @param operation Operation that failed
      * @param exception IOException that occurred
      */
-    private void handleIoError(String operation, IOException exception) {
-        // Error handled silently - file system operation failed
-        // Operation: {operation}, Error: {exception.getMessage()}
+    private void handleIoError(IOException exception) {
+        switch (exception) {
+            case null -> {}
+            case IOException ignored -> Objects.requireNonNull(ignored);
+        }
     }
 
     /**
-     * Normalizes date format by converting `-` to `_`.
-     * Ensures all dates use underscores instead of hyphens.
+     * Normalizes date format by converting hyphens to underscores.
      *
      * @param dateFormat Original date format
      * @return Normalized date format with underscores
@@ -355,7 +415,7 @@ public class FileListenerAdapter implements ListenerPort {
 
     /**
      * Cleans up old folders based on retention days.
-     * Removes folders that are older than the configured retention period.
+     * Removes folders that are older than or equal to the cutoff date.
      */
     private void cleanupOldFolders() {
         if (retentionDays <= 0) {
@@ -373,27 +433,26 @@ public class FileListenerAdapter implements ListenerPort {
 
             try (Stream<Path> paths = Files.list(basePathObj)) {
                 paths.filter(Files::isDirectory)
-                        .forEach(folderPath -> {
+                        .filter(folderPath -> {
                             var folderName = folderPath.getFileName().toString();
                             var folderDate = parseFolderDate(folderName);
-                            
-                            if (folderDate != null && folderDate.isBefore(cutoffDate)) {
-                                try {
-                                    deleteDirectoryRecursively(folderPath);
-                                } catch (IOException e) {
-                                    handleIoError("delete old folder: " + folderName, e);
-                                }
+                            return folderDate != null && !folderDate.isAfter(cutoffDate);
+                        })
+                        .forEach(folderPath -> {
+                            try {
+                                deleteDirectoryRecursively(folderPath);
+                            } catch (IOException e) {
+                                handleIoError(e);
                             }
                         });
             }
         } catch (IOException e) {
-            handleIoError("cleanup old folders", e);
+            handleIoError(e);
         }
     }
 
     /**
      * Parses folder date from folder name.
-     * Folder name format should match folder-date-format (e.g., "yyyy_MM_dd").
      *
      * @param folderName Folder name (e.g., "2025_11_08")
      * @return Parsed LocalDate or null if parsing fails
@@ -408,7 +467,6 @@ public class FileListenerAdapter implements ListenerPort {
 
     /**
      * Deletes directory recursively.
-     *
      * @param directory Directory to delete
      * @throws IOException if deletion fails
      */
@@ -417,11 +475,11 @@ public class FileListenerAdapter implements ListenerPort {
             try (Stream<Path> paths = Files.walk(directory)) {
                 paths.sorted(Comparator.reverseOrder())
                         .forEach(path -> {
-                            try {
-                                Files.delete(path);
-                            } catch (IOException e) {
-                                handleIoError("delete: " + path, e);
-                            }
+                                   try {
+                                       Files.delete(path);
+                                   } catch (IOException e) {
+                                       handleIoError(e);
+                                   }
                         });
             }
         }

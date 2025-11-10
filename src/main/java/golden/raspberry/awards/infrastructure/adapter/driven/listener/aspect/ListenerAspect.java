@@ -1,4 +1,4 @@
-package golden.raspberry.awards.infrastructure.listener;
+package golden.raspberry.awards.infrastructure.adapter.driven.listener.aspect;
 
 import golden.raspberry.awards.core.application.port.out.ListenerPort;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -17,29 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * AOP Aspect for automatically intercepting REST API operations (GET, PUT, DELETE, POST).
- *
- * <p><strong>Important:</strong> Uses custom listener use case - NO external listener dependencies.
- *
- * <p>This aspect intercepts REST controller methods and listens to them automatically
- * using the ListenerPort directly. Follows hexagonal architecture principles:
- * - Aspect (Infrastructure) calls Port (ListenerPort) directly
- * - Adapter (FileListenerAdapter) implements Port and writes to file
- *
- * <p>Intercepts:
- * - @GetMapping methods (GET operations)
- * - @PutMapping methods (PUT operations)
- * - @DeleteMapping methods (DELETE operations)
- * - @PostMapping methods (POST operations)
- *
- * <p>Listens to:
- * - HTTP method and endpoint
- * - Status codes (200 OK, 400 Bad Request, 500 Internal Server Error, etc.)
- * - Request and response data
- * - Errors (if any)
- * - Before/after data for PUT and DELETE operations
- *
- * <p>Uses Java 21 features: Pattern Matching, Switch Expressions, Records, String Templates, Optional.
+ * AOP Aspect for intercepting REST API operations.
  *
  * @author Luiz Generoso
  * @since 1.0.0
@@ -49,17 +27,17 @@ import java.util.UUID;
 public class ListenerAspect {
 
     /**
-     * Record to encapsulate operation data for listener.
+     * Encapsulates operation data for listener.
      *
-     * @param httpMethod HTTP method (GET, PUT, DELETE, POST)
+     * @param httpMethod HTTP method
      * @param endpoint Endpoint path
      * @param statusCode HTTP status code
      * @param entityType Entity type
      * @param entityId Entity identifier
-     * @param dataBefore Data before (for PUT/DELETE)
-     * @param dataAfter Data after (for PUT/GET/POST)
-     * @param requestData Request data (for POST)
-     * @param error Error message (if any)
+     * @param dataBefore Data before operation
+     * @param dataAfter Data after operation
+     * @param requestData Request data
+     * @param error Error message
      */
     private record OperationData(
             String httpMethod,
@@ -73,7 +51,7 @@ public class ListenerAspect {
             String error
     ) {
         /**
-         * Compact constructor for validation.
+         * Compact constructor with validation.
          */
         public OperationData {
             Objects.requireNonNull(httpMethod, "HTTP method cannot be null");
@@ -83,54 +61,54 @@ public class ListenerAspect {
         }
 
         /**
-         * Factory method to create OperationData for GET operations.
+         * Creates OperationData for GET operations.
          */
         public static OperationData forGet(String httpMethod, String endpoint, Integer statusCode,
-                                            String entityType, String entityId, Object dataAfter, String error) {
+                                           String entityType, String entityId, Object dataAfter, String error) {
             return new OperationData(httpMethod, endpoint, statusCode, entityType, entityId,
                     null, dataAfter, null, error);
         }
 
         /**
-         * Factory method to create OperationData for PUT operations.
+         * Creates OperationData for PUT operations.
          */
         public static OperationData forPut(String httpMethod, String endpoint, Integer statusCode,
-                                            String entityType, String entityId,
-                                            Object dataBefore, Object dataAfter, String error) {
+                                           String entityType, String entityId,
+                                           Object dataBefore, Object dataAfter, String error) {
             return new OperationData(httpMethod, endpoint, statusCode, entityType, entityId,
                     dataBefore, dataAfter, null, error);
         }
 
         /**
-         * Factory method to create OperationData for DELETE operations.
+         * Creates OperationData for DELETE operations.
          */
         public static OperationData forDelete(String httpMethod, String endpoint, Integer statusCode,
-                                               String entityType, String entityId, Object dataBefore, String error) {
+                                              String entityType, String entityId, Object dataBefore, String error) {
             return new OperationData(httpMethod, endpoint, statusCode, entityType, entityId,
                     dataBefore, null, null, error);
         }
 
         /**
-         * Factory method to create OperationData for POST operations.
+         * Creates OperationData for POST operations.
          */
         public static OperationData forPost(String httpMethod, String endpoint, Integer statusCode,
-                                             String entityType, String entityId,
-                                             Object requestData, Object dataAfter, String error) {
+                                            String entityType, String entityId,
+                                            Object requestData, Object dataAfter, String error) {
             return new OperationData(httpMethod, endpoint, statusCode, entityType, entityId,
                     null, dataAfter, requestData, error);
         }
 
         /**
-         * Factory method to create OperationData for error cases.
+         * Creates OperationData for error cases.
          */
         public static OperationData forError(String httpMethod, String endpoint, String entityType,
-                                              String entityId, Object requestData, String error) {
+                                             String entityId, Object requestData, String error) {
             return new OperationData(httpMethod, endpoint, 500, entityType, entityId,
                     null, null, requestData, error);
         }
 
         /**
-         * Factory method to create OperationData with default values.
+         * Creates OperationData with default values.
          */
         public static OperationData withDefaults(String httpMethod, String endpoint, String entityType,
                                                  String entityId, Object requestData) {
@@ -152,19 +130,24 @@ public class ListenerAspect {
 
     /**
      * Gets the current session ID from the HTTP request.
-     * Extracts session ID from HttpServletRequest if available,
-     * otherwise generates a unique session ID for the request.
      *
-     * @return Session identifier from HTTP request or generated UUID
+     * @return Session identifier
      */
     public String getSessionId() {
         return extractSessionIdFromRequest()
-                .orElseGet(() -> UUID.randomUUID().toString());
+                .orElseGet(() -> {
+                    var requestAttributes = RequestContextHolder.getRequestAttributes();
+                    if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
+                        var request = servletRequestAttributes.getRequest();
+                        var session = request.getSession(true);
+                        return session.getId();
+                    }
+                    return UUID.randomUUID().toString();
+                });
     }
 
     /**
      * Extracts session ID from HTTP request.
-     * Uses RequestContextHolder to get current HttpServletRequest.
      *
      * @return Optional containing session ID if available, empty otherwise
      */
@@ -181,9 +164,9 @@ public class ListenerAspect {
     }
 
     /**
-     * Intercepts GET methods annotated with @GetMapping.
+     * Intercepts GET methods.
      *
-     * @param joinPoint Join point for intercepted method
+     * @param joinPoint Join point
      * @return Result of method execution
      * @throws Throwable if method execution fails
      */
@@ -193,9 +176,9 @@ public class ListenerAspect {
     }
 
     /**
-     * Intercepts PUT methods annotated with @PutMapping.
+     * Intercepts PUT methods.
      *
-     * @param joinPoint Join point for intercepted method
+     * @param joinPoint Join point
      * @return Result of method execution
      * @throws Throwable if method execution fails
      */
@@ -205,9 +188,9 @@ public class ListenerAspect {
     }
 
     /**
-     * Intercepts DELETE methods annotated with @DeleteMapping.
+     * Intercepts DELETE methods.
      *
-     * @param joinPoint Join point for intercepted method
+     * @param joinPoint Join point
      * @return Result of method execution
      * @throws Throwable if method execution fails
      */
@@ -217,9 +200,9 @@ public class ListenerAspect {
     }
 
     /**
-     * Intercepts POST methods annotated with @PostMapping.
+     * Intercepts POST methods.
      *
-     * @param joinPoint Join point for intercepted method
+     * @param joinPoint Join point
      * @return Result of method execution
      * @throws Throwable if method execution fails
      */
@@ -229,11 +212,10 @@ public class ListenerAspect {
     }
 
     /**
-     * Listens to REST API operation with detailed information.
-     * Uses Java 21 Pattern Matching and Switch Expressions for elegant and robust code.
+     * Listens to REST API operation.
      *
-     * @param joinPoint  Join point for intercepted method
-     * @param httpMethod HTTP method (GET, PUT, DELETE, POST)
+     * @param joinPoint Join point
+     * @param httpMethod HTTP method
      * @return Result of method execution
      * @throws Throwable if method execution fails
      */
@@ -270,13 +252,13 @@ public class ListenerAspect {
 
 
     /**
-     * Processes response using Pattern Matching.
+     * Processes response.
      *
-     * @param response    Response object
-     * @param httpMethod  HTTP method
-     * @param endpoint    Endpoint path
-     * @param entityType  Entity type
-     * @param entityId    Entity identifier
+     * @param response Response object
+     * @param httpMethod HTTP method
+     * @param endpoint Endpoint path
+     * @param entityType Entity type
+     * @param entityId Entity identifier
      * @param requestData Request data
      * @return OperationData with processed information
      */
@@ -293,14 +275,14 @@ public class ListenerAspect {
     }
 
     /**
-     * Processes ResponseEntity using Switch Expressions for HTTP method handling.
+     * Processes ResponseEntity.
      *
      * @param responseEntity ResponseEntity
-     * @param httpMethod      HTTP method
-     * @param endpoint        Endpoint path
-     * @param entityType      Entity type
-     * @param entityId        Entity identifier
-     * @param requestData     Request data
+     * @param httpMethod HTTP method
+     * @param endpoint Endpoint path
+     * @param entityType Entity type
+     * @param entityId Entity identifier
+     * @param requestData Request data
      * @return OperationData with processed information
      */
     private OperationData processResponseEntity(ResponseEntity<?> responseEntity, String httpMethod,
@@ -328,12 +310,10 @@ public class ListenerAspect {
     }
 
     /**
-     * Listens to the operation using ListenerPort directly.
-     * Uses Switch Expression for elegant method dispatch.
-     * Passes sessionId extracted from HTTP request.
+     * Listens to the operation using ListenerPort.
      *
-     * @param operationData Operation data to listen to
-     * @param sessionId Session ID from HTTP request
+     * @param operationData Operation data
+     * @param sessionId Session ID
      */
     private void listenOperationData(OperationData operationData, String sessionId) {
         switch (operationData.httpMethod()) {
@@ -362,7 +342,6 @@ public class ListenerAspect {
 
     /**
      * Extracts endpoint path from join point.
-     * Uses Optional for elegant null handling.
      *
      * @param joinPoint Join point
      * @return Endpoint path
@@ -384,7 +363,6 @@ public class ListenerAspect {
 
     /**
      * Extracts method-level path from mapping annotations.
-     * Uses Optional and method references for elegant annotation handling.
      *
      * @param method Method
      * @return Method path or empty string
@@ -408,7 +386,6 @@ public class ListenerAspect {
 
     /**
      * Extracts entity type from join point.
-     * Uses String methods for elegant transformation.
      *
      * @param joinPoint Join point
      * @return Entity type
@@ -422,7 +399,6 @@ public class ListenerAspect {
 
     /**
      * Extracts entity ID from method arguments.
-     * Uses Pattern Matching for elegant type handling.
      *
      * @param args Method arguments
      * @return Entity ID or null
@@ -446,9 +422,8 @@ public class ListenerAspect {
 
     /**
      * Extracts request data from method arguments.
-     * Uses Switch Expression for HTTP method handling.
      *
-     * @param args       Method arguments
+     * @param args Method arguments
      * @param httpMethod HTTP method
      * @return Request data or null
      */
@@ -465,7 +440,6 @@ public class ListenerAspect {
 
     /**
      * Extracts error message from response body.
-     * Uses Optional for elegant null handling.
      *
      * @param responseBody Response body
      * @return Error message or null

@@ -1,8 +1,8 @@
-package golden.raspberry.awards.adapter.driven.csv;
+package golden.raspberry.awards.infrastructure.adapter.driven.csv;
 
 import com.opencsv.CSVWriter;
 import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
-import golden.raspberry.awards.core.domain.model.MovieWithId;
+import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -18,29 +18,8 @@ import java.util.stream.Stream;
 
 /**
  * Output Adapter for writing movies to CSV file.
- *
- * <p>Implements CsvFileWriterPort and handles CSV file operations
- * for synchronizing database changes with CSV file.
- *
- * <p>This adapter follows hexagonal architecture principles:
- * - Implements Port defined by Application layer
- * - Handles file system operations (Infrastructure)
- * - Ensures CSV file is synchronized with database
- *
+ * Implements CsvFileWriterPort and synchronizes database changes with CSV file.
  * <p>CSV format: id;year;title;studios;producers;winner;;
- *
- * <p>Uses Java 21 features EXTREMELY:
- * <ul>
- *   <li>Optional for null-safety</li>
- *   <li>Stream API for functional processing</li>
- *   <li>Pattern Matching for validation</li>
- *   <li>String Templates for error messages</li>
- *   <li>Text Blocks for logs</li>
- *   <li>Records for internal data structures</li>
- *   <li>Method references for cleaner code</li>
- *   <li>Sealed interfaces for validation</li>
- * </ul>
- *
  * @author Luiz Generoso
  * @since 1.0.0
  */
@@ -56,7 +35,6 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
 
     /**
      * Constructor for dependency injection.
-     *
      * @param csvFile      CSV file path from properties
      * @param csvSeparator CSV separator character from properties
      * @param winnerYes    Winner value string from properties
@@ -72,6 +50,12 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         this.winnerYes = Objects.requireNonNull(winnerYes, "Winner yes value cannot be null");
     }
 
+    /**
+     * Appends a new movie to the CSV file.
+     * @param movie Movie with ID to append to CSV file
+     * @throws NullPointerException if movie is null
+     * @throws IllegalStateException if CSV file cannot be read or written
+     */
     @Override
     public void appendMovie(MovieWithId movie) {
         Objects.requireNonNull(movie, "Movie cannot be null");
@@ -86,6 +70,12 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         writeCsvData(new CsvData(csvData.headerLine(), updatedDataLines));
     }
 
+    /**
+     * Updates an existing movie in the CSV file.
+     * @param movie Movie with ID to update in CSV file
+     * @throws NullPointerException if movie is null
+     * @throws IllegalStateException if movie is not found in CSV or file cannot be read/written
+     */
     @Override
     public void updateMovie(MovieWithId movie) {
         Objects.requireNonNull(movie, "Movie cannot be null");
@@ -101,6 +91,12 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         writeCsvData(new CsvData(csvData.headerLine(), updatedDataLines));
     }
 
+    /**
+     * Removes a movie from the CSV file by ID.
+     * @param id Movie ID to remove from CSV file
+     * @throws NullPointerException if id is null
+     * @throws IllegalStateException if movie is not found in CSV or file cannot be read/written
+     */
     @Override
     public void removeMovie(Long id) {
         Objects.requireNonNull(id, "ID cannot be null");
@@ -116,6 +112,14 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         writeCsvData(new CsvData(csvData.headerLine(), updatedDataLines));
     }
 
+    /**
+     * Reads CSV data from file system or classpath.
+     * Attempts to read from file system first, then falls back to classpath if not found.
+     * If neither exists, returns default header line.
+     *
+     * @return CsvData containing header line and data lines
+     * @throws IllegalStateException if CSV file cannot be read from file system or classpath
+     */
     private CsvData readCsvData() {
         var fileSystemPath = Path.of("src/main/resources", csvFile);
         
@@ -129,6 +133,13 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         return separateHeaderAndData(allLines);
     }
 
+    /**
+     * Separates CSV header line from data lines.
+     * Takes the first line as header and filters valid data lines from the rest.
+     *
+     * @param allLines All CSV lines including header
+     * @return CsvData with separated header and valid data lines
+     */
     private CsvData separateHeaderAndData(List<String[]> allLines) {
         return Optional.of(allLines)
                 .filter(lines -> !lines.isEmpty())
@@ -143,6 +154,13 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                 .orElseGet(() -> new CsvData(CSV_HEADER.split(String.valueOf(csvSeparator)), List.of()));
     }
 
+    /**
+     * Validates if a CSV line is a valid data line.
+     * A line is valid if it has at least one column and the ID column is not empty.
+     *
+     * @param line CSV line as string array
+     * @return true if line is valid, false otherwise
+     */
     private boolean isValidDataLine(String[] line) {
         return Optional.ofNullable(line)
                 .filter(l -> l.length > ID_COLUMN_INDEX)
@@ -152,6 +170,14 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                 .orElse(false);
     }
 
+    /**
+     * Reads CSV data from file system.
+     * Uses OpenCSV library to parse the CSV file with the configured separator.
+     *
+     * @param path File system path to CSV file
+     * @return List of CSV lines as string arrays, or default header if file is empty
+     * @throws IllegalStateException if CSV file cannot be read or parsed
+     */
     private List<String[]> readFromFileSystem(Path path) {
         try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
              var csvReader = new com.opencsv.CSVReaderBuilder(reader)
@@ -169,12 +195,26 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         }
     }
 
+    /**
+     * Attempts to read CSV data from classpath.
+     * Returns Optional.empty() if resource does not exist.
+     *
+     * @return Optional containing list of CSV lines if resource exists, empty otherwise
+     */
     private Optional<List<String[]>> readFromClasspath() {
         return Optional.of(new ClassPathResource(csvFile))
                 .filter(ClassPathResource::exists)
                 .map(this::readFromClasspathResource);
     }
 
+    /**
+     * Reads CSV data from classpath resource.
+     * Uses OpenCSV library to parse the CSV file with the configured separator.
+     *
+     * @param resource ClassPathResource pointing to CSV file
+     * @return List of CSV lines as string arrays, or default header if file is empty
+     * @throws IllegalStateException if CSV file cannot be read or parsed
+     */
     private List<String[]> readFromClasspathResource(ClassPathResource resource) {
         try (var inputStream = resource.getInputStream();
              var reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -193,6 +233,13 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         }
     }
 
+    /**
+     * Writes CSV data to file system.
+     * Creates parent directories if they don't exist and writes header and data lines.
+     *
+     * @param csvData CsvData containing header line and data lines to write
+     * @throws IllegalStateException if CSV file cannot be written or directories cannot be created
+     */
     private void writeCsvData(CsvData csvData) {
         var fileSystemPath = Path.of("src/main/resources", csvFile);
         try {
@@ -214,6 +261,14 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         }
     }
 
+    /**
+     * Converts a MovieWithId domain object to CSV line format.
+     * Creates a string array with all movie fields in the correct order.
+     * <p>CSV format: id;year;title;studios;producers;winner;;
+     *
+     * @param movie Movie with ID to convert
+     * @return String array representing CSV line
+     */
     private String[] convertMovieToCsvLine(MovieWithId movie) {
         return new String[]{
                 String.valueOf(movie.id()),
@@ -227,6 +282,15 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         };
     }
 
+    /**
+     * Updates a CSV line if it matches the given movie ID.
+     * Returns the updated line if match is found, otherwise returns the original line unchanged.
+     *
+     * @param line    CSV line to check and potentially update
+     * @param movieId Movie ID to match against
+     * @param movie   Movie with ID to use for update
+     * @return Updated CSV line if match found, original line otherwise
+     */
     private String[] updateLineIfMatches(String[] line, String movieId, MovieWithId movie) {
         return Optional.ofNullable(line)
                 .filter(l -> l.length > ID_COLUMN_INDEX)
@@ -235,6 +299,14 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                 .orElse(line);
     }
 
+    /**
+     * Checks if a CSV line belongs to a specific movie by ID.
+     * Validates that the line has enough columns and the ID column matches.
+     *
+     * @param line    CSV line to check
+     * @param movieId Movie ID to match against
+     * @return true if line belongs to the movie, false otherwise
+     */
     private boolean isLineForMovie(String[] line, String movieId) {
         return Optional.ofNullable(line)
                 .filter(l -> l.length > ID_COLUMN_INDEX)
@@ -242,6 +314,15 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
                 .orElse(false);
     }
 
+    /**
+     * Validates that a movie exists in the original CSV before update.
+     * Also validates that the movie still exists after update operation.
+     *
+     * @param updatedLines  CSV lines after update operation
+     * @param movieId       Movie ID to validate
+     * @param originalLines Original CSV lines before update
+     * @throws IllegalStateException if movie is not found in original CSV or not present after update
+     */
     private void validateMovieExists(List<String[]> updatedLines, String movieId, List<String[]> originalLines) {
         var originalExists = originalLines.stream()
                 .anyMatch(line -> isLineForMovie(line, movieId));
@@ -260,6 +341,15 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         }
     }
 
+    /**
+     * Validates that a movie exists in the original CSV before removal.
+     * Also validates that the movie no longer exists after removal operation.
+     *
+     * @param updatedLines  CSV lines after removal operation
+     * @param movieId       Movie ID to validate
+     * @param originalLines Original CSV lines before removal
+     * @throws IllegalStateException if movie is not found in original CSV or still exists after removal
+     */
     private void validateMovieExistsBeforeRemoval(List<String[]> updatedLines, String movieId, List<String[]> originalLines) {
         var originalExists = originalLines.stream()
                 .anyMatch(line -> isLineForMovie(line, movieId));
@@ -278,10 +368,9 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
         }
     }
 
-
     /**
      * Internal record for separating CSV header from data lines.
-     * Uses Java 21 Record for immutability and elegance.
+     * Internal record for separating CSV header from data lines.
      */
     private record CsvData(String[] headerLine, List<String[]> dataLines) {
         CsvData {

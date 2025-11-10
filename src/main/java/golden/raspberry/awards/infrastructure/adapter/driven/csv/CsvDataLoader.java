@@ -1,9 +1,9 @@
-package golden.raspberry.awards.adapter.driven.csv;
+package golden.raspberry.awards.infrastructure.adapter.driven.csv;
 
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
-import golden.raspberry.awards.adapter.driven.persistence.entity.MovieEntity;
-import golden.raspberry.awards.adapter.driven.persistence.repository.MovieJpaRepository;
+import golden.raspberry.awards.infrastructure.adapter.driven.persistence.entity.MovieEntity;
+import golden.raspberry.awards.infrastructure.adapter.driven.persistence.repository.MovieJpaRepository;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -22,29 +22,7 @@ import java.util.stream.IntStream;
 
 /**
  * CSV Data Loader for populating database on application startup.
- *
- * <p>This component implements CommandLineRunner to execute CSV loading
- * automatically when the application starts. It reads the CSV file from
- * the classpath and populates the database via MovieRepositoryPort.
- *
- * <p><strong>Important:</strong>
- * <ul>
- *   <li>CSV is the <strong>sole data source</strong> of the project</li>
- *   <li>Database schema is already created by JPA (ddl-auto=create-drop)</li>
- *   <li>This loader only <strong>populates</strong> the database with CSV data</li>
- *   <li>No SQL files or migrations are needed</li>
- * </ul>
- *
- * <p>Uses Java 21 features elegantly and robustly:
- * <ul>
- *   <li>Streams API for functional processing</li>
- *   <li>Pattern Matching for validation</li>
- *   <li>Switch Expressions for field parsing</li>
- *   <li>Text Blocks for complex messages</li>
- *   <li>Records for internal data structures</li>
- *   <li>String Templates for formatted messages</li>
- *   <li>Method references for cleaner code</li>
- * </ul>
+ * Implements CommandLineRunner to execute CSV loading automatically when the application starts.
  *
  * @author Luiz Generoso
  * @since 1.0.0
@@ -63,12 +41,6 @@ public class CsvDataLoader implements CommandLineRunner {
 
     /**
      * Constructor for dependency injection.
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>@Value for configuration injection</li>
-     *   <li>Objects.requireNonNull for null safety</li>
-     * </ul>
      *
      * @param jpaRepository    JPA repository for saving movies with IDs from CSV
      * @param idKeyManagerPort Port for managing ID keys in XML
@@ -103,9 +75,6 @@ public class CsvDataLoader implements CommandLineRunner {
     /**
      * Executes CSV data loading on application startup.
      *
-     * <p>This method is automatically called by Spring Boot after
-     * the application context is fully initialized.
-     *
      * @param args Command line arguments (not used)
      */
     @Override
@@ -119,9 +88,12 @@ public class CsvDataLoader implements CommandLineRunner {
             saveMoviesWithIds(entities);
 
             var maxIdFromDatabase = jpaRepository.findMaxId().orElse(0L);
-            var synchronizedId = resetToOriginal
-                    ? idKeyManagerPort.resetLastId(maxIdFromDatabase)
-                    : idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase);
+            Optional.of(resetToOriginal)
+                    .filter(Boolean::booleanValue)
+                    .ifPresentOrElse(
+                            ignored -> idKeyManagerPort.resetLastId(maxIdFromDatabase),
+                            () -> idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase)
+                    );
         } catch (Exception e) {
             throw new RuntimeException("Failed to load CSV data: %s".formatted(e.getMessage()), e);
         }
@@ -129,13 +101,6 @@ public class CsvDataLoader implements CommandLineRunner {
 
     /**
      * Resets the CSV file to the original file from primary-base.
-     * Copies data/primary-base/MovieList.csv to data/movieList.csv.
-     *
-     * <p>This method is called when csv.reset-to-original=true in application.properties.
-     * It replaces the current movieList.csv with the original file, effectively
-     * resetting all modifications made to the CSV.
-     *
-     * <p>Uses Java 21 features: Optional, method references, String Templates.
      *
      * @throws Exception if original CSV file cannot be read or target file cannot be written
      */
@@ -159,7 +124,6 @@ public class CsvDataLoader implements CommandLineRunner {
     /**
      * Saves movies with IDs from CSV directly to database.
      * Uses JPA repository to preserve IDs from CSV.
-     *
      * @param entities List of MovieEntity with IDs from CSV
      */
     private void saveMoviesWithIds(List<MovieEntity> entities) {
@@ -167,28 +131,12 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Loads movies from CSV file using Java 21 Streams API EXTREMELY.
-     *
-     * <p>Reads the CSV file from file system first (if reset was done),
-     * otherwise from classpath. Parses each line using streams,
-     * and converts them to MovieEntity with IDs from CSV. Invalid lines are skipped
-     * with appropriate warnings.
-     *
-     * <p>CSV format: id;year;title;studios;producers;winner
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Optional for null-safe operations</li>
-     *   <li>Stream API for functional processing</li>
-     *   <li>Method references for cleaner code</li>
-     *   <li>String Templates for error messages</li>
-     * </ul>
+     * Loads movies from CSV file.
      *
      * @return List of MovieEntity with IDs from CSV
      * @throws Exception if CSV file cannot be read or parsed
      */
     private List<MovieEntity> loadMoviesFromCsv() throws Exception {
-        // Try to read from file system first (if reset was done, this will be the overwritten file)
         var fileSystemPath = Paths.get("src/main/resources", csvFile);
         var inputStream = Files.exists(fileSystemPath)
                 ? Files.newInputStream(fileSystemPath)
@@ -227,7 +175,6 @@ public class CsvDataLoader implements CommandLineRunner {
      * Parses all CSV lines using functional approach.
      * Skips header (first line) and processes data lines.
      * Creates MovieEntity with IDs from CSV.
-     *
      * @param allLines All CSV lines including header
      * @return List of parsed MovieEntity with IDs from CSV
      */
@@ -242,15 +189,6 @@ public class CsvDataLoader implements CommandLineRunner {
 
     /**
      * Safely parses a CSV line into MovieEntity with ID from CSV.
-     * Returns Optional.empty() if parsing fails.
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Pattern Matching with switch expressions</li>
-     *   <li>Optional for null-safe operations</li>
-     *   <li>Sealed interfaces for type-safe validation</li>
-     *   <li>String Templates for error messages</li>
-     * </ul>
      *
      * @param line       CSV line as string array
      * @param lineNumber Line number for error reporting (1-based)
@@ -259,20 +197,17 @@ public class CsvDataLoader implements CommandLineRunner {
     private Optional<MovieEntity> parseEntityLineSafely(
             String[] line, int lineNumber) {
         return validateLine(line, lineNumber)
-                .map(valid -> parseMovieEntityLineSafely(valid.line(), valid.lineNumber(), line))
-                .orElse(Optional.empty());
+                .flatMap(valid -> parseMovieEntityLineSafely(valid.line(), valid.lineNumber()));
     }
 
     /**
      * Parses a validated CSV line safely into MovieEntity, returning Optional.empty() on error.
-     *
      * @param line       CSV line as string array (guaranteed valid)
      * @param lineNumber Line number for error reporting
-     * @param originalLine Original line for error logging
      * @return Optional containing MovieEntity with ID, or empty if parsing fails
      */
     private Optional<MovieEntity> parseMovieEntityLineSafely(
-            String[] line, int lineNumber, String[] originalLine) {
+            String[] line, int lineNumber) {
         try {
             return Optional.of(parseMovieEntityLine(line, lineNumber));
         } catch (Exception e) {
@@ -281,16 +216,7 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Validates a CSV line using functional approach with Optional.
-     * Eliminates multiple if statements using Stream API and pattern matching.
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Optional for null-safe validation</li>
-     *   <li>Predicate for functional validation</li>
-     *   <li>Method references for cleaner code</li>
-     *   <li>Sealed interfaces for type-safe results</li>
-     * </ul>
+     * Validates a CSV line.
      *
      * @param line       CSV line to validate
      * @param lineNumber Line number for error reporting
@@ -305,7 +231,6 @@ public class CsvDataLoader implements CommandLineRunner {
 
     /**
      * Creates a predicate to check if line has minimum required columns.
-     * Uses method reference for elegant functional validation.
      *
      * @return Predicate that checks column count
      */
@@ -313,17 +238,8 @@ public class CsvDataLoader implements CommandLineRunner {
         return line -> line.length >= minColumns;
     }
 
-
     /**
      * Parses a validated CSV line into a MovieEntity with ID from CSV.
-     * Used for loading data from CSV where IDs are provided.
-     *
-     * <p>CSV format: id;year;title;studios;producers;winner
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Method references for field parsing</li>
-     *   <li>String Templates for error messages</li>
-     * </ul>
      *
      * @param line       CSV line as string array (guaranteed valid)
      * @param lineNumber Line number for error reporting
@@ -343,13 +259,7 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Parses ID field using functional approach with Optional.
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Optional for null-safe operations</li>
-     *   <li>String Templates for error messages</li>
-     * </ul>
+     * Parses ID field.
      *
      * @param value      String value to parse
      * @param lineNumber Line number for error reporting
@@ -369,7 +279,6 @@ public class CsvDataLoader implements CommandLineRunner {
 
     /**
      * Parses long safely with error handling.
-     *
      * @param value      String value to parse
      * @param lineNumber Line number for error reporting
      * @return Parsed long value
@@ -386,16 +295,7 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Parses year field using functional approach with Optional and Stream API.
-     * Eliminates multiple if statements using pattern matching.
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Optional for null-safe operations</li>
-     *   <li>Predicate for functional validation</li>
-     *   <li>String Templates for error messages</li>
-     *   <li>Method references for cleaner code</li>
-     * </ul>
+     * Parses year field.
      *
      * @param value      String value to parse
      * @param lineNumber Line number for error reporting
@@ -415,7 +315,6 @@ public class CsvDataLoader implements CommandLineRunner {
 
     /**
      * Parses integer safely with error handling.
-     *
      * @param value      String value to parse
      * @param lineNumber Line number for error reporting
      * @return Parsed integer value
@@ -432,8 +331,7 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Validates year range using functional approach.
-     * Throws exception if year is out of range.
+     * Validates year range.
      *
      * @param year       Year to validate
      * @param lineNumber Line number for error reporting
@@ -450,16 +348,7 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Parses a string field using functional approach with Optional.
-     * Eliminates multiple if statements using Stream API.
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Optional for null-safe operations</li>
-     *   <li>Predicate for functional validation</li>
-     *   <li>String Templates for error messages</li>
-     *   <li>Method references for cleaner code</li>
-     * </ul>
+     * Parses a string field.
      *
      * @param value      String value to parse
      * @param fieldName  Name of the field for error messages
@@ -479,15 +368,7 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Parses winner field using functional approach with Optional.
-     * Eliminates if statement using method references.
-     *
-     * <p>Uses Java 21 features EXTREMELY:
-     * <ul>
-     *   <li>Optional for null-safe operations</li>
-     *   <li>Method references for cleaner code</li>
-     *   <li>Predicate for functional validation</li>
-     * </ul>
+     * Parses winner field.
      *
      * @param value String value to parse
      * @return Boolean indicating if movie is a winner
@@ -501,8 +382,7 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
-     * Sealed interface for validation results using pattern matching.
-     * Provides type-safe validation results.
+     * Sealed interface for validation results.
      */
     private sealed interface ValidationResult {
         /**
@@ -513,15 +393,6 @@ public class CsvDataLoader implements CommandLineRunner {
          */
         record Valid(String[] line, int lineNumber) implements ValidationResult {
         }
-
-        /**
-         * Invalid line with error information.
-         *
-         * @param lineNumber    Line number (1-based)
-         * @param reason        Reason for invalidity
-         * @param actualColumns Actual number of columns found
-         */
-        record Invalid(int lineNumber, String reason, int actualColumns) implements ValidationResult {
-        }
     }
 }
+

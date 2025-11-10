@@ -1,7 +1,7 @@
-package golden.raspberry.awards.adapter.driven.persistence.mapper;
+package golden.raspberry.awards.infrastructure.adapter.driven.persistence.mapper;
 
-import golden.raspberry.awards.adapter.driven.persistence.entity.MovieEntity;
-import golden.raspberry.awards.core.domain.model.Movie;
+import golden.raspberry.awards.infrastructure.adapter.driven.persistence.entity.MovieEntity;
+import golden.raspberry.awards.core.domain.model.aggregate.Movie;
 
 import java.util.List;
 import java.util.Objects;
@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 /**
  * Mapper between Domain Model (Movie) and Entity (MovieEntity).
- * Converts between domain and persistence layers.
- * <p>
- * Uses Java 21 features: Streams, Pattern Matching.
+ *
+ * @author Luiz Generoso
+ * @since 1.0.0
  */
 public final class MovieMapper {
 
