@@ -1,0 +1,34 @@
+.modal-iframe {
+    width: 100%;
+    height: calc(100vh - 60px);
+    border: none;
+}
+
+.modal-code-content {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 1rem;
+    max-height: calc(100vh - 200px);
+    overflow: auto;
+}
+
+#h2ConsoleModal .modal-body {
+    background-color: #f5f5dc !important;
+    padding: 0 !important;
+}
+
+#h2ConsoleModal .modal-content {
+    background-color: #f5f5dc !important;
+    border: none !important;
+}
+
+#h2ConsoleModal .modal-header {
+    background-color: #212529 !important;
+    border-bottom: 1px solid #404040 !important;
+}
+
+#h2ConsoleIframe {
+    background-color: #f5f5dc !important;
+    display: block;
+}
+

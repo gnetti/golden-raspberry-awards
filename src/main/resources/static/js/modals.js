@@ -118,31 +118,75 @@ function loadH2ConsoleModal() {
     
     iframe.src = '/h2-console';
     
-    iframe.onload = function() {
-        try {
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            const iframeHead = iframeDoc.head || iframeDoc.getElementsByTagName('head')[0];
-            
-            const link = iframeDoc.createElement('link');
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.href = '/css/h2-console-dark.css';
-            iframeHead.appendChild(link);
-            
-            fetch('/css/h2-console-inline.css')
-                .then(response => response.text())
-                .then(cssText => {
-                    const style = iframeDoc.createElement('style');
-                    style.textContent = cssText;
-                    iframeHead.appendChild(style);
-                })
-                .catch(error => {
-                    console.warn('Could not load H2 Console inline CSS:', error);
-                });
-        } catch (e) {
-            console.warn('Could not inject CSS into H2 Console iframe:', e);
-        }
-    };
+        iframe.onload = function() {
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const iframeHead = iframeDoc.head || iframeDoc.getElementsByTagName('head')[0];
+                const iframeBody = iframeDoc.body;
+                
+                iframeDoc.documentElement.style.backgroundColor = '#f5f5dc';
+                iframeBody.style.backgroundColor = '#f5f5dc';
+                
+                const link = iframeDoc.createElement('link');
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = '/css/h2-console-dark.css';
+                iframeHead.appendChild(link);
+                
+                fetch('/css/h2-console-inline.css')
+                    .then(response => response.text())
+                    .then(cssText => {
+                        const style = iframeDoc.createElement('style');
+                        style.textContent = cssText;
+                        style.id = 'h2-console-custom-styles';
+                        iframeHead.appendChild(style);
+                        
+                        iframeDoc.documentElement.style.backgroundColor = '#f5f5dc';
+                        iframeBody.style.backgroundColor = '#f5f5dc';
+                    })
+                    .catch(error => {
+                        console.warn('Could not load H2 Console inline CSS:', error);
+                    });
+                
+                setTimeout(() => {
+                    iframeDoc.documentElement.style.backgroundColor = '#f5f5dc';
+                    iframeBody.style.backgroundColor = '#f5f5dc';
+                    
+                    const observer = new MutationObserver(() => {
+                        iframeDoc.documentElement.style.backgroundColor = '#f5f5dc';
+                        iframeBody.style.backgroundColor = '#f5f5dc';
+                        
+                        const allDivs = iframeDoc.querySelectorAll('div');
+                        allDivs.forEach(div => {
+                            if (!div.classList.contains('login') && 
+                                !div.classList.contains('header') && 
+                                !div.classList.contains('menuBar') &&
+                                !div.classList.contains('toolbar') &&
+                                !div.classList.contains('sqlArea') &&
+                                !div.classList.contains('result') &&
+                                !div.classList.contains('tree') &&
+                                !div.classList.contains('help') &&
+                                !div.classList.contains('main')) {
+                                if (getComputedStyle(div).backgroundColor === 'rgb(26, 26, 26)' || 
+                                    getComputedStyle(div).backgroundColor === 'rgb(45, 45, 45)') {
+                                    div.style.backgroundColor = '#f5f5dc';
+                                    div.style.color = '#212529';
+                                }
+                            }
+                        });
+                    });
+                    
+                    observer.observe(iframeBody, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        attributeFilter: ['style', 'class']
+                    });
+                }, 100);
+            } catch (e) {
+                console.warn('Could not inject CSS into H2 Console iframe:', e);
+            }
+        };
     
     modal.show();
     return true;
