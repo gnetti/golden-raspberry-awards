@@ -1,4 +1,4 @@
-package golden.raspberry.awards.adapter.driving.rest;
+package golden.raspberry.awards.adapter.driving.rest.exception;
 
 import golden.raspberry.awards.adapter.driving.rest.dto.ApiErrorDTO;
 import org.springframework.http.HttpStatus;
@@ -10,18 +10,14 @@ import org.springframework.web.context.request.WebRequest;
 
 /**
  * Global Exception Handler for REST API.
- *
  * <p>Implements Richardson Level 2: structured and informative error messages.
  * Maps exceptions to appropriate HTTP status codes.
- *
  * <p><strong>Status Codes:</strong>
  * <ul>
  *   <li>400 Bad Request: IllegalArgumentException, IllegalStateException, NullPointerException, HttpMessageNotReadableException</li>
  *   <li>500 Internal Server Error: All other exceptions</li>
  * </ul>
- *
- * <p>Uses Java 21 features: Records, var, String Templates.
- *
+ * *
  * @author Luiz Generoso
  * @since 1.0.0
  */
@@ -31,7 +27,6 @@ public class ApiExceptionHandler {
     /**
      * Handles IllegalArgumentException (400 Bad Request).
      * Used for validation errors.
-     *
      * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
@@ -53,7 +48,6 @@ public class ApiExceptionHandler {
     /**
      * Handles IllegalStateException (400 Bad Request).
      * Used for business logic errors.
-     *
      * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
@@ -75,7 +69,6 @@ public class ApiExceptionHandler {
     /**
      * Handles NullPointerException (400 Bad Request).
      * Should not occur in production, but handled for safety.
-     *
      * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
@@ -102,7 +95,6 @@ public class ApiExceptionHandler {
      * Handles HttpMessageNotReadableException (400 Bad Request).
      * Occurs when JSON is malformed, missing, or contains type mismatches.
      * Provides FUNDAMENTALS error message.
-     *
      * @param ex      Exception thrown
      * @param request Web request
      * @return ResponseEntity with ApiErrorDTO
@@ -128,10 +120,8 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-
     /**
      * Extracts path from WebRequest description.
-     *
      * @param request Web request
      * @return Request path
      */
