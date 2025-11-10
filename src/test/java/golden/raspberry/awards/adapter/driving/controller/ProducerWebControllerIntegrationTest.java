@@ -1,4 +1,4 @@
-package golden.raspberry.awards.adapter.driving.web;
+package golden.raspberry.awards.adapter.driving.controller;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration tests for ProducerWebController Thymeleaf pages.
  *
- * <p>Tests validate that the web pages render correctly
+ * <p>Tests validate that the controller pages render correctly
  * with proper model attributes and view names.
  *
  * <p><strong>Test Coverage:</strong>
