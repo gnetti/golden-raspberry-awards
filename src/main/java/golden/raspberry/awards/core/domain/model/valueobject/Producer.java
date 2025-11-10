@@ -1,4 +1,4 @@
-package golden.raspberry.awards.core.domain.model;
+package golden.raspberry.awards.core.domain.model.valueobject;
 
 import org.springframework.lang.NonNull;
 
@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 /**
  * Value Object representing a Producer.
- * Pure Java Record (Java 21) - no Spring dependencies.
- * Handles parsing of producer strings (comma and "and" separated).
- * Uses Java 21 features: Records, Streams.
+ *
+ * @author Luiz Generoso
+ * @since 1.0.0
  */
 public record Producer(String name) {
     public Producer {
@@ -26,13 +26,10 @@ public record Producer(String name) {
     }
 
     /**
-     * Parses a producer string that may contain multiple producers
-     * separated by comma or "and".
+     * Parses a producer string that may contain multiple producers separated by comma or "and".
      *
      * @param producersString String containing one or more producers
      * @return List of Producer objects parsed from the string
-     * @example "Producer 1, Producer 2 and Producer 3" returns
-     * [Producer("Producer 1"), Producer("Producer 2"), Producer("Producer 3")]
      */
     public static List<Producer> parseMultiple(String producersString) {
         if (producersString == null || producersString.isBlank()) {
