@@ -9,6 +9,9 @@ import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
 import golden.raspberry.awards.core.domain.model.aggregate.Movie;
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 import golden.raspberry.awards.core.application.port.out.MovieRepositoryPort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -125,6 +128,20 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, SaveMovieWit
     public List<MovieWithId> findAll() {
         var entities = jpaRepository.findAll();
         return MovieWithIdMapper.toDomainList(entities);
+    }
+
+    /**
+     * Finds all movies with ID using pagination and sorting.
+     *
+     * @param pageable Pagination and sorting parameters
+     * @return Page of MovieWithId
+     */
+    @Override
+    public Page<MovieWithId> findAll(Pageable pageable) {
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+        var entityPage = jpaRepository.findAll(pageable);
+        var domainList = MovieWithIdMapper.toDomainList(entityPage.getContent());
+        return new PageImpl<>(domainList, pageable, entityPage.getTotalElements());
     }
 
 }

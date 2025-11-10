@@ -4,6 +4,8 @@ import golden.raspberry.awards.core.application.port.in.GetMoviePort;
 import golden.raspberry.awards.core.application.port.out.MovieQueryPort;
 import golden.raspberry.awards.core.application.usecase.validation.MovieValidation;
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Objects;
@@ -52,6 +54,18 @@ public record GetMoviePortHandler(
     @Override
     public List<MovieWithId> executeAll() {
         return movieQueryPort.findAll();
+    }
+
+    /**
+     * Executes use case to get all movies with pagination and sorting.
+     *
+     * @param pageable Pagination and sorting parameters
+     * @return Page of MovieWithId
+     */
+    @Override
+    public Page<MovieWithId> executeAll(Pageable pageable) {
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+        return movieQueryPort.findAll(pageable);
     }
 }
 

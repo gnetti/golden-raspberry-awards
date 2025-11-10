@@ -23,6 +23,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.Objects;
 
@@ -96,21 +100,70 @@ public class MovieController {
     }
 
     @Operation(
-            summary = "Get all movies",
-            description = "Returns a list of all movies in the database"
+            summary = "Get all movies with pagination",
+            description = "Returns a paginated list of movies with sorting support. Supports pagination parameters: page (0-based), size, sort (field,direction)."
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Successfully retrieved all movies",
-            content = @Content(schema = @Schema(implementation = MovieDTO.class))
-    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved movies",
+                    content = @Content(schema = @Schema(implementation = MovieDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request - Invalid pagination parameters",
+                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+            )
+    })
     @GetMapping
-    public ResponseEntity<java.util.List<MovieDTO>> getAll() {
-        var moviesWithId = getMoviePort.executeAll();
-        var movieDTOs = moviesWithId.stream()
-                .map(this::toMovieDTO)
-                .toList();
+    public ResponseEntity<Page<MovieDTO>> getAll(
+            @Parameter(
+                    description = "Page number (0-based, default: 0)",
+                    example = "0"
+            )
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(
+                    description = "Page size (default: 10, max: 100)",
+                    example = "10"
+            )
+            @RequestParam(defaultValue = "10") int size,
+            @Parameter(
+                    description = "Sort field (id, year, title, studios, producers, winner). Default: id",
+                    example = "id"
+            )
+            @RequestParam(defaultValue = "id") String sort,
+            @Parameter(
+                    description = "Sort direction (asc, desc). Default: asc",
+                    example = "asc"
+            )
+            @RequestParam(defaultValue = "asc") String direction) {
+        
+        if (page < 0) page = 0;
+        if (size < 1) size = 10;
+        if (size > 100) size = 100;
+        
+        var sortDirection = "desc".equalsIgnoreCase(direction) 
+                ? Sort.Direction.DESC 
+                : Sort.Direction.ASC;
+        
+        var sortField = mapSortField(sort);
+        var pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortField));
+        
+        var moviePage = getMoviePort.executeAll(pageable);
+        var movieDTOs = moviePage.map(this::toMovieDTO);
+        
         return ResponseEntity.ok(movieDTOs);
+    }
+
+    private String mapSortField(String sortBy) {
+        return switch (sortBy.toLowerCase()) {
+            case "year" -> "year";
+            case "title" -> "title";
+            case "studios" -> "studios";
+            case "producers" -> "producers";
+            case "winner" -> "winner";
+            default -> "id";
+        };
     }
 
     @Operation(

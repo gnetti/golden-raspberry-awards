@@ -1,6 +1,8 @@
 package golden.raspberry.awards.core.application.port.in;
 
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -27,5 +29,13 @@ public interface GetMoviePort {
      * @return List of all MovieWithId
      */
     List<MovieWithId> executeAll();
+
+    /**
+     * Gets all movies with pagination and sorting.
+     *
+     * @param pageable Pagination and sorting parameters
+     * @return Page of MovieWithId
+     */
+    Page<MovieWithId> executeAll(Pageable pageable);
 }
 
