@@ -7,11 +7,13 @@
     <title layout:title-pattern="$CONTENT_TITLE - Golden Raspberry Awards">
         Golden Raspberry Awards
     </title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <link rel="apple-touch-icon" th:href="@{/images/favicon.svg}">
     <link th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}" rel="stylesheet">
 
     <link th:href="@{/webjars/font-awesome/6.5.1/css/all.min.css}" rel="stylesheet">
-
     <link th:href="@{/css/custom.css}" rel="stylesheet">
+    <link th:href="@{/css/modals.css}" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100">
 <div th:replace="~{layout/fragments/navbar :: navbar}"></div>
@@ -23,8 +25,10 @@
 </main>
 
 <div th:replace="~{layout/fragments/footer :: footer}"></div>
+<div th:replace="~{layout/fragments/modals :: modals}"></div>
 
 <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/modals.js}"></script>
 
 <div layout:fragment="scripts">
 

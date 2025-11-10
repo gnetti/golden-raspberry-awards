@@ -5,13 +5,13 @@ import golden.raspberry.awards.adapter.driving.rest.dto.MovieDTO;
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsPort;
 import golden.raspberry.awards.core.application.port.in.GetMoviePort;
 import golden.raspberry.awards.core.application.port.out.ConverterDtoPort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -72,14 +72,20 @@ public class ProducerWebController {
      * Handles GET request for intervals page.
      *
      * @param model Model to add attributes for Thymeleaf
-     * @return View name "pages/intervals"
+     * @param modal Whether to return only the content for modal (no layout)
+     * @return View name "pages/intervals" or "fragments/intervals-modal" if modal
      */
     @GetMapping("/intervals")
-    public String intervals(Model model) {
+    public String intervals(Model model, @RequestParam(required = false) Boolean modal) {
         var response = calculateIntervalsPort.execute();
         var dto = converterDtoPort.toDTO(response);
         model.addAttribute("intervals", dto);
         model.addAttribute("title", "Producer Intervals");
+        
+        if (Boolean.TRUE.equals(modal)) {
+            return "fragments/intervals-modal";
+        }
+        
         return "pages/intervals";
     }
 
@@ -101,31 +107,29 @@ public class ProducerWebController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
         
-        var allMovies = getMoviePort.executeAll();
-        var allMovieDTOs = allMovies.stream()
+        if (page < 0) page = 0;
+        if (size < 1) size = 10;
+        
+        var sortDirection = "desc".equalsIgnoreCase(direction) 
+                ? Sort.Direction.DESC 
+                : Sort.Direction.ASC;
+        
+        var sort = Sort.by(sortDirection, mapSortField(sortBy));
+        var pageable = PageRequest.of(page, size, sort);
+        
+        var moviePage = getMoviePort.executeAll(pageable);
+        var movieDTOs = moviePage.getContent().stream()
                 .map(movie -> (MovieDTO) converterDtoPort.toDTO(movie))
                 .collect(Collectors.toList());
-
-        var sortedMovies = sortMovies(allMovieDTOs, sortBy, direction);
         
-        var totalItems = sortedMovies.size();
-        var totalPages = (int) Math.ceil((double) totalItems / size);
-        
-        if (page < 0) page = 0;
-        if (page >= totalPages && totalPages > 0) page = totalPages - 1;
-        
-        var start = page * size;
-        var end = Math.min(start + size, totalItems);
-        var paginatedMovies = sortedMovies.subList(start, end);
-        
-        var pageNumbers = java.util.stream.IntStream.range(0, totalPages)
+        var pageNumbers = java.util.stream.IntStream.range(0, moviePage.getTotalPages())
                 .boxed()
                 .collect(Collectors.toList());
         
-        model.addAttribute("movies", paginatedMovies);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("movies", movieDTOs);
+        model.addAttribute("currentPage", moviePage.getNumber());
+        model.addAttribute("totalPages", moviePage.getTotalPages());
+        model.addAttribute("totalItems", moviePage.getTotalElements());
         model.addAttribute("pageSize", size);
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("direction", direction);
@@ -135,23 +139,15 @@ public class ProducerWebController {
         return "pages/movies";
     }
 
-    private List<MovieDTO> sortMovies(List<MovieDTO> movies, String sortBy, String direction) {
-        Comparator<MovieDTO> comparator = switch (sortBy.toLowerCase()) {
-            case "year" -> Comparator.comparing(MovieDTO::year, Comparator.nullsLast(Comparator.naturalOrder()));
-            case "title" -> Comparator.comparing(MovieDTO::title, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
-            case "studios" -> Comparator.comparing(MovieDTO::studios, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
-            case "producers" -> Comparator.comparing(MovieDTO::producers, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
-            case "winner" -> Comparator.comparing(MovieDTO::winner, Comparator.nullsLast(Comparator.naturalOrder()));
-            default -> Comparator.comparing(MovieDTO::id, Comparator.nullsLast(Comparator.naturalOrder()));
+    private String mapSortField(String sortBy) {
+        return switch (sortBy.toLowerCase()) {
+            case "year" -> "year";
+            case "title" -> "title";
+            case "studios" -> "studios";
+            case "producers" -> "producers";
+            case "winner" -> "winner";
+            default -> "id";
         };
-        
-        if ("desc".equalsIgnoreCase(direction)) {
-            comparator = comparator.reversed();
-        }
-        
-        return movies.stream()
-                .sorted(comparator)
-                .collect(Collectors.toList());
     }
 }
 
