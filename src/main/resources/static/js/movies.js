@@ -6,6 +6,15 @@ function changePageSize(size) {
     const url = new URL(window.location.href);
     url.searchParams.set('size', size);
     url.searchParams.set('page', '0');
+    // Always preserve filterType and filterValue
+    const filterType = document.getElementById('filterType').value;
+    const filterValue = document.getElementById('filterInput').value.trim();
+    url.searchParams.set('filterType', filterType);
+    if (filterValue) {
+        url.searchParams.set('filterValue', filterValue);
+    } else {
+        url.searchParams.delete('filterValue');
+    }
     window.location.href = url.toString();
 }
 
@@ -13,6 +22,15 @@ function changeSort(sortBy) {
     const url = new URL(window.location.href);
     url.searchParams.set('sortBy', sortBy);
     url.searchParams.set('page', '0');
+    // Always preserve filterType and filterValue
+    const filterType = document.getElementById('filterType').value;
+    const filterValue = document.getElementById('filterInput').value.trim();
+    url.searchParams.set('filterType', filterType);
+    if (filterValue) {
+        url.searchParams.set('filterValue', filterValue);
+    } else {
+        url.searchParams.delete('filterValue');
+    }
     window.location.href = url.toString();
 }
 
@@ -20,87 +38,81 @@ function changeDirection(direction) {
     const url = new URL(window.location.href);
     url.searchParams.set('direction', direction);
     url.searchParams.set('page', '0');
+    // Always preserve filterType and filterValue
+    const filterType = document.getElementById('filterType').value;
+    const filterValue = document.getElementById('filterInput').value.trim();
+    url.searchParams.set('filterType', filterType);
+    if (filterValue) {
+        url.searchParams.set('filterValue', filterValue);
+    } else {
+        url.searchParams.delete('filterValue');
+    }
     window.location.href = url.toString();
 }
 
-// Filter movies in the table and cards
+// Handle filter input keyup with debounce
+let filterTimeout;
+function handleFilterKeyup(event) {
+    // If Enter key is pressed, filter immediately
+    if (event.key === 'Enter') {
+        clearTimeout(filterTimeout);
+        filterMovies();
+        return;
+    }
+    
+    // Otherwise, debounce the filter
+    clearTimeout(filterTimeout);
+    filterTimeout = setTimeout(() => {
+        filterMovies();
+    }, 500); // Wait 500ms after user stops typing
+}
+
+// Filter movies using backend - searches in ALL database records
 function filterMovies() {
-    const filterValue = document.getElementById('filterInput').value.toLowerCase();
+    const filterInput = document.getElementById('filterInput');
+    let filterValue = filterInput.value.trim();
     const filterType = document.getElementById('filterType').value;
-    currentFilter = filterValue;
     
-    // Filter table rows (desktop)
-    const tableRows = document.querySelectorAll('#moviesTable tbody tr.movie-row');
-    tableRows.forEach(row => {
-        let shouldShow = false;
-        
-        if (filterType === 'all') {
-            // Search in all fields
-            const text = row.textContent.toLowerCase();
-            shouldShow = text.includes(filterValue);
-        } else {
-            // Search in specific field
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 6) {
-                let cellText = '';
-                switch(filterType) {
-                    case 'id':
-                        cellText = cells[0].textContent.toLowerCase();
-                        break;
-                    case 'year':
-                        cellText = cells[1].textContent.toLowerCase();
-                        break;
-                    case 'title':
-                        cellText = cells[2].textContent.toLowerCase();
-                        break;
-                    case 'studios':
-                        cellText = cells[3].textContent.toLowerCase();
-                        break;
-                    case 'producers':
-                        cellText = cells[4].textContent.toLowerCase();
-                        break;
-                }
-                shouldShow = cellText.includes(filterValue);
-            }
-        }
-        
-        row.style.display = shouldShow ? '' : 'none';
-    });
+    // Validate minimum length based on filter type
+    let minLength = 1;
+    switch(filterType) {
+        case 'id':
+            minLength = 1; // ID: from 1st character
+            break;
+        case 'year':
+            minLength = 2; // Year: from 2nd character
+            break;
+        case 'title':
+        case 'studios':
+        case 'producers':
+        case 'all':
+            minLength = 3; // String fields: from 3rd character
+            break;
+    }
     
-    // Filter cards (mobile)
-    const cards = document.querySelectorAll('.movie-card.movie-row');
-    cards.forEach(card => {
-        let shouldShow = false;
-        
-        if (filterType === 'all') {
-            // Search in all fields
-            const text = card.textContent.toLowerCase();
-            shouldShow = text.includes(filterValue);
-        } else {
-            // Search in specific field using data attributes
-            let cardText = '';
-            switch(filterType) {
-                case 'id':
-                    cardText = card.getAttribute('data-id')?.toLowerCase() || '';
-                    break;
-                case 'year':
-                    cardText = card.getAttribute('data-year')?.toLowerCase() || '';
-                    break;
-                case 'title':
-                    cardText = card.getAttribute('data-title')?.toLowerCase() || '';
-                    break;
-                case 'studios':
-                    cardText = card.getAttribute('data-studios')?.toLowerCase() || '';
-                    break;
-                case 'producers':
-                    cardText = card.getAttribute('data-producers')?.toLowerCase() || '';
-                    break;
-            }
-            shouldShow = cardText.includes(filterValue);
-        }
-        
-        card.style.display = shouldShow ? '' : 'none';
-    });
+    // If filter value is too short, don't search (but keep the value in input)
+    if (filterValue && filterValue.length < minLength) {
+        return; // Don't search yet, wait for more characters
+    }
+    
+    // Build URL with current pagination and sort parameters
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', '0'); // Reset to first page when filtering
+    
+    // Always set focusFilter flag when filtering (even when clearing)
+    url.searchParams.set('focusFilter', 'true');
+    
+    // Always preserve filterType to maintain select value
+    url.searchParams.set('filterType', filterType);
+    
+    if (filterValue && filterValue.length >= minLength) {
+        url.searchParams.set('filterValue', filterValue);
+    } else {
+        url.searchParams.delete('filterValue');
+    }
+    
+    // Reload page with filter parameters - this will search in ALL database records
+    window.location.href = url.toString();
 }
 
 // Open modal for new movie
@@ -251,11 +263,30 @@ function showNotification(message, type) {
     }, 3000);
 }
 
-// Initialize filter on page load
+// Initialize filter on page load and maintain focus
 document.addEventListener('DOMContentLoaded', function() {
     const filterInput = document.getElementById('filterInput');
-    if (filterInput && currentFilter) {
-        filterInput.value = currentFilter;
-        filterMovies();
+    if (filterInput) {
+        // Restore filter value if exists
+        if (currentFilter) {
+            filterInput.value = currentFilter;
+        }
+        
+        // Maintain focus on filter input after page reload if focusFilter flag is set
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('focusFilter') === 'true') {
+            // Small delay to ensure page is fully loaded
+            setTimeout(() => {
+                filterInput.focus();
+                // Move cursor to end of input
+                const length = filterInput.value.length;
+                filterInput.setSelectionRange(length, length);
+                
+                // Remove focusFilter parameter from URL without reload
+                urlParams.delete('focusFilter');
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                window.history.replaceState({}, '', newUrl);
+            }, 100);
+        }
     }
 });
