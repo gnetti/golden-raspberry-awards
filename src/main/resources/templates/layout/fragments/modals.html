@@ -1,113 +1,265 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en-us">
-<body>
-    <div th:fragment="modals">
-        <div class="modal fade" id="intervalsModal" tabindex="-1" aria-labelledby="intervalsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title" id="intervalsModalLabel">
-                            <i class="fa-solid fa-chart-line text-primary"></i>
-                            Producer Intervals
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body bg-dark" id="intervalsModalBody">
-                        <div class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+    <body>
+        <div th:fragment="modals">
+            <div
+                class="modal fade"
+                id="intervalsModal"
+                tabindex="-1"
+                aria-labelledby="intervalsModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="intervalsModalLabel">
+                                <i class="fa-solid fa-chart-line text-primary"></i>
+                                Producer Intervals
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body bg-dark" id="intervalsModalBody">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="modal fade" id="swaggerModal" tabindex="-1" aria-labelledby="swaggerModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title" id="swaggerModalLabel">
-                            <i class="fas fa-tools text-success"></i>
-                            Swagger UI
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div
+                class="modal fade"
+                id="swaggerModal"
+                tabindex="-1"
+                aria-labelledby="swaggerModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="swaggerModalLabel">
+                                <i class="fas fa-tools text-success"></i>
+                                Swagger UI
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body p-0 bg-dark">
+                            <iframe
+                                id="swaggerIframe"
+                                src="/swagger-ui.html"
+                                class="modal-iframe"
+                                title="Swagger UI"
+                            ></iframe>
+                        </div>
                     </div>
-                    <div class="modal-body p-0 bg-dark">
-                        <iframe id="swaggerIframe" src="/swagger-ui.html" class="modal-iframe" title="Swagger UI"></iframe>
+                </div>
+            </div>
+
+            <div
+                class="modal fade"
+                id="javadocModal"
+                tabindex="-1"
+                aria-labelledby="javadocModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="javadocModalLabel">
+                                <i class="fas fa-book-open text-info"></i>
+                                JavaDoc
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body p-0 bg-dark">
+                            <iframe
+                                id="javadocIframe"
+                                src="/docs/index.html"
+                                class="modal-iframe"
+                                title="JavaDoc"
+                            ></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="modal fade"
+                id="openapiModal"
+                tabindex="-1"
+                aria-labelledby="openapiModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="openapiModalLabel">
+                                <i class="fas fa-file-code text-warning"></i>
+                                OpenAPI Specification
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body bg-dark">
+                            <pre
+                                id="openapiContent"
+                                class="modal-code-content"
+                            ><code class="language-json">Loading...</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="modal fade"
+                id="moviesModal"
+                tabindex="-1"
+                aria-labelledby="moviesModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="moviesModalLabel">
+                                <i class="fa-solid fa-clapperboard text-danger"></i>
+                                🎬 Movies Management
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body p-0 bg-dark">
+                            <iframe
+                                id="moviesIframe"
+                                src="/movies"
+                                class="modal-iframe"
+                                title="Movies Management"
+                            ></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="modal fade"
+                id="moviesApiModal"
+                tabindex="-1"
+                aria-labelledby="moviesApiModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="moviesApiModalLabel">
+                                <i class="fas fa-film text-danger"></i>
+                                Movies API
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body bg-dark">
+                            <pre
+                                id="moviesApiContent"
+                                class="modal-code-content"
+                            ><code class="language-json">Loading...</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="modal fade"
+                id="h2ConsoleModal"
+                tabindex="-1"
+                aria-labelledby="h2ConsoleModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="h2ConsoleModalLabel">
+                                <i class="fas fa-database text-secondary"></i>
+                                H2 Console
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body p-0">
+                            <iframe
+                                id="h2ConsoleIframe"
+                                src="/h2-console"
+                                class="modal-iframe"
+                                title="H2 Console"
+                            ></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="modal fade"
+                id="manualModal"
+                tabindex="-1"
+                aria-labelledby="manualModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="manualModalLabel">
+                                <i class="fas fa-book text-info"></i>
+                                📚 System Manual
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body p-0 bg-dark">
+                            <iframe
+                                id="manualIframe"
+                                src="/manual"
+                                class="modal-iframe"
+                                title="System Manual"
+                            ></iframe>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="modal fade" id="javadocModal" tabindex="-1" aria-labelledby="javadocModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title" id="javadocModalLabel">
-                            <i class="fas fa-book-open text-info"></i>
-                            JavaDoc
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-0 bg-dark">
-                        <iframe id="javadocIframe" src="/docs/index.html" class="modal-iframe" title="JavaDoc"></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="openapiModal" tabindex="-1" aria-labelledby="openapiModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title" id="openapiModalLabel">
-                            <i class="fas fa-file-code text-warning"></i>
-                            OpenAPI Specification
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body bg-dark">
-                        <pre id="openapiContent" class="modal-code-content"><code class="language-json">Loading...</code></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="moviesApiModal" tabindex="-1" aria-labelledby="moviesApiModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title" id="moviesApiModalLabel">
-                            <i class="fas fa-film text-danger"></i>
-                            Movies API
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body bg-dark">
-                        <pre id="moviesApiContent" class="modal-code-content"><code class="language-json">Loading...</code></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="h2ConsoleModal" tabindex="-1" aria-labelledby="h2ConsoleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title" id="h2ConsoleModalLabel">
-                            <i class="fas fa-database text-secondary"></i>
-                            H2 Console
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-0">
-                        <iframe id="h2ConsoleIframe" src="/h2-console" class="modal-iframe" title="H2 Console"></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
+    </body>
 </html>
-

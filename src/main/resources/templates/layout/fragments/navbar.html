@@ -1,38 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en-us">
-<body>
-    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/}">
-                <i class="fa-solid fa-trophy text-warning"></i>
-                Golden Raspberry Awards
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                    data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/}">
-                            <i class="fa-solid fa-home"></i> Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/movies}">
-                            <i class="fa-solid fa-film"></i> Movies
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/intervals}">
-                            <i class="fa-solid fa-chart-line"></i> Intervals
-                        </a>
-                    </li>
-                </ul>
-                <img th:src="@{/images/logo.svg}" alt="Golden Raspberry Awards Logo" class="navbar-image ms-3" style="max-height: 40px; width: auto;">
+    <body>
+        <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" th:href="@{/dashboard}">
+                    <i class="fa-solid fa-trophy text-warning"></i>
+                    Golden Raspberry Awards
+                </a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dashboard}">
+                                <i class="fa-solid fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/movies}">
+                                <i class="fa-solid fa-film"></i> Movies
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/intervals}">
+                                <i class="fa-solid fa-chart-line"></i> Intervals
+                            </a>
+                        </li>
+                    </ul>
+                    <img
+                        th:src="@{/images/logo.svg}"
+                        alt="Golden Raspberry Awards Logo"
+                        class="navbar-image ms-3"
+                        style="max-height: 40px; width: auto"
+                    />
+                </div>
             </div>
-        </div>
-    </nav>
-</body>
+        </nav>
+    </body>
 </html>
-
