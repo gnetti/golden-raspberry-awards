@@ -67,5 +67,22 @@ public record GetMoviePortHandler(
         Objects.requireNonNull(pageable, "Pageable cannot be null");
         return movieQueryPort.findAll(pageable);
     }
+    
+    /**
+     * Executes use case to get all movies with pagination, sorting and filtering.
+     * Filters are applied to ALL database records before pagination.
+     *
+     * @param filterType Type of filter (all, title, year, studios, producers, id)
+     * @param filterValue Value to search for
+     * @param pageable Pagination and sorting parameters
+     * @return Page of MovieWithId
+     */
+    @Override
+    public Page<MovieWithId> executeAllWithFilter(String filterType, String filterValue, Pageable pageable) {
+        Objects.requireNonNull(filterType, "Filter type cannot be null");
+        Objects.requireNonNull(filterValue, "Filter value cannot be null");
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+        return movieQueryPort.findAllWithFilter(filterType, filterValue, pageable);
+    }
 }
 
