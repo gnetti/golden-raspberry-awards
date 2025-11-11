@@ -4,145 +4,151 @@
       layout:decorate="~{layout/base}" lang="en-us">
 <head>
     <title>Movies - Golden Raspberry Awards</title>
+    <link th:href="@{/css/movies.css}" rel="stylesheet">
 </head>
 <body>
     <div layout:fragment="content">
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <h2>
+        <!-- Header with Title -->
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <h2 class="mb-0">
                     <i class="fa-solid fa-film text-primary"></i>
-                    Movies
+                    Listing Movies
                 </h2>
-                <p class="text-muted small mb-0">
-                    Total: <strong th:text="${totalItems}">0</strong> movies
-                </p>
             </div>
         </div>
 
+        <!-- Action Bar: New Movie Button and Filter -->
         <div class="row mb-3">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body compact-info-card">
-                        <div class="row align-items-end">
-                            <div class="col-md-3">
-                                <label for="pageSize" class="form-label small mb-1">Items per page:</label>
-                                <select id="pageSize" class="form-select form-select-sm" onchange="changePageSize(this.value)">
-                                    <option value="5" th:selected="${pageSize == 5}">5</option>
-                                    <option value="10" th:selected="${pageSize == 10}">10</option>
-                                    <option value="20" th:selected="${pageSize == 20}">20</option>
-                                    <option value="50" th:selected="${pageSize == 50}">50</option>
-                                    <option value="100" th:selected="${pageSize == 100}">100</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="sortBy" class="form-label small mb-1">Sort by:</label>
-                                <select id="sortBy" class="form-select form-select-sm" onchange="changeSort(this.value)">
-                                    <option value="id" th:selected="${sortBy == 'id'}">ID</option>
-                                    <option value="year" th:selected="${sortBy == 'year'}">Year</option>
-                                    <option value="title" th:selected="${sortBy == 'title'}">Title</option>
-                                    <option value="studios" th:selected="${sortBy == 'studios'}">Studios</option>
-                                    <option value="producers" th:selected="${sortBy == 'producers'}">Producers</option>
-                                    <option value="winner" th:selected="${sortBy == 'winner'}">Winner</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="direction" class="form-label small mb-1">Direction:</label>
-                                <select id="direction" class="form-select form-select-sm" onchange="changeDirection(this.value)">
-                                    <option value="asc" th:selected="${direction == 'asc'}">Ascending</option>
-                                    <option value="desc" th:selected="${direction == 'desc'}">Descending</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 text-end">
-                                <span class="small text-muted">
-                                    Page <strong th:text="${currentPage + 1}">1</strong> of <strong th:text="${totalPages}">1</strong>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-12 col-md-6 mb-2 mb-md-0">
+                <button type="button" class="btn btn-primary btn-new-movie w-100 w-md-auto" onclick="openNewMovieModal()">
+                    <i class="fa-solid fa-plus"></i> <span class="d-none d-sm-inline">New Movie</span><span class="d-sm-none">New</span>
+                </button>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="input-group">
+                    <select id="filterType" class="form-select filter-type-selector" onchange="filterMovies()">
+                        <option value="all">All Fields</option>
+                        <option value="title">Title</option>
+                        <option value="year">Year</option>
+                        <option value="studios">Studios</option>
+                        <option value="producers">Producers</option>
+                        <option value="id" selected>ID</option>
+                    </select>
+                    <div class="filter-divider"></div>
+                    <input type="text" 
+                           id="filterInput" 
+                           class="form-control" 
+                           placeholder="Filter" 
+                           onkeyup="filterMovies()">
+                    <button class="btn btn-outline-secondary" type="button" onclick="filterMovies()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Movies Table -->
-        <div class="row">
+        <!-- Desktop Table View -->
+        <div class="row d-none d-md-block">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-dark table-striped table-hover">
+                            <table class="table table-dark table-striped table-hover mb-0" id="moviesTable">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th class="text-start">
                                             <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='id', direction=${sortBy == 'id' and direction == 'asc' ? 'desc' : 'asc'})}" 
                                                class="text-decoration-none text-white">
                                                 ID
                                                 <i th:if="${sortBy == 'id'}" 
                                                    th:class="${direction == 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'}"
-                                                   class="fa-solid"></i>
+                                                   class="fa-solid ms-1"></i>
                                             </a>
                                         </th>
-                                        <th>
+                                        <th class="text-center">
                                             <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='year', direction=${sortBy == 'year' and direction == 'asc' ? 'desc' : 'asc'})}" 
                                                class="text-decoration-none text-white">
                                                 Year
                                                 <i th:if="${sortBy == 'year'}" 
                                                    th:class="${direction == 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'}"
-                                                   class="fa-solid"></i>
+                                                   class="fa-solid ms-1"></i>
                                             </a>
                                         </th>
-                                        <th>
+                                        <th class="text-center">
                                             <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='title', direction=${sortBy == 'title' and direction == 'asc' ? 'desc' : 'asc'})}" 
                                                class="text-decoration-none text-white">
                                                 Title
                                                 <i th:if="${sortBy == 'title'}" 
                                                    th:class="${direction == 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'}"
-                                                   class="fa-solid"></i>
+                                                   class="fa-solid ms-1"></i>
                                             </a>
                                         </th>
-                                        <th>
+                                        <th class="text-center">
                                             <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='studios', direction=${sortBy == 'studios' and direction == 'asc' ? 'desc' : 'asc'})}" 
                                                class="text-decoration-none text-white">
                                                 Studios
                                                 <i th:if="${sortBy == 'studios'}" 
                                                    th:class="${direction == 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'}"
-                                                   class="fa-solid"></i>
+                                                   class="fa-solid ms-1"></i>
                                             </a>
                                         </th>
-                                        <th>
+                                        <th class="text-center">
                                             <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='producers', direction=${sortBy == 'producers' and direction == 'asc' ? 'desc' : 'asc'})}" 
                                                class="text-decoration-none text-white">
                                                 Producers
                                                 <i th:if="${sortBy == 'producers'}" 
                                                    th:class="${direction == 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'}"
-                                                   class="fa-solid"></i>
+                                                   class="fa-solid ms-1"></i>
                                             </a>
                                         </th>
-                                        <th>
+                                        <th class="text-center">
                                             <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='winner', direction=${sortBy == 'winner' and direction == 'asc' ? 'desc' : 'asc'})}" 
                                                class="text-decoration-none text-white">
                                                 Winner
                                                 <i th:if="${sortBy == 'winner'}" 
                                                    th:class="${direction == 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'}"
-                                                   class="fa-solid"></i>
+                                                   class="fa-solid ms-1"></i>
                                             </a>
                                         </th>
+                                        <th class="text-end">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:if="${movies.isEmpty()}">
-                                        <td colspan="6" class="text-center text-muted">
+                                        <td colspan="7" class="text-center text-muted">
                                             No movies found
                                         </td>
                                     </tr>
-                                    <tr th:each="movie : ${movies}">
-                                        <td th:text="${movie.id}"></td>
-                                        <td th:text="${movie.year}"></td>
-                                        <td th:text="${movie.title}"></td>
-                                        <td th:text="${movie.studios}"></td>
-                                        <td th:text="${movie.producers}"></td>
-                                        <td>
+                                    <tr th:each="movie : ${movies}" class="movie-row">
+                                        <td class="text-start" th:text="${movie.id}"></td>
+                                        <td class="text-center" th:text="${movie.year}"></td>
+                                        <td class="text-center" th:text="${movie.title}"></td>
+                                        <td class="text-center" th:text="${movie.studios}"></td>
+                                        <td class="text-center" th:text="${movie.producers}"></td>
+                                        <td class="text-center">
                                             <span th:if="${movie.winner}" class="badge bg-success">Yes</span>
                                             <span th:unless="${movie.winner}" class="badge bg-secondary">No</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-action btn-edit" 
+                                                    th:data-id="${movie.id}"
+                                                    th:data-year="${movie.year}"
+                                                    th:data-title="${movie.title}"
+                                                    th:data-studios="${movie.studios}"
+                                                    th:data-producers="${movie.producers}"
+                                                    th:data-winner="${movie.winner}"
+                                                    onclick="openEditMovieModal(this)">
+                                                <i class="fa-solid fa-pencil"></i>
+                                            </button>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-action btn-delete" 
+                                                    th:data-id="${movie.id}"
+                                                    th:data-title="${movie.title}"
+                                                    onclick="confirmDeleteMovie(this)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -153,43 +159,224 @@
             </div>
         </div>
 
+        <!-- Mobile Card View -->
+        <div class="row d-md-none">
+            <div class="col-12">
+                <div th:if="${movies.isEmpty()}" class="text-center text-muted py-4">
+                    No movies found
+                </div>
+                <div th:each="movie : ${movies}" 
+                     class="card mb-3 movie-card movie-row"
+                     th:data-id="${movie.id}"
+                     th:data-year="${movie.year}"
+                     th:data-title="${movie.title}"
+                     th:data-studios="${movie.studios}"
+                     th:data-producers="${movie.producers}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="card-title mb-1" th:text="${movie.title}">Title</h6>
+                                <small class="text-muted">ID: <span th:text="${movie.id}"></span> | Year: <span th:text="${movie.year}"></span></small>
+                            </div>
+                            <div>
+                                <span th:if="${movie.winner}" class="badge bg-success">Winner</span>
+                                <span th:unless="${movie.winner}" class="badge bg-secondary">Not winner</span>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted d-block"><strong>Studios:</strong> <span th:text="${movie.studios}"></span></small>
+                            <small class="text-muted d-block"><strong>Producers:</strong> <span th:text="${movie.producers}"></span></small>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <button type="button" 
+                                    class="btn btn-sm btn-action btn-edit" 
+                                    th:data-id="${movie.id}"
+                                    th:data-year="${movie.year}"
+                                    th:data-title="${movie.title}"
+                                    th:data-studios="${movie.studios}"
+                                    th:data-producers="${movie.producers}"
+                                    th:data-winner="${movie.winner}"
+                                    onclick="openEditMovieModal(this)">
+                                <i class="fa-solid fa-pencil"></i> Edit
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-sm btn-action btn-delete" 
+                                    th:data-id="${movie.id}"
+                                    th:data-title="${movie.title}"
+                                    onclick="confirmDeleteMovie(this)">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
         <div class="row mt-3" th:if="${totalPages > 1}">
-            <div class="col-md-12">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                            <a class="page-link" 
-                               th:href="@{/movies(page=${currentPage - 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
-                               th:if="${currentPage > 0}">
-                                <i class="fa-solid fa-chevron-left"></i> Previous
-                            </a>
-                            <span class="page-link" th:if="${currentPage == 0}">
-                                <i class="fa-solid fa-chevron-left"></i> Previous
-                            </span>
-                        </li>
-                        
-                        <li th:each="pageNum : ${pageNumbers}" 
-                            class="page-item" 
-                            th:classappend="${pageNum == currentPage} ? 'active'">
-                            <a class="page-link" 
-                               th:href="@{/movies(page=${pageNum}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
-                               th:text="${pageNum + 1}"
-                               th:if="${pageNum != currentPage}"></a>
-                            <span class="page-link" th:if="${pageNum == currentPage}" th:text="${pageNum + 1}"></span>
-                        </li>
-                        
-                        <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
-                            <a class="page-link" 
-                               th:href="@{/movies(page=${currentPage + 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
-                               th:if="${currentPage < totalPages - 1}">
-                                Next <i class="fa-solid fa-chevron-right"></i>
-                            </a>
-                            <span class="page-link" th:if="${currentPage >= totalPages - 1}">
-                                Next <i class="fa-solid fa-chevron-right"></i>
-                            </span>
-                        </li>
-                    </ul>
-                </nav>
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pagination-container">
+                    <!-- Items per page selector -->
+                    <div class="d-flex align-items-center">
+                        <span class="me-2 small text-muted d-none d-sm-inline">Items per page:</span>
+                        <span class="me-2 small text-muted d-sm-none">Items:</span>
+                        <select id="pageSize" 
+                                class="form-select form-select-sm rounded-pill page-size-selector" 
+                                style="width: auto; min-width: 70px;"
+                                onchange="changePageSize(this.value)">
+                            <option value="5" th:selected="${pageSize == 5}">5</option>
+                            <option value="10" th:selected="${pageSize == 10}">10</option>
+                            <option value="20" th:selected="${pageSize == 20}">20</option>
+                            <option value="50" th:selected="${pageSize == 50}">50</option>
+                            <option value="100" th:selected="${pageSize == 100}">100</option>
+                        </select>
+                    </div>
+
+                    <!-- Pagination buttons -->
+                    <nav aria-label="Page navigation" class="flex-grow-1 d-flex justify-content-center">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- First page -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link rounded-circle" 
+                                   th:href="@{/movies(page=0, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:if="${currentPage > 0}">
+                                    <i class="fa-solid fa-angles-left"></i>
+                                </a>
+                                <span class="page-link rounded-circle" th:if="${currentPage == 0}">
+                                    <i class="fa-solid fa-angles-left"></i>
+                                </span>
+                            </li>
+                            
+                            <!-- Previous page -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link rounded-circle" 
+                                   th:href="@{/movies(page=${currentPage - 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:if="${currentPage > 0}">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </a>
+                                <span class="page-link rounded-circle" th:if="${currentPage == 0}">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </span>
+                            </li>
+                            
+                            <!-- Page numbers -->
+                            <li th:each="pageNum : ${pageNumbers}" 
+                                th:class="${'page-item' + (pageNum == currentPage ? ' active' : '') + (pageNum == -1 ? ' disabled' : '')}">
+                                <!-- Ellipsis -->
+                                <span class="page-link rounded-circle" th:if="${pageNum == -1}">...</span>
+                                <!-- Active page -->
+                                <span class="page-link rounded-circle active" 
+                                      th:if="${pageNum != -1 and pageNum == currentPage}" 
+                                      th:text="${pageNum + 1}"></span>
+                                <!-- Other pages -->
+                                <a class="page-link rounded-circle" 
+                                   th:href="@{/movies(page=${pageNum}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:text="${pageNum + 1}"
+                                   th:if="${pageNum != -1 and pageNum != currentPage}"></a>
+                            </li>
+                            
+                            <!-- Next page -->
+                            <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                                <a class="page-link rounded-circle" 
+                                   th:href="@{/movies(page=${currentPage + 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:if="${currentPage < totalPages - 1}">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                                <span class="page-link rounded-circle" th:if="${currentPage >= totalPages - 1}">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </span>
+                            </li>
+                            
+                            <!-- Last page -->
+                            <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                                <a class="page-link rounded-circle" 
+                                   th:href="@{/movies(page=${totalPages - 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:if="${currentPage < totalPages - 1}">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                </a>
+                                <span class="page-link rounded-circle" th:if="${currentPage >= totalPages - 1}">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <!-- Page info -->
+                    <div class="small text-muted">
+                        <span th:text="${currentPage * pageSize + 1}">1</span> - 
+                        <span th:text="${currentPage * pageSize + movies.size()}">10</span> of 
+                        <span th:text="${totalItems}">101</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movie Modal -->
+    <div class="modal fade" id="movieModal" tabindex="-1" aria-labelledby="movieModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="movieModalLabel">New Movie</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="movieForm">
+                        <input type="hidden" id="movieId" name="id">
+                        <div class="mb-3">
+                            <label for="movieYear" class="form-label">Year <span class="text-danger">*</span></label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="movieYear" 
+                                   name="year" 
+                                   min="1900" 
+                                   max="2100" 
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="movieTitle" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="movieTitle" 
+                                   name="title" 
+                                   maxlength="255" 
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="movieStudios" class="form-label">Studios <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="movieStudios" 
+                                   name="studios" 
+                                   maxlength="255" 
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="movieProducers" class="form-label">Producers <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="movieProducers" 
+                                   name="producers" 
+                                   maxlength="255" 
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="movieWinner" 
+                                       name="winner">
+                                <label class="form-check-label" for="movieWinner">
+                                    Winner
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMovie()">Save</button>
+                </div>
             </div>
         </div>
     </div>
@@ -199,4 +386,3 @@
     </div>
 </body>
 </html>
-
