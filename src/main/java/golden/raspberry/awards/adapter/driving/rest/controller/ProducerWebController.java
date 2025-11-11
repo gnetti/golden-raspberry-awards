@@ -122,13 +122,13 @@ public class ProducerWebController {
                 .map(movie -> (MovieDTO) converterDtoPort.toDTO(movie))
                 .collect(Collectors.toList());
         
-        var pageNumbers = java.util.stream.IntStream.range(0, moviePage.getTotalPages())
-                .boxed()
-                .collect(Collectors.toList());
+        var currentPageNum = moviePage.getNumber();
+        var totalPages = moviePage.getTotalPages();
+        var pageNumbers = calculatePageNumbers(currentPageNum, totalPages);
         
         model.addAttribute("movies", movieDTOs);
-        model.addAttribute("currentPage", moviePage.getNumber());
-        model.addAttribute("totalPages", moviePage.getTotalPages());
+        model.addAttribute("currentPage", currentPageNum);
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalItems", moviePage.getTotalElements());
         model.addAttribute("pageSize", size);
         model.addAttribute("sortBy", sortBy);
@@ -148,6 +148,53 @@ public class ProducerWebController {
             case "winner" -> "winner";
             default -> "id";
         };
+    }
+
+    /**
+     * Calculates page numbers to display with ellipsis for large page counts.
+     * Shows max 7 page numbers: first, last, current, and 2-3 on each side.
+     *
+     * @param currentPage Current page number (0-based)
+     * @param totalPages Total number of pages
+     * @return List of page numbers to display, with -1 representing ellipsis
+     */
+    private java.util.List<Integer> calculatePageNumbers(int currentPage, int totalPages) {
+        var pages = new java.util.ArrayList<Integer>();
+        
+        if (totalPages <= 7) {
+            // Show all pages if 7 or fewer
+            for (int i = 0; i < totalPages; i++) {
+                pages.add(i);
+            }
+        } else {
+            // Always show first page
+            pages.add(0);
+            
+            if (currentPage <= 3) {
+                // Near the beginning: show 1,2,3,4,5
+                for (int i = 1; i <= 5; i++) {
+                    pages.add(i);
+                }
+                pages.add(-1); // ellipsis
+                pages.add(totalPages - 1); // last page
+            } else if (currentPage >= totalPages - 4) {
+                // Near the end: show ... n-4, n-3, n-2, n-1, n
+                pages.add(-1); // ellipsis
+                for (int i = totalPages - 5; i < totalPages; i++) {
+                    pages.add(i);
+                }
+            } else {
+                // In the middle: show ... current-1, current, current+1 ...
+                pages.add(-1); // ellipsis
+                pages.add(currentPage - 1);
+                pages.add(currentPage);
+                pages.add(currentPage + 1);
+                pages.add(-1); // ellipsis
+                pages.add(totalPages - 1); // last page
+            }
+        }
+        
+        return pages;
     }
 }
 
