@@ -16,7 +16,7 @@ public record DocumentInfoDTO(
         @Schema(description = "Base URL", example = "http://localhost:8080")
         String baseUrl,
 
-        @Schema(description = "API description", example = "RESTful API for managing Golden Raspberry Awards movie data")
+        @Schema(description = "API description", example = "RestFul API for managing Golden Raspberry Awards movie data")
         String description,
 
         @Schema(description = "Architecture style", example = "Hexagonal Architecture (Ports & Adapters)")
@@ -37,7 +37,7 @@ public record DocumentInfoDTO(
         return new DocumentInfoDTO(
                 "1.0.0",
                 "http://localhost:8080",
-                "RESTful API for managing Golden Raspberry Awards movie data",
+                "RestFul API for managing Golden Raspberry Awards movie data",
                 "Hexagonal Architecture (Ports & Adapters)",
                 "Richardson Level 2",
                 "Luiz Generoso"

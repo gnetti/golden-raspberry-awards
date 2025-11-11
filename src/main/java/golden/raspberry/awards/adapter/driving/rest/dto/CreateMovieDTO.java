@@ -1,7 +1,8 @@
 package golden.raspberry.awards.adapter.driving.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import golden.raspberry.awards.adapter.driving.rest.dto.Constant.MovieSchemaConstant;
+import golden.raspberry.awards.adapter.driving.rest.dto.Constants.MovieSchemaConstant;
+import golden.raspberry.awards.adapter.driving.rest.controller.constants.ApiIllustrationSetConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
@@ -15,12 +16,15 @@ import java.util.Optional;
  * @author Luiz Generoso
  * @since 1.0.0
  */
-@Schema(description = "Data Transfer Object for creating movies")
+@Schema(
+        description = "Data Transfer Object for creating movies",
+        example = ApiIllustrationSetConstants.ILLUSTRATION_SET_CREATE_MOVIE_REQUEST
+)
 public record CreateMovieDTO(
         @JsonProperty("year")
         @Schema(
                 description = MovieSchemaConstant.YEAR_DESCRIPTION,
-                example = MovieSchemaConstant.YEAR_EXAMPLE,
+                example = MovieSchemaConstant.YEAR_ILLUSTRATION_SET,
                 minimum = MovieSchemaConstant.YEAR_MINIMUM,
                 maximum = MovieSchemaConstant.YEAR_MAXIMUM
         )
@@ -31,7 +35,7 @@ public record CreateMovieDTO(
         @JsonProperty("title")
         @Schema(
                 description = MovieSchemaConstant.TITLE_DESCRIPTION,
-                example = MovieSchemaConstant.TITLE_EXAMPLE
+                example = MovieSchemaConstant.TITLE_ILLUSTRATION_SET
         )
         @NotNull(message = "Field 'title' is required and cannot be null")
         @NotBlank(message = "Field 'title' cannot be empty or contain only whitespace")
@@ -41,7 +45,7 @@ public record CreateMovieDTO(
         @JsonProperty("studios")
         @Schema(
                 description = MovieSchemaConstant.STUDIOS_DESCRIPTION,
-                example = MovieSchemaConstant.STUDIOS_EXAMPLE
+                example = MovieSchemaConstant.STUDIOS_ILLUSTRATION_SET
         )
         @NotNull(message = "Field 'studios' is required and cannot be null")
         @NotBlank(message = "Field 'studios' cannot be empty or contain only whitespace")
@@ -51,7 +55,7 @@ public record CreateMovieDTO(
         @JsonProperty("producers")
         @Schema(
                 description = MovieSchemaConstant.PRODUCERS_DESCRIPTION,
-                example = MovieSchemaConstant.PRODUCERS_EXAMPLE
+                example = MovieSchemaConstant.PRODUCERS_ILLUSTRATION_SET
         )
         @NotNull(message = "Field 'producers' is required and cannot be null")
         @NotBlank(message = "Field 'producers' cannot be empty or contain only whitespace")
@@ -61,7 +65,7 @@ public record CreateMovieDTO(
         @JsonProperty("winner")
         @Schema(
                 description = MovieSchemaConstant.WINNER_DESCRIPTION,
-                example = MovieSchemaConstant.WINNER_EXAMPLE
+                example = MovieSchemaConstant.WINNER_ILLUSTRATION_SET
         )
         @NotNull(message = "Field 'winner' is required and cannot be null")
         Boolean winner
