@@ -37,5 +37,16 @@ public interface GetMoviePort {
      * @return Page of MovieWithId
      */
     Page<MovieWithId> executeAll(Pageable pageable);
+    
+    /**
+     * Gets all movies with pagination, sorting and filtering.
+     * Filters are applied to ALL database records before pagination.
+     *
+     * @param filterType Type of filter (all, title, year, studios, producers, id)
+     * @param filterValue Value to search for
+     * @param pageable Pagination and sorting parameters
+     * @return Page of MovieWithId
+     */
+    Page<MovieWithId> executeAllWithFilter(String filterType, String filterValue, Pageable pageable);
 }
 
