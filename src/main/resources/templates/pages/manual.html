@@ -1,515 +1,626 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}" lang="en-us">
-<head>
-    <title>Manual do Sistema - Golden Raspberry Awards</title>
-    <link th:href="@{/css/manual.css}" rel="stylesheet">
-</head>
-<body>
-<div layout:fragment="content">
-    <div class="manual-container">
-        <div class="manual-header">
-            <h1>
-                <i class="fa-solid fa-book text-warning"></i>
-                Manual do Sistema
-            </h1>
-            <p class="lead">Guia completo para aproveitar ao máximo o Golden Raspberry Awards</p>
-        </div>
-
-        <!-- Tabs Navigation -->
-        <ul class="nav nav-tabs manual-tabs" id="manualTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
-                    <i class="fa-solid fa-compass"></i> Visão Geral
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="architecture-tab" data-bs-toggle="tab" data-bs-target="#architecture" type="button" role="tab">
-                    <i class="fa-solid fa-sitemap"></i> Arquitetura
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="modules-tab" data-bs-toggle="tab" data-bs-target="#modules" type="button" role="tab">
-                    <i class="fa-solid fa-cube"></i> Módulos
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="flows-tab" data-bs-toggle="tab" data-bs-target="#flows" type="button" role="tab">
-                    <i class="fa-solid fa-route"></i> Fluxos
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="usage-tab" data-bs-toggle="tab" data-bs-target="#usage" type="button" role="tab">
-                    <i class="fa-solid fa-user"></i> Como Usar
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="sync-tab" data-bs-toggle="tab" data-bs-target="#sync" type="button" role="tab">
-                    <i class="fa-solid fa-sync"></i> Sincronização
-                </button>
-            </li>
-        </ul>
-
-        <!-- Tab Content -->
-        <div class="tab-content manual-content" id="manualTabContent">
-            <!-- Visão Geral -->
-            <div class="tab-pane fade show active" id="overview" role="tabpanel">
-                <div class="content-section">
-                    <h2><i class="fa-solid fa-eye text-primary"></i> O que é o Sistema</h2>
-                    <p>O Golden Raspberry Awards é um sistema completo para gerenciar filmes indicados e vencedores do prêmio "Worst Movie". Permite criar, editar, excluir e consultar filmes, além de calcular automaticamente os intervalos entre prêmios consecutivos dos produtores.</p>
-                    
-                    <div class="feature-grid">
-                        <div class="feature-card">
-                            <i class="fa-solid fa-film text-danger"></i>
-                            <h4>Gerenciamento de Filmes</h4>
-                            <p>CRUD completo com validações robustas</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fa-solid fa-chart-line text-success"></i>
-                            <h4>Cálculo de Intervalos</h4>
-                            <p>Identifica produtores com menores e maiores intervalos</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fa-solid fa-mobile-screen text-info"></i>
-                            <h4>Interface Responsiva</h4>
-                            <p>Funciona perfeitamente em desktop e mobile</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fa-solid fa-database text-warning"></i>
-                            <h4>Sincronização Automática</h4>
-                            <p>CSV e banco de dados sempre sincronizados</p>
-                        </div>
-                    </div>
+<!doctype html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}"
+    lang="en-us"
+>
+    <head>
+        <title>System Manual - Golden Raspberry Awards</title>
+        <link th:href="@{/css/manual.css}" rel="stylesheet" />
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="manual-container">
+                <div class="manual-header">
+                    <h1>
+                        <i class="fa-solid fa-book text-warning"></i>
+                        System Manual
+                    </h1>
+                    <p class="lead">
+                        Complete guide to get the most out of Golden Raspberry Awards
+                    </p>
                 </div>
-            </div>
 
-            <!-- Arquitetura -->
-            <div class="tab-pane fade" id="architecture" role="tabpanel">
-                <div class="content-section">
-                    <h2><i class="fa-solid fa-sitemap text-primary"></i> Estrutura em Camadas</h2>
-                    <p>O sistema segue a <strong>Arquitetura Hexagonal (Ports & Adapters)</strong>, organizada em camadas independentes que se comunicam através de interfaces.</p>
-                    
-                    <div class="architecture-layers">
-                        <div class="layer-card layer-domain">
-                            <div class="layer-header">
-                                <i class="fa-solid fa-shield-halved"></i>
-                                <h3>Camada de Domínio</h3>
-                            </div>
-                            <p><strong>Responsabilidade:</strong> Regras de negócio puras</p>
-                            <ul>
-                                <li>Modelos: Filmes, Produtores, Intervalos</li>
-                                <li>Lógica de cálculo de intervalos</li>
-                                <li>Validações de domínio</li>
-                            </ul>
-                        </div>
+                <ul class="nav nav-tabs manual-tabs" id="manualTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link active"
+                            id="overview-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#overview"
+                            type="button"
+                            role="tab"
+                        >
+                            <i class="fa-solid fa-compass"></i> Overview
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link"
+                            id="architecture-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#architecture"
+                            type="button"
+                            role="tab"
+                        >
+                            <i class="fa-solid fa-sitemap"></i> Architecture
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link"
+                            id="modules-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#modules"
+                            type="button"
+                            role="tab"
+                        >
+                            <i class="fa-solid fa-cube"></i> Modules
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link"
+                            id="flows-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#flows"
+                            type="button"
+                            role="tab"
+                        >
+                            <i class="fa-solid fa-route"></i> Flows
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link"
+                            id="usage-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#usage"
+                            type="button"
+                            role="tab"
+                        >
+                            <i class="fa-solid fa-user"></i> How to Use
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link"
+                            id="sync-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#sync"
+                            type="button"
+                            role="tab"
+                        >
+                            <i class="fa-solid fa-sync"></i> Synchronization
+                        </button>
+                    </li>
+                </ul>
 
-                        <div class="layer-card layer-application">
-                            <div class="layer-header">
-                                <i class="fa-solid fa-cogs"></i>
-                                <h3>Camada de Aplicação</h3>
-                            </div>
-                            <p><strong>Responsabilidade:</strong> Orquestração de casos de uso</p>
-                            <ul>
-                                <li>Use Cases: Criar, Atualizar, Deletar, Consultar</li>
-                                <li>Validações de negócio</li>
-                                <li>Coordenação entre camadas</li>
-                            </ul>
-                        </div>
+                <div class="tab-content manual-content" id="manualTabContent">
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <div class="content-section">
+                            <h2><i class="fa-solid fa-eye text-primary"></i> What is the System</h2>
+                            <p>
+                                Golden Raspberry Awards is a complete system for managing movies
+                                nominated and winners of the "Worst Movie" award. It allows
+                                creating, editing, deleting and querying movies, in addition to
+                                automatically calculating intervals between consecutive awards from
+                                producers.
+                            </p>
 
-                        <div class="layer-card layer-infrastructure">
-                            <div class="layer-header">
-                                <i class="fa-solid fa-server"></i>
-                                <h3>Camada de Infraestrutura</h3>
+                            <div class="feature-grid">
+                                <div class="feature-card">
+                                    <i class="fa-solid fa-film text-danger"></i>
+                                    <h4>Movie Management</h4>
+                                    <p>Complete CRUD with robust validations</p>
+                                </div>
+                                <div class="feature-card">
+                                    <i class="fa-solid fa-chart-line text-success"></i>
+                                    <h4>Interval Calculation</h4>
+                                    <p>Identifies producers with smallest and largest intervals</p>
+                                </div>
+                                <div class="feature-card">
+                                    <i class="fa-solid fa-mobile-screen text-info"></i>
+                                    <h4>Responsive Interface</h4>
+                                    <p>Works perfectly on desktop and mobile</p>
+                                </div>
+                                <div class="feature-card">
+                                    <i class="fa-solid fa-database text-warning"></i>
+                                    <h4>Automatic Synchronization</h4>
+                                    <p>CSV and database always synchronized</p>
+                                </div>
                             </div>
-                            <p><strong>Responsabilidade:</strong> Implementações técnicas</p>
-                            <ul>
-                                <li>Persistência (H2 Database)</li>
-                                <li>Gerenciamento de arquivos CSV</li>
-                                <li>Controle de IDs via XML</li>
-                            </ul>
-                        </div>
-
-                        <div class="layer-card layer-interface">
-                            <div class="layer-header">
-                                <i class="fa-solid fa-window-maximize"></i>
-                                <h3>Camada de Interface</h3>
-                            </div>
-                            <p><strong>Responsabilidade:</strong> Comunicação com usuários</p>
-                            <ul>
-                                <li>Controllers REST (API)</li>
-                                <li>Controllers Web (Páginas)</li>
-                                <li>Conversão de formatos</li>
-                            </ul>
                         </div>
                     </div>
 
-                    <div class="info-box">
-                        <i class="fa-solid fa-info-circle"></i>
-                        <p><strong>Vantagem:</strong> Qualquer tecnologia externa pode ser substituída sem afetar o núcleo do sistema.</p>
-                    </div>
-                </div>
-            </div>
+                    <div class="tab-pane fade" id="architecture" role="tabpanel">
+                        <div class="content-section">
+                            <h2>
+                                <i class="fa-solid fa-sitemap text-primary"></i> Layered Structure
+                            </h2>
+                            <p>
+                                The system follows
+                                <strong>Hexagonal Architecture (Ports & Adapters)</strong>,
+                                organized in independent layers that communicate through interfaces.
+                            </p>
 
-            <!-- Módulos -->
-            <div class="tab-pane fade" id="modules" role="tabpanel">
-                <div class="content-section">
-                    <h2><i class="fa-solid fa-cube text-primary"></i> Módulos do Sistema</h2>
-                    
-                    <div class="module-list">
-                        <div class="module-item">
-                            <div class="module-icon">
-                                <i class="fa-solid fa-film"></i>
+                            <div class="architecture-layers">
+                                <div class="layer-card layer-domain">
+                                    <div class="layer-header">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        <h3>Domain Layer</h3>
+                                    </div>
+                                    <p><strong>Responsibility:</strong> Pure business rules</p>
+                                    <ul>
+                                        <li>Models: Movies, Producers, Intervals</li>
+                                        <li>Interval calculation logic</li>
+                                        <li>Domain validations</li>
+                                    </ul>
+                                </div>
+
+                                <div class="layer-card layer-application">
+                                    <div class="layer-header">
+                                        <i class="fa-solid fa-cogs"></i>
+                                        <h3>Application Layer</h3>
+                                    </div>
+                                    <p><strong>Responsibility:</strong> Use case orchestration</p>
+                                    <ul>
+                                        <li>Use Cases: Create, Update, Delete, Query</li>
+                                        <li>Business validations</li>
+                                        <li>Coordination between layers</li>
+                                    </ul>
+                                </div>
+
+                                <div class="layer-card layer-infrastructure">
+                                    <div class="layer-header">
+                                        <i class="fa-solid fa-server"></i>
+                                        <h3>Infrastructure Layer</h3>
+                                    </div>
+                                    <p>
+                                        <strong>Responsibility:</strong> Technical implementations
+                                    </p>
+                                    <ul>
+                                        <li>Persistence (H2 Database)</li>
+                                        <li>CSV file management</li>
+                                        <li>ID control via XML</li>
+                                    </ul>
+                                </div>
+
+                                <div class="layer-card layer-interface">
+                                    <div class="layer-header">
+                                        <i class="fa-solid fa-window-maximize"></i>
+                                        <h3>Interface Layer</h3>
+                                    </div>
+                                    <p><strong>Responsibility:</strong> User communication</p>
+                                    <ul>
+                                        <li>REST Controllers (API)</li>
+                                        <li>Web Controllers (Pages)</li>
+                                        <li>Format conversion</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="module-content">
-                                <h3>Módulo de Filmes</h3>
-                                <p><strong>Responsabilidade:</strong> Gerenciar o ciclo de vida completo dos filmes</p>
+
+                            <div class="info-box">
+                                <i class="fa-solid fa-info-circle"></i>
+                                <p>
+                                    <strong>Advantage:</strong> Any external technology can be
+                                    replaced without affecting the system core.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="modules" role="tabpanel">
+                        <div class="content-section">
+                            <h2><i class="fa-solid fa-cube text-primary"></i> System Modules</h2>
+
+                            <div class="module-list">
+                                <div class="module-item">
+                                    <div class="module-icon">
+                                        <i class="fa-solid fa-film"></i>
+                                    </div>
+                                    <div class="module-content">
+                                        <h3>Movies Module</h3>
+                                        <p>
+                                            <strong>Responsibility:</strong> Manage the complete
+                                            lifecycle of movies
+                                        </p>
+                                        <ul>
+                                            <li>Create, edit, delete and list movies</li>
+                                            <li>
+                                                Validations: Year (1900-current), Title (2-500),
+                                                Studios (2-500), Producers (2-1000)
+                                            </li>
+                                            <li>Pagination, sorting and advanced filters</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="module-item">
+                                    <div class="module-icon">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <div class="module-content">
+                                        <h3>Intervals Module</h3>
+                                        <p>
+                                            <strong>Responsibility:</strong> Calculate intervals
+                                            between consecutive awards
+                                        </p>
+                                        <ul>
+                                            <li>Processes all winning movies</li>
+                                            <li>Groups wins by producer</li>
+                                            <li>Identifies minimum and maximum intervals</li>
+                                            <li>Returns producers with these intervals</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="module-item">
+                                    <div class="module-icon">
+                                        <i class="fa-solid fa-database"></i>
+                                    </div>
+                                    <div class="module-content">
+                                        <h3>Persistence Module</h3>
+                                        <p>
+                                            <strong>Responsibility:</strong> Store and retrieve data
+                                        </p>
+                                        <ul>
+                                            <li>H2 Database: Main database</li>
+                                            <li>CSV File: Original data file</li>
+                                            <li>XML Key Manager: ID management</li>
+                                            <li>Automatic synchronization between sources</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="module-item">
+                                    <div class="module-icon">
+                                        <i class="fa-solid fa-window-maximize"></i>
+                                    </div>
+                                    <div class="module-content">
+                                        <h3>Web Interface Module</h3>
+                                        <p>
+                                            <strong>Responsibility:</strong> Provide visual
+                                            interface
+                                        </p>
+                                        <ul>
+                                            <li>Dashboard: Home page with quick access</li>
+                                            <li>Movies: Listing and management</li>
+                                            <li>New/Edit Movie: Forms with validation</li>
+                                            <li>Intervals: Interval visualization</li>
+                                            <li>Responsive modals</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="module-item">
+                                    <div class="module-icon">
+                                        <i class="fa-solid fa-plug"></i>
+                                    </div>
+                                    <div class="module-content">
+                                        <h3>REST API Module</h3>
+                                        <p>
+                                            <strong>Responsibility:</strong> Provide endpoints for
+                                            integration
+                                        </p>
+                                        <ul>
+                                            <li>POST /api/movies - Create movie</li>
+                                            <li>GET /api/movies/{id} - Get movie</li>
+                                            <li>GET /api/movies - List movies (paginated)</li>
+                                            <li>PUT /api/movies/{id} - Update movie</li>
+                                            <li>DELETE /api/movies/{id} - Delete movie</li>
+                                            <li>
+                                                GET /api/movies/producers/intervals - Calculate
+                                                intervals
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="flows" role="tabpanel">
+                        <div class="content-section">
+                            <h2><i class="fa-solid fa-route text-primary"></i> Main Flows</h2>
+
+                            <div class="flow-list">
+                                <div class="flow-item">
+                                    <h3>
+                                        <i class="fa-solid fa-plus-circle text-success"></i> Movie
+                                        Creation
+                                    </h3>
+                                    <ol>
+                                        <li>User fills form</li>
+                                        <li>Real-time validation of each field</li>
+                                        <li>Submit to API when clicking "Save"</li>
+                                        <li>Server validation</li>
+                                        <li>Generation of new sequential ID</li>
+                                        <li>Save to H2 database</li>
+                                        <li>Add row to CSV</li>
+                                        <li>Update ID XML</li>
+                                        <li>Success notification</li>
+                                        <li>Redirect to list</li>
+                                    </ol>
+                                </div>
+
+                                <div class="flow-item">
+                                    <h3>
+                                        <i class="fa-solid fa-search text-info"></i> Movie Query
+                                    </h3>
+                                    <ol>
+                                        <li>User accesses "Movies" page</li>
+                                        <li>System loads first page (10 items)</li>
+                                        <li>User can paginate, sort or filter</li>
+                                        <li>System searches in database</li>
+                                        <li>Returns paginated results</li>
+                                        <li>Displays in table (desktop) or cards (mobile)</li>
+                                    </ol>
+                                </div>
+
+                                <div class="flow-item">
+                                    <h3>
+                                        <i class="fa-solid fa-calculator text-warning"></i> Interval
+                                        Calculation
+                                    </h3>
+                                    <ol>
+                                        <li>User accesses "Producer Intervals"</li>
+                                        <li>System searches all winning movies</li>
+                                        <li>Groups wins by producer</li>
+                                        <li>Calculates differences between consecutive wins</li>
+                                        <li>Identifies smallest and largest interval</li>
+                                        <li>Filters producers with these intervals</li>
+                                        <li>Displays in two tables: Minimums and Maximums</li>
+                                    </ol>
+                                </div>
+
+                                <div class="flow-item">
+                                    <h3>
+                                        <i class="fa-solid fa-edit text-primary"></i> Movie Update
+                                    </h3>
+                                    <ol>
+                                        <li>User clicks "Edit"</li>
+                                        <li>System loads movie data</li>
+                                        <li>Form pre-filled (ID disabled)</li>
+                                        <li>User modifies fields</li>
+                                        <li>Real-time validation</li>
+                                        <li>Submit when clicking "Update"</li>
+                                        <li>Updates in database and CSV</li>
+                                        <li>Success notification</li>
+                                        <li>Redirect to list</li>
+                                    </ol>
+                                </div>
+
+                                <div class="flow-item">
+                                    <h3>
+                                        <i class="fa-solid fa-trash text-danger"></i> Movie Deletion
+                                    </h3>
+                                    <ol>
+                                        <li>User clicks "Delete"</li>
+                                        <li>Elegant confirmation modal</li>
+                                        <li>Shows movie title</li>
+                                        <li>User confirms or cancels</li>
+                                        <li>If confirmed: removes from database and CSV</li>
+                                        <li>Success notification</li>
+                                        <li>Reloads list</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="usage" role="tabpanel">
+                        <div class="content-section">
+                            <h2><i class="fa-solid fa-user text-primary"></i> Usage Guide</h2>
+
+                            <div class="usage-section">
+                                <h3><i class="fa-solid fa-door-open"></i> Accessing the System</h3>
+                                <ol>
+                                    <li>Start the Spring Boot application</li>
+                                    <li>Access <code>http://localhost:8080</code></li>
+                                    <li>You will be redirected to the Dashboard</li>
+                                </ol>
+                            </div>
+
+                            <div class="usage-section">
+                                <h3><i class="fa-solid fa-film"></i> Managing Movies</h3>
+
+                                <div class="usage-card">
+                                    <h4><i class="fa-solid fa-plus"></i> Create New Movie</h4>
+                                    <ol>
+                                        <li>Click "New Movie" on the movies page</li>
+                                        <li>Fill all required fields (*)</li>
+                                        <li>Use the year picker to select the year</li>
+                                        <li>Check "Winner" if the movie was a winner</li>
+                                        <li>Click "Save" when all fields are valid</li>
+                                    </ol>
+                                </div>
+
+                                <div class="usage-card">
+                                    <h4><i class="fa-solid fa-edit"></i> Edit Movie</h4>
+                                    <ol>
+                                        <li>In the list, click the edit icon</li>
+                                        <li>Modify desired fields</li>
+                                        <li>ID cannot be changed</li>
+                                        <li>Click "Update Movie"</li>
+                                    </ol>
+                                </div>
+
+                                <div class="usage-card">
+                                    <h4><i class="fa-solid fa-trash"></i> Delete Movie</h4>
+                                    <ol>
+                                        <li>In the list, click the delete icon</li>
+                                        <li>Confirm deletion in the modal</li>
+                                        <li>The movie will be permanently removed</li>
+                                    </ol>
+                                </div>
+
+                                <div class="usage-card">
+                                    <h4><i class="fa-solid fa-filter"></i> Filter Movies</h4>
+                                    <ol>
+                                        <li>
+                                            Select filter type (ID, Year, Title, Studios, Producers,
+                                            All)
+                                        </li>
+                                        <li>Type the value to search</li>
+                                        <li>Search is done across all records</li>
+                                        <li>Press Enter or wait for debounce</li>
+                                    </ol>
+                                </div>
+
+                                <div class="usage-card">
+                                    <h4><i class="fa-solid fa-sort"></i> Sort Movies</h4>
+                                    <ol>
+                                        <li>Click on the desired column header</li>
+                                        <li>Click again to reverse (ASC/DESC)</li>
+                                        <li>Sorting is maintained when changing pages</li>
+                                    </ol>
+                                </div>
+
+                                <div class="usage-card">
+                                    <h4><i class="fa-solid fa-list"></i> Pagination</h4>
+                                    <ol>
+                                        <li>Use buttons: First, Previous, Next, Last</li>
+                                        <li>Click on specific page numbers</li>
+                                        <li>Change "Items per page" (5, 10, 20, 50, 100)</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="usage-section">
+                                <h3><i class="fa-solid fa-chart-line"></i> Viewing Intervals</h3>
+                                <ol>
+                                    <li>Access "Producer Intervals" on the dashboard</li>
+                                    <li>
+                                        The system automatically calculates:
+                                        <ul>
+                                            <li>
+                                                <strong>Minimums:</strong> Producers with smallest
+                                                interval
+                                            </li>
+                                            <li>
+                                                <strong>Maximums:</strong> Producers with largest
+                                                interval
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        Each interval shows: Producer, Interval (years), Previous
+                                        year, Following year
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <div class="usage-section">
+                                <h3><i class="fa-solid fa-book"></i> Interactive Documentation</h3>
                                 <ul>
-                                    <li>Criar, editar, excluir e listar filmes</li>
-                                    <li>Validações: Ano (1900-atual), Título (2-500), Estúdios (2-500), Produtores (2-1000)</li>
-                                    <li>Paginação, ordenação e filtros avançados</li>
+                                    <li>
+                                        <strong>Swagger UI:</strong> Test all endpoints in the
+                                        browser
+                                    </li>
+                                    <li>
+                                        <strong>H2 Console:</strong> Execute SQL queries directly
+                                        <ul>
+                                            <li>JDBC URL: <code>jdbc:h2:~/test</code></li>
+                                            <li>Username: <code>sa</code></li>
+                                            <li>Password: (empty)</li>
+                                        </ul>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="module-item">
-                            <div class="module-icon">
-                                <i class="fa-solid fa-chart-line"></i>
-                            </div>
-                            <div class="module-content">
-                                <h3>Módulo de Intervalos</h3>
-                                <p><strong>Responsabilidade:</strong> Calcular intervalos entre prêmios consecutivos</p>
+                    <div class="tab-pane fade" id="sync" role="tabpanel">
+                        <div class="content-section">
+                            <h2>
+                                <i class="fa-solid fa-sync text-primary"></i> Data Synchronization
+                            </h2>
+
+                            <div class="sync-section">
+                                <h3><i class="fa-solid fa-database"></i> Data Sources</h3>
+                                <p>The system maintains three synchronized sources:</p>
                                 <ul>
-                                    <li>Processa todos os filmes vencedores</li>
-                                    <li>Agrupa vitórias por produtor</li>
-                                    <li>Identifica intervalos mínimo e máximo</li>
-                                    <li>Retorna produtores com esses intervalos</li>
+                                    <li><strong>H2 Database:</strong> Main database</li>
+                                    <li>
+                                        <strong>CSV File:</strong> Original data file
+                                        (<code>data/movieList.csv</code>)
+                                    </li>
+                                    <li>
+                                        <strong>XML Key Manager:</strong> ID manager
+                                        (<code>highest-id/key.xml</code>)
+                                    </li>
                                 </ul>
                             </div>
-                        </div>
 
-                        <div class="module-item">
-                            <div class="module-icon">
-                                <i class="fa-solid fa-database"></i>
+                            <div class="sync-section">
+                                <h3><i class="fa-solid fa-play"></i> On Startup</h3>
+                                <ol>
+                                    <li>System reads CSV file</li>
+                                    <li>Loads all movies into H2 database</li>
+                                    <li>Preserves original IDs from CSV</li>
+                                    <li>Synchronizes ID manager with highest ID from database</li>
+                                </ol>
                             </div>
-                            <div class="module-content">
-                                <h3>Módulo de Persistência</h3>
-                                <p><strong>Responsabilidade:</strong> Armazenar e recuperar dados</p>
-                                <ul>
-                                    <li>H2 Database: Banco principal</li>
-                                    <li>CSV File: Arquivo de dados original</li>
-                                    <li>XML Key Manager: Gerenciamento de IDs</li>
-                                    <li>Sincronização automática entre fontes</li>
-                                </ul>
+
+                            <div class="sync-section">
+                                <h3><i class="fa-solid fa-plus"></i> When Creating Movie</h3>
+                                <ol>
+                                    <li>Save to H2 database</li>
+                                    <li>Add row to end of CSV</li>
+                                    <li>Increment ID in XML</li>
+                                </ol>
                             </div>
-                        </div>
 
-                        <div class="module-item">
-                            <div class="module-icon">
-                                <i class="fa-solid fa-window-maximize"></i>
+                            <div class="sync-section">
+                                <h3><i class="fa-solid fa-edit"></i> When Updating Movie</h3>
+                                <ol>
+                                    <li>Update in H2 database</li>
+                                    <li>Replace corresponding line in CSV</li>
+                                </ol>
                             </div>
-                            <div class="module-content">
-                                <h3>Módulo de Interface Web</h3>
-                                <p><strong>Responsabilidade:</strong> Prover interface visual</p>
-                                <ul>
-                                    <li>Dashboard: Página inicial com acesso rápido</li>
-                                    <li>Movies: Listagem e gerenciamento</li>
-                                    <li>New/Edit Movie: Formulários com validação</li>
-                                    <li>Intervals: Visualização de intervalos</li>
-                                    <li>Modais responsivos</li>
-                                </ul>
+
+                            <div class="sync-section">
+                                <h3><i class="fa-solid fa-trash"></i> When Deleting Movie</h3>
+                                <ol>
+                                    <li>Remove from H2 database</li>
+                                    <li>Remove corresponding line from CSV</li>
+                                </ol>
                             </div>
-                        </div>
 
-                        <div class="module-item">
-                            <div class="module-icon">
-                                <i class="fa-solid fa-plug"></i>
-                            </div>
-                            <div class="module-content">
-                                <h3>Módulo de API REST</h3>
-                                <p><strong>Responsabilidade:</strong> Prover endpoints para integração</p>
-                                <ul>
-                                    <li>POST /api/movies - Criar filme</li>
-                                    <li>GET /api/movies/{id} - Buscar filme</li>
-                                    <li>GET /api/movies - Listar filmes (paginado)</li>
-                                    <li>PUT /api/movies/{id} - Atualizar filme</li>
-                                    <li>DELETE /api/movies/{id} - Excluir filme</li>
-                                    <li>GET /api/movies/producers/intervals - Calcular intervalos</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fluxos -->
-            <div class="tab-pane fade" id="flows" role="tabpanel">
-                <div class="content-section">
-                    <h2><i class="fa-solid fa-route text-primary"></i> Fluxos Principais</h2>
-                    
-                    <div class="flow-list">
-                        <div class="flow-item">
-                            <h3><i class="fa-solid fa-plus-circle text-success"></i> Criação de Filme</h3>
-                            <ol>
-                                <li>Usuário preenche formulário</li>
-                                <li>Validação em tempo real de cada campo</li>
-                                <li>Envio para API ao clicar em "Save"</li>
-                                <li>Validação no servidor</li>
-                                <li>Geração de novo ID sequencial</li>
-                                <li>Salva no banco H2</li>
-                                <li>Adiciona linha no CSV</li>
-                                <li>Atualiza XML de IDs</li>
-                                <li>Notificação de sucesso</li>
-                                <li>Redireciona para lista</li>
-                            </ol>
-                        </div>
-
-                        <div class="flow-item">
-                            <h3><i class="fa-solid fa-search text-info"></i> Consulta de Filmes</h3>
-                            <ol>
-                                <li>Usuário acessa página "Movies"</li>
-                                <li>Sistema carrega primeira página (10 itens)</li>
-                                <li>Usuário pode paginar, ordenar ou filtrar</li>
-                                <li>Sistema busca no banco de dados</li>
-                                <li>Retorna resultados paginados</li>
-                                <li>Exibe em tabela (desktop) ou cards (mobile)</li>
-                            </ol>
-                        </div>
-
-                        <div class="flow-item">
-                            <h3><i class="fa-solid fa-calculator text-warning"></i> Cálculo de Intervalos</h3>
-                            <ol>
-                                <li>Usuário acessa "Producer Intervals"</li>
-                                <li>Sistema busca todos os filmes vencedores</li>
-                                <li>Agrupa vitórias por produtor</li>
-                                <li>Calcula diferenças entre vitórias consecutivas</li>
-                                <li>Identifica menor e maior intervalo</li>
-                                <li>Filtra produtores com esses intervalos</li>
-                                <li>Exibe em duas tabelas: Mínimos e Máximos</li>
-                            </ol>
-                        </div>
-
-                        <div class="flow-item">
-                            <h3><i class="fa-solid fa-edit text-primary"></i> Atualização de Filme</h3>
-                            <ol>
-                                <li>Usuário clica em "Edit"</li>
-                                <li>Sistema carrega dados do filme</li>
-                                <li>Formulário pré-preenchido (ID desabilitado)</li>
-                                <li>Usuário modifica campos</li>
-                                <li>Validação em tempo real</li>
-                                <li>Envio ao clicar em "Update"</li>
-                                <li>Atualiza no banco e CSV</li>
-                                <li>Notificação de sucesso</li>
-                                <li>Redireciona para lista</li>
-                            </ol>
-                        </div>
-
-                        <div class="flow-item">
-                            <h3><i class="fa-solid fa-trash text-danger"></i> Exclusão de Filme</h3>
-                            <ol>
-                                <li>Usuário clica em "Delete"</li>
-                                <li>Modal de confirmação elegante</li>
-                                <li>Mostra título do filme</li>
-                                <li>Usuário confirma ou cancela</li>
-                                <li>Se confirmar: remove do banco e CSV</li>
-                                <li>Notificação de sucesso</li>
-                                <li>Recarrega lista</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Como Usar -->
-            <div class="tab-pane fade" id="usage" role="tabpanel">
-                <div class="content-section">
-                    <h2><i class="fa-solid fa-user text-primary"></i> Guia de Uso</h2>
-                    
-                    <div class="usage-section">
-                        <h3><i class="fa-solid fa-door-open"></i> Acessando o Sistema</h3>
-                        <ol>
-                            <li>Inicie a aplicação Spring Boot</li>
-                            <li>Acesse <code>http://localhost:8080</code></li>
-                            <li>Você será redirecionado para o Dashboard</li>
-                        </ol>
-                    </div>
-
-                    <div class="usage-section">
-                        <h3><i class="fa-solid fa-film"></i> Gerenciando Filmes</h3>
-                        
-                        <div class="usage-card">
-                            <h4><i class="fa-solid fa-plus"></i> Criar Novo Filme</h4>
-                            <ol>
-                                <li>Clique em "New Movie" na página de filmes</li>
-                                <li>Preencha todos os campos obrigatórios (*)</li>
-                                <li>Use o seletor de ano para escolher o ano</li>
-                                <li>Marque "Winner" se o filme foi vencedor</li>
-                                <li>Clique em "Save" quando todos os campos estiverem válidos</li>
-                            </ol>
-                        </div>
-
-                        <div class="usage-card">
-                            <h4><i class="fa-solid fa-edit"></i> Editar Filme</h4>
-                            <ol>
-                                <li>Na lista, clique no ícone de edição</li>
-                                <li>Modifique os campos desejados</li>
-                                <li>O ID não pode ser alterado</li>
-                                <li>Clique em "Update Movie"</li>
-                            </ol>
-                        </div>
-
-                        <div class="usage-card">
-                            <h4><i class="fa-solid fa-trash"></i> Excluir Filme</h4>
-                            <ol>
-                                <li>Na lista, clique no ícone de exclusão</li>
-                                <li>Confirme a exclusão no modal</li>
-                                <li>O filme será removido permanentemente</li>
-                            </ol>
-                        </div>
-
-                        <div class="usage-card">
-                            <h4><i class="fa-solid fa-filter"></i> Filtrar Filmes</h4>
-                            <ol>
-                                <li>Selecione o tipo de filtro (ID, Year, Title, Studios, Producers, All)</li>
-                                <li>Digite o valor a buscar</li>
-                                <li>A busca é feita em todos os registros</li>
-                                <li>Pressione Enter ou aguarde o debounce</li>
-                            </ol>
-                        </div>
-
-                        <div class="usage-card">
-                            <h4><i class="fa-solid fa-sort"></i> Ordenar Filmes</h4>
-                            <ol>
-                                <li>Clique no cabeçalho da coluna desejada</li>
-                                <li>Clique novamente para inverter (ASC/DESC)</li>
-                                <li>A ordenação é mantida ao mudar de página</li>
-                            </ol>
-                        </div>
-
-                        <div class="usage-card">
-                            <h4><i class="fa-solid fa-list"></i> Paginação</h4>
-                            <ol>
-                                <li>Use os botões: First, Previous, Next, Last</li>
-                                <li>Clique em números de página específicos</li>
-                                <li>Altere "Items per page" (5, 10, 20, 50, 100)</li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div class="usage-section">
-                        <h3><i class="fa-solid fa-chart-line"></i> Visualizando Intervalos</h3>
-                        <ol>
-                            <li>Acesse "Producer Intervals" no dashboard</li>
-                            <li>O sistema calcula automaticamente:
-                                <ul>
-                                    <li><strong>Mínimos:</strong> Produtores com menor intervalo</li>
-                                    <li><strong>Máximos:</strong> Produtores com maior intervalo</li>
-                                </ul>
-                            </li>
-                            <li>Cada intervalo mostra: Produtor, Intervalo (anos), Ano anterior, Ano seguinte</li>
-                        </ol>
-                    </div>
-
-                    <div class="usage-section">
-                        <h3><i class="fa-solid fa-book"></i> Documentação Interativa</h3>
-                        <ul>
-                            <li><strong>Swagger UI:</strong> Teste todos os endpoints no navegador</li>
-                            <li><strong>H2 Console:</strong> Execute queries SQL diretamente
-                                <ul>
-                                    <li>JDBC URL: <code>jdbc:h2:~/test</code></li>
-                                    <li>Username: <code>sa</code></li>
-                                    <li>Password: (vazio)</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sincronização -->
-            <div class="tab-pane fade" id="sync" role="tabpanel">
-                <div class="content-section">
-                    <h2><i class="fa-solid fa-sync text-primary"></i> Sincronização de Dados</h2>
-                    
-                    <div class="sync-section">
-                        <h3><i class="fa-solid fa-database"></i> Fontes de Dados</h3>
-                        <p>O sistema mantém três fontes sincronizadas:</p>
-                        <ul>
-                            <li><strong>H2 Database:</strong> Banco de dados principal</li>
-                            <li><strong>CSV File:</strong> Arquivo de dados original (<code>data/movieList.csv</code>)</li>
-                            <li><strong>XML Key Manager:</strong> Gerenciador de IDs (<code>highest-id/key.xml</code>)</li>
-                        </ul>
-                    </div>
-
-                    <div class="sync-section">
-                        <h3><i class="fa-solid fa-play"></i> No Startup</h3>
-                        <ol>
-                            <li>Sistema lê o arquivo CSV</li>
-                            <li>Carrega todos os filmes no banco H2</li>
-                            <li>Preserva IDs originais do CSV</li>
-                            <li>Sincroniza ID manager com maior ID do banco</li>
-                        </ol>
-                    </div>
-
-                    <div class="sync-section">
-                        <h3><i class="fa-solid fa-plus"></i> Ao Criar Filme</h3>
-                        <ol>
-                            <li>Salva no banco H2</li>
-                            <li>Adiciona linha no final do CSV</li>
-                            <li>Incrementa ID no XML</li>
-                        </ol>
-                    </div>
-
-                    <div class="sync-section">
-                        <h3><i class="fa-solid fa-edit"></i> Ao Atualizar Filme</h3>
-                        <ol>
-                            <li>Atualiza no banco H2</li>
-                            <li>Substitui linha correspondente no CSV</li>
-                        </ol>
-                    </div>
-
-                    <div class="sync-section">
-                        <h3><i class="fa-solid fa-trash"></i> Ao Excluir Filme</h3>
-                        <ol>
-                            <li>Remove do banco H2</li>
-                            <li>Remove linha correspondente do CSV</li>
-                        </ol>
-                    </div>
-
-                    <div class="sync-section">
-                        <h3><i class="fa-solid fa-file-csv"></i> Formato do CSV</h3>
-                        <p>O arquivo CSV segue o formato:</p>
-                        <code>id;year;title;studios;producers;winner;;</code>
-                        <p class="mt-2"><strong>Exemplo:</strong></p>
-                        <pre><code>1;1980;Can't Stop the Music;Associated Film Distribution;Allan Carr;yes;;
+                            <div class="sync-section">
+                                <h3><i class="fa-solid fa-file-csv"></i> CSV Format</h3>
+                                <p>The CSV file follows the format:</p>
+                                <code>id;year;title;studios;producers;winner;;</code>
+                                <p class="mt-2"><strong>Example:</strong></p>
+                                <pre><code>1;1980;Can't Stop the Music;Associated Film Distribution;Allan Carr;yes;;
 2;1980;Cruising;United Artists;Jerry Weintraub;;
 3;1980;The Formula;MGM;Steve Shagan;;</code></pre>
-                    </div>
+                            </div>
 
-                    <div class="sync-section">
-                        <h3><i class="fa-solid fa-hashtag"></i> Gerenciamento de IDs</h3>
-                        <ul>
-                            <li>Novo filme recebe o próximo ID sequencial</li>
-                            <li>IDs são preservados do CSV original</li>
-                            <li>Sistema garante que não há conflitos de ID</li>
-                        </ul>
+                            <div class="sync-section">
+                                <h3><i class="fa-solid fa-hashtag"></i> ID Management</h3>
+                                <ul>
+                                    <li>New movie receives next sequential ID</li>
+                                    <li>IDs are preserved from original CSV</li>
+                                    <li>System ensures there are no ID conflicts</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div layout:fragment="scripts">
-    <script>
-        // Smooth scroll to top when switching tabs
-        document.querySelectorAll('#manualTabs button').forEach(button => {
-            button.addEventListener('shown.bs.tab', function () {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        });
-    </script>
-</div>
-</body>
+        <div layout:fragment="scripts">
+            <script>
+                document.querySelectorAll('#manualTabs button').forEach((button) => {
+                    button.addEventListener('shown.bs.tab', function () {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                });
+            </script>
+        </div>
+    </body>
 </html>
-
