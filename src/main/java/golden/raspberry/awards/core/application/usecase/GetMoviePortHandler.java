@@ -7,7 +7,6 @@ import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -44,16 +43,6 @@ public record GetMoviePortHandler(
                 .orElseThrow(() -> new IllegalStateException(
                         "Movie with ID %d not found".formatted(id)
                 ));
-    }
-
-    /**
-     * Executes use case to get all movies.
-     *
-     * @return List of all MovieWithId
-     */
-    @Override
-    public List<MovieWithId> executeAll() {
-        return movieQueryPort.findAll();
     }
 
     /**
