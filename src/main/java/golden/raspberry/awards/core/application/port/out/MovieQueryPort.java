@@ -37,5 +37,15 @@ public interface MovieQueryPort {
      * @return Page of MovieWithId
      */
     Page<MovieWithId> findAll(Pageable pageable);
+    
+    /**
+     * Finds movies with ID using pagination, sorting and filtering.
+     *
+     * @param filterType Type of filter (all, title, year, studios, producers, id)
+     * @param filterValue Value to search for
+     * @param pageable Pagination and sorting parameters
+     * @return Page of MovieWithId
+     */
+    Page<MovieWithId> findAllWithFilter(String filterType, String filterValue, Pageable pageable);
 }
 
