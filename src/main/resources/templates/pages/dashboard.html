@@ -1,171 +1,231 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}" lang="en-us">
-<head>
-    <title>Dashboard - Golden Raspberry Awards</title>
-</head>
-<body>
-<div layout:fragment="content">
-    <div class="row">
-        <div class="col-md-12 text-center mb-3">
-            <h2 class="mb-2">
-                <i class="fa-solid fa-trophy text-warning"></i>
-                Golden Raspberry Awards
-            </h2>
-            <p class="small mb-0">Awards Management System</p>
-        </div>
-    </div>
+<!doctype html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}"
+    lang="en-us"
+>
+    <head>
+        <title>Dashboard - Golden Raspberry Awards</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="row">
+                <div class="col-md-12 text-center mb-3">
+                    <h2 class="mb-2">
+                        <i class="fa-solid fa-trophy text-warning"></i>
+                        Golden Raspberry Awards
+                    </h2>
+                    <p class="small mb-0">Awards Management System</p>
+                </div>
+            </div>
 
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="card border-primary">
-                <div class="card-body compact-info-card">
-                    <h6 class="card-title mb-2">
-                        <i class="fas fa-info-circle text-primary"></i> About This API
-                    </h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-1 small"><strong>Version:</strong> <span th:text="${apiVersion}">1.0.0</span></p>
-                            <p class="mb-1 small"><strong>Base URL:</strong> <code th:text="${baseUrl}">http://localhost:8080</code></p>
-                            <p class="mb-1 small"><strong>Author:</strong> <span th:text="${author}">Luiz Generoso</span></p>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card border-primary">
+                        <div class="card-body compact-info-card">
+                            <h6 class="card-title mb-2">
+                                <i class="fas fa-info-circle text-primary"></i> About This API
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1 small">
+                                        <strong>Version:</strong>
+                                        <span th:text="${apiVersion}">1.0.0</span>
+                                    </p>
+                                    <p class="mb-1 small">
+                                        <strong>Base URL:</strong>
+                                        <code th:text="${baseUrl}">http://localhost:8080</code>
+                                    </p>
+                                    <p class="mb-1 small">
+                                        <strong>Author:</strong>
+                                        <span th:text="${author}">Luiz Generoso</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1 small">
+                                        <strong>Description:</strong>
+                                        <span th:text="${description}"
+                                            >RESTful API for managing Golden Raspberry Awards movie
+                                            data</span
+                                        >
+                                    </p>
+                                    <p class="mb-1 small">
+                                        <strong>Architecture:</strong>
+                                        <span th:text="${architecture}"
+                                            >Hexagonal Architecture</span
+                                        >
+                                    </p>
+                                    <p class="mb-1 small">
+                                        <strong>Maturity Level:</strong>
+                                        <span th:text="${maturityLevel}">Richardson Level 2</span>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <p class="mb-1 small"><strong>Description:</strong> <span th:text="${description}">RESTful API for managing Golden Raspberry Awards movie data</span></p>
-                            <p class="mb-1 small"><strong>Architecture:</strong> <span th:text="${architecture}">Hexagonal Architecture</span></p>
-                            <p class="mb-1 small"><strong>Maturity Level:</strong> <span th:text="${maturityLevel}">Richardson Level 2</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-primary compact-card">
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="fa-solid fa-chart-line fa-2x text-primary mb-2"></i>
+                            <h6 class="card-title mb-2">Producer Intervals</h6>
+                            <p class="card-text flex-grow-1 small">
+                                Visualize the producers with the longest and shortest intervals
+                                between consecutive awards.
+                            </p>
+                            <a th:href="@{/intervals}" class="btn btn-primary btn-sm mt-auto">
+                                <i class="fa-solid fa-arrow-right"></i> View Intervals
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <div
+                        class="card h-100 border-danger compact-card shadow-lg"
+                        style="border-width: 3px !important; transform: scale(1.05)"
+                    >
+                        <div class="card-body text-center d-flex flex-column">
+                            <div class="mb-2">
+                                <i
+                                    class="fa-solid fa-clapperboard fa-3x text-danger mb-2"
+                                    style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3)"
+                                ></i>
+                            </div>
+                            <h5 class="card-title mb-2 fw-bold text-danger">
+                                <span class="badge bg-danger text-white px-3 py-2">🎬 MOVIES</span>
+                            </h5>
+                            <p class="card-text flex-grow-1 small fw-semibold">
+                                Manage your movie collection! Create, edit, delete, and search
+                                through all Golden Raspberry Awards movies with advanced filtering.
+                            </p>
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-lg mt-auto fw-bold"
+                                style="box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4)"
+                                onclick="if (!isMobile()) { loadMoviesModal(); } else { window.location.href='/movies'; }"
+                            >
+                                <i class="fa-solid fa-film me-2"></i> Manage Movies
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-success compact-card">
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="fas fa-tools fa-2x text-success mb-2"></i>
+                            <h6 class="card-title mb-2">Swagger UI</h6>
+                            <p class="card-text flex-grow-1 small">
+                                Interactive API documentation with live testing capabilities. Try
+                                out all endpoints directly from your browser.
+                            </p>
+                            <a th:href="@{/swagger-ui.html}" class="btn btn-success btn-sm mt-auto">
+                                <i class="fa-solid fa-book"></i> Open Swagger
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-info compact-card">
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="fas fa-book-open fa-2x text-info mb-2"></i>
+                            <h6 class="card-title mb-2">JavaDoc</h6>
+                            <p class="card-text flex-grow-1 small">
+                                Complete API reference documentation generated from JavaDoc
+                                comments.
+                            </p>
+                            <a th:href="@{/docs/index.html}" class="btn btn-info btn-sm mt-auto">
+                                <i class="fa-solid fa-book-open"></i> View JavaDoc
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-warning compact-card">
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="fas fa-file-code fa-2x text-warning mb-2"></i>
+                            <h6 class="card-title mb-2">OpenAPI Spec</h6>
+                            <p class="card-text flex-grow-1 small">
+                                Raw OpenAPI 3.0 JSON specification. Use this to import into API
+                                clients like Postman or generate SDKs.
+                            </p>
+                            <a th:href="@{/api-docs}" class="btn btn-warning btn-sm mt-auto">
+                                <i class="fa-solid fa-file-code"></i> View Spec
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-secondary compact-card">
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="fas fa-database fa-2x text-secondary mb-2"></i>
+                            <h6 class="card-title mb-2">H2 Console</h6>
+                            <p class="card-text flex-grow-1 small">
+                                Access the in-memory H2 database console. JDBC URL: jdbc:h2:~/test
+                            </p>
+                            <a th:href="@{/h2-console}" class="btn btn-secondary btn-sm mt-auto">
+                                <i class="fa-solid fa-database"></i> Open Console
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <div
+                        class="card h-100 compact-card"
+                        style="border-color: #9d4edd !important; border-width: 2px"
+                    >
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="fas fa-film fa-2x mb-2" style="color: #9d4edd"></i>
+                            <h6 class="card-title mb-2" style="color: #9d4edd">Movies API</h6>
+                            <p class="card-text flex-grow-1 small">
+                                View the raw JSON response from the Movies API endpoint. Perfect for
+                                debugging and integration.
+                            </p>
+                            <button
+                                type="button"
+                                class="btn btn-sm mt-auto"
+                                style="
+                                    background: linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%);
+                                    border: none;
+                                    color: white;
+                                "
+                                onclick="if (!isMobile()) { loadMoviesApiModal(); } else { window.location.href='/api/movies'; }"
+                            >
+                                <i class="fa-solid fa-code"></i> View API
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-info compact-card">
+                        <div class="card-body text-center d-flex flex-column">
+                            <i class="fas fa-book fa-2x text-info mb-2"></i>
+                            <h6 class="card-title mb-2">System Manual</h6>
+                            <p class="card-text flex-grow-1 small">
+                                Complete system guide: architecture, modules, flows and how to use
+                                all features.
+                            </p>
+                            <button
+                                type="button"
+                                class="btn btn-info btn-sm mt-auto"
+                                onclick="if (!isMobile()) { loadManualModal(); } else { window.location.href='/manual'; }"
+                            >
+                                <i class="fa-solid fa-book-open"></i> Open Manual
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="row g-2">
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 border-primary compact-card">
-                <div class="card-body text-center d-flex flex-column">
-                    <i class="fa-solid fa-chart-line fa-2x text-primary mb-2"></i>
-                    <h6 class="card-title mb-2">Producer Intervals</h6>
-                    <p class="card-text flex-grow-1 small">
-                        Visualize the producers with the longest and shortest intervals between consecutive awards.
-                    </p>
-                    <a th:href="@{/intervals}" class="btn btn-primary btn-sm mt-auto">
-                        <i class="fa-solid fa-arrow-right"></i> View Intervals
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 border-danger compact-card shadow-lg" style="border-width: 3px !important; transform: scale(1.05);">
-                <div class="card-body text-center d-flex flex-column">
-                    <div class="mb-2">
-                        <i class="fa-solid fa-clapperboard fa-3x text-danger mb-2" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
-                    </div>
-                    <h5 class="card-title mb-2 fw-bold text-danger">
-                        <span class="badge bg-danger text-white px-3 py-2">🎬 MOVIES</span>
-                    </h5>
-                    <p class="card-text flex-grow-1 small fw-semibold">
-                        Manage your movie collection! Create, edit, delete, and search through all Golden Raspberry Awards movies with advanced filtering.
-                    </p>
-                    <button type="button" class="btn btn-danger btn-lg mt-auto fw-bold" style="box-shadow: 0 4px 8px rgba(220,53,69,0.4);" onclick="if (!isMobile()) { loadMoviesModal(); } else { window.location.href='/movies'; }">
-                        <i class="fa-solid fa-film me-2"></i> Manage Movies
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 border-success compact-card">
-                <div class="card-body text-center d-flex flex-column">
-                    <i class="fas fa-tools fa-2x text-success mb-2"></i>
-                    <h6 class="card-title mb-2">Swagger UI</h6>
-                    <p class="card-text flex-grow-1 small">
-                        Interactive API documentation with live testing capabilities. Try out all endpoints directly from your browser.
-                    </p>
-                    <a th:href="@{/swagger-ui.html}" class="btn btn-success btn-sm mt-auto">
-                        <i class="fa-solid fa-book"></i> Open Swagger
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 border-info compact-card">
-                <div class="card-body text-center d-flex flex-column">
-                    <i class="fas fa-book-open fa-2x text-info mb-2"></i>
-                    <h6 class="card-title mb-2">JavaDoc</h6>
-                    <p class="card-text flex-grow-1 small">
-                        Complete API reference documentation generated from JavaDoc comments.
-                    </p>
-                    <a th:href="@{/docs/index.html}" class="btn btn-info btn-sm mt-auto">
-                        <i class="fa-solid fa-book-open"></i> View JavaDoc
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 border-warning compact-card">
-                <div class="card-body text-center d-flex flex-column">
-                    <i class="fas fa-file-code fa-2x text-warning mb-2"></i>
-                    <h6 class="card-title mb-2">OpenAPI Spec</h6>
-                    <p class="card-text flex-grow-1 small">
-                        Raw OpenAPI 3.0 JSON specification. Use this to import into API clients like Postman or generate SDKs.
-                    </p>
-                    <a th:href="@{/api-docs}" class="btn btn-warning btn-sm mt-auto">
-                        <i class="fa-solid fa-file-code"></i> View Spec
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 border-secondary compact-card">
-                <div class="card-body text-center d-flex flex-column">
-                    <i class="fas fa-database fa-2x text-secondary mb-2"></i>
-                    <h6 class="card-title mb-2">H2 Console</h6>
-                    <p class="card-text flex-grow-1 small">
-                        Access the in-memory H2 database console. JDBC URL: jdbc:h2:~/test
-                    </p>
-                    <a th:href="@{/h2-console}" class="btn btn-secondary btn-sm mt-auto">
-                        <i class="fa-solid fa-database"></i> Open Console
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 compact-card" style="border-color: #9d4edd !important; border-width: 2px;">
-                <div class="card-body text-center d-flex flex-column">
-                    <i class="fas fa-film fa-2x mb-2" style="color: #9d4edd;"></i>
-                    <h6 class="card-title mb-2" style="color: #9d4edd;">Movies API</h6>
-                    <p class="card-text flex-grow-1 small">
-                        View the raw JSON response from the Movies API endpoint. Perfect for debugging and integration.
-                    </p>
-                    <button type="button" class="btn btn-sm mt-auto" style="background: linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%); border: none; color: white;" onclick="if (!isMobile()) { loadMoviesApiModal(); } else { window.location.href='/api/movies'; }">
-                        <i class="fa-solid fa-code"></i> View API
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-lg-3">
-            <div class="card h-100 border-info compact-card">
-                <div class="card-body text-center d-flex flex-column">
-                    <i class="fas fa-book fa-2x text-info mb-2"></i>
-                    <h6 class="card-title mb-2">Manual do Sistema</h6>
-                    <p class="card-text flex-grow-1 small">
-                        Guia completo do sistema: arquitetura, módulos, fluxos e como usar todas as funcionalidades.
-                    </p>
-                    <button type="button" class="btn btn-info btn-sm mt-auto" onclick="if (!isMobile()) { loadManualModal(); } else { window.location.href='/manual'; }">
-                        <i class="fa-solid fa-book-open"></i> Abrir Manual
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>
