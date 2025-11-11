@@ -11,9 +11,7 @@ import java.util.Objects;
  * @author Luiz Generoso
  * @since 1.0.0
  */
-public final class MovieValidator {
-
-    private final MovieQueryPort movieQueryPort;
+public record MovieValidator(MovieQueryPort movieQueryPort) {
 
     /**
      * Constructor for dependency injection.
@@ -32,10 +30,10 @@ public final class MovieValidator {
      */
     public void validateExists(Long id) {
         MovieValidation.validateId(id);
-        
+
         var movieExists = movieQueryPort.findByIdWithId(id)
                 .isPresent();
-        
+
         if (!movieExists) {
             throw new IllegalStateException(
                     "Movie with ID %d not found".formatted(id)
