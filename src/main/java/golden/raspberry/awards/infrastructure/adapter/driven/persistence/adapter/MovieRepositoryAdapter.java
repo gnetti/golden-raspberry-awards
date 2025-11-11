@@ -91,19 +91,6 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, SaveMovieWit
     }
 
     /**
-     * Finds a movie by its ID.
-     *
-     * @param id Movie ID
-     * @return Optional containing Movie if found, empty otherwise
-     */
-    @Override
-    public Optional<Movie> findById(Long id) {
-        Objects.requireNonNull(id, "ID cannot be null");
-        return jpaRepository.findById(id)
-                .map(MovieMapper::toDomain);
-    }
-
-    /**
      * Deletes a movie by its ID.
      *
      * @param id Movie ID
@@ -117,17 +104,6 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, SaveMovieWit
         }
         jpaRepository.deleteById(id);
         return true;
-    }
-
-    /**
-     * Finds all movies with ID.
-     *
-     * @return List of all MovieWithId
-     */
-    @Override
-    public List<MovieWithId> findAll() {
-        var entities = jpaRepository.findAll();
-        return MovieWithIdMapper.toDomainList(entities);
     }
 
     /**
@@ -162,30 +138,15 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, SaveMovieWit
             return findAll(pageable);
         }
         
-        Page<MovieEntity> entityPage;
-        
-        switch (filterType.toLowerCase()) {
-            case "title":
-                entityPage = jpaRepository.findByTitleContainingIgnoreCase(filterValue, pageable);
-                break;
-            case "year":
-                entityPage = jpaRepository.findByYearContaining(filterValue, pageable);
-                break;
-            case "studios":
-                entityPage = jpaRepository.findByStudiosContainingIgnoreCase(filterValue, pageable);
-                break;
-            case "producers":
-                entityPage = jpaRepository.findByProducersContainingIgnoreCase(filterValue, pageable);
-                break;
-            case "id":
-                entityPage = jpaRepository.findByIdContaining(filterValue, pageable);
-                break;
-            case "all":
-            default:
-                entityPage = jpaRepository.findByAllFieldsContaining(filterValue, pageable);
-                break;
-        }
-        
+        Page<MovieEntity> entityPage = switch (filterType.toLowerCase()) {
+            case "title" -> jpaRepository.findByTitleContainingIgnoreCase(filterValue, pageable);
+            case "year" -> jpaRepository.findByYearContaining(filterValue, pageable);
+            case "studios" -> jpaRepository.findByStudiosContainingIgnoreCase(filterValue, pageable);
+            case "producers" -> jpaRepository.findByProducersContainingIgnoreCase(filterValue, pageable);
+            case "id" -> jpaRepository.findByIdContaining(filterValue, pageable);
+            default -> jpaRepository.findByAllFieldsContaining(filterValue, pageable);
+        };
+
         var domainList = MovieWithIdMapper.toDomainList(entityPage.getContent());
         return new PageImpl<>(domainList, pageable, entityPage.getTotalElements());
     }
