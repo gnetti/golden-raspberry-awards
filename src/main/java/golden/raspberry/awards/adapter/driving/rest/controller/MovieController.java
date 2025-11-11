@@ -24,11 +24,16 @@ import org.springframework.web.bind.annotation.*;
 
 import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.Objects;
+
+import golden.raspberry.awards.adapter.driving.rest.controller.constants.MovieControllerConstants;
+import golden.raspberry.awards.adapter.driving.rest.controller.constants.ApiIllustrationSetConstants;
+import golden.raspberry.awards.core.application.service.PaginationNormalizerService;
 
 /**
  * REST Controller for Movie CRUD operations.
@@ -64,27 +69,39 @@ public class MovieController {
             DeleteMoviePort deleteMoviePort,
             ConverterDtoPort converterDtoPort) {
 
-        this.createMoviePort = Objects.requireNonNull(createMoviePort, "CreateMoviePort cannot be null");
-        this.getMoviePort = Objects.requireNonNull(getMoviePort, "GetMoviePort cannot be null");
-        this.updateMoviePort = Objects.requireNonNull(updateMoviePort, "UpdateMoviePort cannot be null");
-        this.deleteMoviePort = Objects.requireNonNull(deleteMoviePort, "DeleteMoviePort cannot be null");
-        this.converterDtoPort = Objects.requireNonNull(converterDtoPort, "ConverterDtoPort cannot be null");
+        this.createMoviePort = Objects.requireNonNull(createMoviePort, MovieControllerConstants.ERROR_MESSAGE_CREATE_MOVIE_PORT_CANNOT_BE_NULL);
+        this.getMoviePort = Objects.requireNonNull(getMoviePort, MovieControllerConstants.ERROR_MESSAGE_GET_MOVIE_PORT_CANNOT_BE_NULL);
+        this.updateMoviePort = Objects.requireNonNull(updateMoviePort, MovieControllerConstants.ERROR_MESSAGE_UPDATE_MOVIE_PORT_CANNOT_BE_NULL);
+        this.deleteMoviePort = Objects.requireNonNull(deleteMoviePort, MovieControllerConstants.ERROR_MESSAGE_DELETE_MOVIE_PORT_CANNOT_BE_NULL);
+        this.converterDtoPort = Objects.requireNonNull(converterDtoPort, MovieControllerConstants.ERROR_MESSAGE_CONVERTER_DTO_PORT_CANNOT_BE_NULL);
     }
 
     @Operation(
-            summary = "Create a new movie",
-            description = "Creates a new movie with the provided data. All fields are required and must be valid."
+            summary = MovieControllerConstants.OPERATION_SUMMARY_CREATE_MOVIE,
+            description = MovieControllerConstants.OPERATION_DESCRIPTION_CREATE_MOVIE
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "201",
-                    description = "Movie created successfully",
-                    content = @Content(schema = @Schema(implementation = MovieDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_CREATED_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_MOVIE_CREATED_SUCCESSFULLY,
+                    content = @Content(
+                            schema = @Schema(implementation = MovieDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Success",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_MOVIE_SUCCESS
+                            )
+                    )
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad Request - Validation error or invalid request body",
-                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_BAD_REQUEST_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_BAD_REQUEST_VALIDATION_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Validation Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_VALIDATION
+                            )
+                    )
             )
     })
     @PostMapping
@@ -100,54 +117,66 @@ public class MovieController {
     }
 
     @Operation(
-            summary = "Get all movies with pagination",
-            description = "Returns a paginated list of movies with sorting support. Supports pagination parameters: page (0-based), size, sort (field,direction)."
+            summary = MovieControllerConstants.OPERATION_SUMMARY_GET_ALL_MOVIES,
+            description = MovieControllerConstants.OPERATION_DESCRIPTION_GET_ALL_MOVIES
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved movies",
-                    content = @Content(schema = @Schema(implementation = MovieDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESSFULLY_RETRIEVED_MOVIES,
+                    content = @Content(
+                            schema = @Schema(implementation = Page.class),
+                            examples = @ExampleObject(
+                                    name = "Success",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_MOVIE_LIST_SUCCESS
+                            )
+                    )
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad Request - Invalid pagination parameters",
-                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_BAD_REQUEST_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_BAD_REQUEST_INVALID_PAGINATION,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Bad Request",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_BAD_REQUEST
+                            )
+                    )
             )
     })
     @GetMapping
     public ResponseEntity<Page<MovieDTO>> getAll(
             @Parameter(
-                    description = "Page number (0-based, default: 0)",
-                    example = "0"
+                    description = MovieControllerConstants.PARAMETER_DESCRIPTION_PAGE_NUMBER,
+                    example = MovieControllerConstants.PARAMETER_ILLUSTRATION_SET_PAGE_NUMBER
             )
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = MovieControllerConstants.DEFAULT_PAGE_NUMBER_STRING) int page,
             @Parameter(
-                    description = "Page size (default: 10, max: 100)",
-                    example = "10"
+                    description = MovieControllerConstants.PARAMETER_DESCRIPTION_PAGE_SIZE,
+                    example = MovieControllerConstants.PARAMETER_ILLUSTRATION_SET_PAGE_SIZE
             )
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = MovieControllerConstants.DEFAULT_PAGE_SIZE_STRING) int size,
             @Parameter(
-                    description = "Sort field (id, year, title, studios, producers, winner). Default: id",
-                    example = "id"
+                    description = MovieControllerConstants.PARAMETER_DESCRIPTION_SORT_FIELD,
+                    example = MovieControllerConstants.PARAMETER_ILLUSTRATION_SET_SORT_FIELD
             )
-            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = MovieControllerConstants.DEFAULT_SORT_FIELD) String sort,
             @Parameter(
-                    description = "Sort direction (asc, desc). Default: asc",
-                    example = "asc"
+                    description = MovieControllerConstants.PARAMETER_DESCRIPTION_SORT_DIRECTION,
+                    example = MovieControllerConstants.PARAMETER_ILLUSTRATION_SET_SORT_DIRECTION
             )
-            @RequestParam(defaultValue = "asc") String direction) {
+            @RequestParam(defaultValue = MovieControllerConstants.DEFAULT_SORT_DIRECTION) String direction) {
         
-        if (page < 0) page = 0;
-        if (size < 1) size = 10;
-        if (size > 100) size = 100;
+        var normalizedPage = PaginationNormalizerService.normalizePage(page);
+        var normalizedSize = PaginationNormalizerService.normalizeSize(size);
+        var normalizedDirection = PaginationNormalizerService.normalizeDirection(direction);
+        var normalizedSortField = PaginationNormalizerService.normalizeSortField(sort);
         
-        var sortDirection = "desc".equalsIgnoreCase(direction) 
+        var sortDirection = "desc".equalsIgnoreCase(normalizedDirection) 
                 ? Sort.Direction.DESC 
                 : Sort.Direction.ASC;
         
-        var sortField = mapSortField(sort);
-        var pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortField));
+        var pageable = PageRequest.of(normalizedPage, normalizedSize, Sort.by(sortDirection, normalizedSortField));
         
         var moviePage = getMoviePort.executeAll(pageable);
         var movieDTOs = moviePage.map(this::toMovieDTO);
@@ -155,63 +184,93 @@ public class MovieController {
         return ResponseEntity.ok(movieDTOs);
     }
 
-    private String mapSortField(String sortBy) {
-        return switch (sortBy.toLowerCase()) {
-            case "year" -> "year";
-            case "title" -> "title";
-            case "studios" -> "studios";
-            case "producers" -> "producers";
-            case "winner" -> "winner";
-            default -> "id";
-        };
-    }
-
     @Operation(
-            summary = "Get a movie by ID",
-            description = "Retrieves a movie by its unique identifier"
+            summary = MovieControllerConstants.OPERATION_SUMMARY_GET_MOVIE_BY_ID,
+            description = MovieControllerConstants.OPERATION_DESCRIPTION_GET_MOVIE_BY_ID
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
-                    description = "Movie found",
-                    content = @Content(schema = @Schema(implementation = MovieDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_MOVIE_FOUND,
+                    content = @Content(
+                            schema = @Schema(implementation = MovieDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Success",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_MOVIE_SUCCESS
+                            )
+                    )
             ),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Movie not found",
-                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_NOT_FOUND_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_MOVIE_NOT_FOUND,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Not Found",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_NOT_FOUND
+                            )
+                    )
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<MovieDTO> getById(@PathVariable @Min(value = 1, message = "Path variable 'id' must be a positive integer (>= 1)") Long id) {
+    public ResponseEntity<MovieDTO> getById(
+            @Parameter(
+                    description = MovieControllerConstants.PARAMETER_DESCRIPTION_ID,
+                    example = MovieControllerConstants.PARAMETER_ILLUSTRATION_SET_ID,
+                    required = true
+            )
+            @PathVariable @Min(value = MovieControllerConstants.VALIDATION_MINIMUM_ID_VALUE, message = MovieControllerConstants.VALIDATION_MESSAGE_PATH_VARIABLE_ID_MUST_BE_POSITIVE_INTEGER) Long id) {
         var movieWithId = getMoviePort.execute(id);
         return ResponseEntity.ok(toMovieDTO(movieWithId));
     }
 
     @Operation(
-            summary = "Update an existing movie",
-            description = "Updates an existing movie with the provided data. All fields are required and must be valid."
+            summary = MovieControllerConstants.OPERATION_SUMMARY_UPDATE_MOVIE,
+            description = MovieControllerConstants.OPERATION_DESCRIPTION_UPDATE_MOVIE
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
-                    description = "Movie updated successfully",
-                    content = @Content(schema = @Schema(implementation = MovieDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_MOVIE_UPDATED_SUCCESSFULLY,
+                    content = @Content(
+                            schema = @Schema(implementation = MovieDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Success",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_MOVIE_SUCCESS
+                            )
+                    )
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad Request - Validation error or invalid request body",
-                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_BAD_REQUEST_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_BAD_REQUEST_VALIDATION_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Validation Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_VALIDATION
+                            )
+                    )
             ),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Movie not found",
-                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_NOT_FOUND_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_MOVIE_NOT_FOUND,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Not Found",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_NOT_FOUND
+                            )
+                    )
             )
     })
     @PutMapping("/{id}")
     public ResponseEntity<MovieDTO> update(
-            @PathVariable @Min(value = 1, message = "Path variable 'id' must be a positive integer (>= 1)") Long id,
+            @Parameter(
+                    description = "Movie unique identifier",
+                    example = MovieControllerConstants.PARAMETER_ILLUSTRATION_SET_ID,
+                    required = true
+            )
+            @PathVariable @Min(value = MovieControllerConstants.VALIDATION_MINIMUM_ID_VALUE, message = MovieControllerConstants.VALIDATION_MESSAGE_PATH_VARIABLE_ID_MUST_BE_POSITIVE_INTEGER) Long id,
             @RequestBody @Valid UpdateMovieDTO updateDTO) {
         var movieWithId = updateMoviePort.execute(
                 id,
@@ -225,22 +284,34 @@ public class MovieController {
     }
 
     @Operation(
-            summary = "Delete a movie by ID",
-            description = "Deletes a movie by its unique identifier"
+            summary = MovieControllerConstants.OPERATION_SUMMARY_DELETE_MOVIE,
+            description = MovieControllerConstants.OPERATION_DESCRIPTION_DELETE_MOVIE
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "204",
-                    description = "Movie deleted successfully"
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_NO_CONTENT_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_MOVIE_DELETED_SUCCESSFULLY
             ),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Movie not found",
-                    content = @Content(schema = @Schema(implementation = ApiErrorDTO.class))
+                    responseCode = MovieControllerConstants.HTTP_STATUS_CODE_NOT_FOUND_STRING,
+                    description = MovieControllerConstants.API_RESPONSE_DESCRIPTION_MOVIE_NOT_FOUND,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Not Found",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_NOT_FOUND
+                            )
+                    )
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable @Min(value = 1, message = "Path variable 'id' must be a positive integer (>= 1)") Long id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(
+                    description = MovieControllerConstants.PARAMETER_DESCRIPTION_ID,
+                    example = MovieControllerConstants.PARAMETER_ILLUSTRATION_SET_ID,
+                    required = true
+            )
+            @PathVariable @Min(value = MovieControllerConstants.VALIDATION_MINIMUM_ID_VALUE, message = MovieControllerConstants.VALIDATION_MESSAGE_PATH_VARIABLE_ID_MUST_BE_POSITIVE_INTEGER) Long id) {
         deleteMoviePort.execute(id);
         return ResponseEntity.noContent().build();
     }
