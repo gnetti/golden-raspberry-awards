@@ -4,6 +4,7 @@ import golden.raspberry.awards.core.application.port.in.*;
 import golden.raspberry.awards.core.application.port.in.GetMoviePort;
 import golden.raspberry.awards.core.application.port.out.CsvFileWriterPort;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
+import golden.raspberry.awards.core.application.port.out.ConverterDtoPort;
 import golden.raspberry.awards.core.application.port.out.MovieQueryPort;
 import golden.raspberry.awards.core.application.port.out.SaveMovieWithIdPort;
 import golden.raspberry.awards.core.application.service.IntervalProcessorService;
@@ -85,6 +86,22 @@ public class PortsConfiguration {
     public GetMoviePort getMovieUseCase(MovieQueryPort movieQueryPort) {
         Objects.requireNonNull(movieQueryPort, "MovieQueryPort cannot be null");
         return new GetMoviePortHandler(movieQueryPort);
+    }
+
+    /**
+     * Creates a bean for the GetMoviesForWebPort.
+     *
+     * @param getMoviePort Port for getting movies
+     * @param converterDtoPort Port for converting domain models to DTOs
+     * @return GetMoviesForWebPort bean
+     */
+    @Bean
+    public GetMoviesForWebPort getMoviesForWebUseCase(
+            GetMoviePort getMoviePort,
+            ConverterDtoPort converterDtoPort) {
+        Objects.requireNonNull(getMoviePort, "GetMoviePort cannot be null");
+        Objects.requireNonNull(converterDtoPort, "ConverterDtoPort cannot be null");
+        return new GetMoviesForWebPortHandler(getMoviePort, converterDtoPort);
     }
 
     /**
