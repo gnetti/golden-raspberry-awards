@@ -34,7 +34,10 @@
                         <tr th:each="interval : ${intervals.min}">
                             <td th:text="${interval.producer}"></td>
                             <td>
-                                <span class="badge bg-success badge-interval" th:text="${interval.interval} + ' years'"></span>
+                                <span
+                                    class="badge bg-success badge-interval"
+                                    th:text="${interval.interval} + ' years'"
+                                ></span>
                             </td>
                             <td th:text="${interval.previousWin}"></td>
                             <td th:text="${interval.followingWin}"></td>
@@ -71,7 +74,10 @@
                         <tr th:each="interval : ${intervals.max}">
                             <td th:text="${interval.producer}"></td>
                             <td>
-                                <span class="badge bg-warning text-dark badge-interval" th:text="${interval.interval} + ' years'"></span>
+                                <span
+                                    class="badge bg-warning text-dark badge-interval"
+                                    th:text="${interval.interval} + ' years'"
+                                ></span>
                             </td>
                             <td th:text="${interval.previousWin}"></td>
                             <td th:text="${interval.followingWin}"></td>
@@ -82,4 +88,3 @@
         </div>
     </div>
 </div>
-
