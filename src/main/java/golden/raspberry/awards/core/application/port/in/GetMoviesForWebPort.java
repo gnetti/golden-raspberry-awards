@@ -1,6 +1,8 @@
 package golden.raspberry.awards.core.application.port.in;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Input Port for getting movies for web interface.
@@ -19,6 +21,16 @@ public interface GetMoviesForWebPort {
      */
     MoviesWebResponse execute(MoviesWebRequest request);
 
+    /**
+     * Request for movies query with pagination, sorting and filtering.
+     *
+     * @param page Page number (0-based)
+     * @param size Page size
+     * @param sortBy Sort field name
+     * @param direction Sort direction (asc/desc)
+     * @param filterType Type of filter
+     * @param filterValue Filter value
+     */
     record MoviesWebRequest(
             int page,
             int size,
@@ -27,24 +39,74 @@ public interface GetMoviesForWebPort {
             String filterType,
             String filterValue
     ) {
+        private static final int MIN_PAGE = 0;
+        private static final int MIN_SIZE = 1;
+        private static final int MAX_SIZE = 100;
+        private static final String DEFAULT_SORT_BY = "id";
+        private static final String DEFAULT_DIRECTION = "asc";
+
         public MoviesWebRequest {
-            if (page < 0) {
-                throw new IllegalArgumentException("Page number must be >= 0, but was: " + page);
-            }
-            if (size < 1) {
-                throw new IllegalArgumentException("Page size must be >= 1, but was: " + size);
-            }
-            if (size > 100) {
-                throw new IllegalArgumentException("Page size must be <= 100, but was: " + size);
+            validatePage(page);
+            validateSize(size);
+        }
+
+        private static void validatePage(int page) {
+            if (page < MIN_PAGE) {
+                throw new IllegalArgumentException(
+                        "Page number must be >= %d, but was: %d".formatted(MIN_PAGE, page)
+                );
             }
         }
 
-        public static MoviesWebRequest normalize(int page, int size, String sortBy, String direction, String filterType, String filterValue) {
-            var normalizedPage = Math.max(0, page);
-            var normalizedSize = Math.max(1, Math.min(100, size));
-            var normalizedSortBy = sortBy != null ? sortBy : "id";
-            var normalizedDirection = direction != null ? direction : "asc";
-            return new MoviesWebRequest(normalizedPage, normalizedSize, normalizedSortBy, normalizedDirection, filterType, filterValue);
+        private static void validateSize(int size) {
+            if (size < MIN_SIZE) {
+                throw new IllegalArgumentException(
+                        "Page size must be >= %d, but was: %d".formatted(MIN_SIZE, size)
+                );
+            }
+            if (size > MAX_SIZE) {
+                throw new IllegalArgumentException(
+                        "Page size must be <= %d, but was: %d".formatted(MAX_SIZE, size)
+                );
+            }
+        }
+
+        /**
+         * Normalizes request parameters with default values.
+         *
+         * @param page Page number
+         * @param size Page size
+         * @param sortBy Sort field
+         * @param direction Sort direction
+         * @param filterType Filter type
+         * @param filterValue Filter value
+         * @return Normalized request
+         */
+        public static MoviesWebRequest normalize(
+                int page,
+                int size,
+                String sortBy,
+                String direction,
+                String filterType,
+                String filterValue) {
+
+            var normalizedPage = Math.max(MIN_PAGE, page);
+            var normalizedSize = Math.max(MIN_SIZE, Math.min(MAX_SIZE, size));
+            var normalizedSortBy = Optional.ofNullable(sortBy)
+                    .filter(Predicate.not(String::isBlank))
+                    .orElse(DEFAULT_SORT_BY);
+            var normalizedDirection = Optional.ofNullable(direction)
+                    .filter(Predicate.not(String::isBlank))
+                    .orElse(DEFAULT_DIRECTION);
+
+            return new MoviesWebRequest(
+                    normalizedPage,
+                    normalizedSize,
+                    normalizedSortBy,
+                    normalizedDirection,
+                    filterType,
+                    filterValue
+            );
         }
     }
 
@@ -75,4 +137,3 @@ public interface GetMoviesForWebPort {
             String filterValue
     ) {}
 }
-

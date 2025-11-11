@@ -4,7 +4,6 @@ import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,13 +21,6 @@ public interface MovieQueryPort {
      * @return Optional containing MovieWithId if found, empty otherwise
      */
     Optional<MovieWithId> findByIdWithId(Long id);
-
-    /**
-     * Finds all movies with ID.
-     *
-     * @return List of all MovieWithId
-     */
-    List<MovieWithId> findAll();
 
     /**
      * Finds all movies with ID using pagination and sorting.

@@ -4,8 +4,6 @@ import golden.raspberry.awards.core.domain.model.aggregate.MovieWithId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 /**
  * Input Port for getting movies.
  *
@@ -22,13 +20,6 @@ public interface GetMoviePort {
      * @throws IllegalStateException if movie not found
      */
     MovieWithId execute(Long id);
-
-    /**
-     * Gets all movies.
-     *
-     * @return List of all MovieWithId
-     */
-    List<MovieWithId> executeAll();
 
     /**
      * Gets all movies with pagination and sorting.
