@@ -1,19 +1,30 @@
 package golden.raspberry.awards.adapter.driving.rest.controller;
 
+import golden.raspberry.awards.adapter.driving.rest.dto.ApiErrorDTO;
 import golden.raspberry.awards.adapter.driving.rest.dto.DocumentInfoDTO;
 import golden.raspberry.awards.adapter.driving.rest.dto.MovieDTO;
+import golden.raspberry.awards.adapter.driving.rest.controller.constants.ProducerWebControllerConstants;
+import golden.raspberry.awards.adapter.driving.rest.controller.constants.ApiIllustrationSetConstants;
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsPort;
 import golden.raspberry.awards.core.application.port.in.GetMoviePort;
+import golden.raspberry.awards.core.application.port.in.GetMoviesForWebPort;
 import golden.raspberry.awards.core.application.port.out.ConverterDtoPort;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import golden.raspberry.awards.core.application.service.YearService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Web Controller for Thymeleaf pages.
@@ -22,42 +33,131 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Controller
+@Tag(name = "Web Pages", description = "Thymeleaf web page endpoints")
 public class ProducerWebController {
 
     private final CalculateIntervalsPort calculateIntervalsPort;
     private final ConverterDtoPort converterDtoPort;
     private final GetMoviePort getMoviePort;
+    private final GetMoviesForWebPort getMoviesForWebPort;
 
-    /**
-     * Constructor for dependency injection.
-     *
-     * @param calculateIntervalsPort Use case for calculating intervals
-     * @param converterDtoPort Port for converting domain models to DTOs
-     * @param getMoviePort Port for getting movies
-     */
     public ProducerWebController(
             CalculateIntervalsPort calculateIntervalsPort,
             ConverterDtoPort converterDtoPort,
-            GetMoviePort getMoviePort) {
+            GetMoviePort getMoviePort,
+            GetMoviesForWebPort getMoviesForWebPort) {
         this.calculateIntervalsPort = Objects.requireNonNull(
                 calculateIntervalsPort,
-                "CalculateIntervalsPort cannot be null"
+                ProducerWebControllerConstants.ERROR_MESSAGE_CALCULATE_INTERVALS_PORT_CANNOT_BE_NULL
         );
         this.converterDtoPort = Objects.requireNonNull(
                 converterDtoPort,
-                "ConverterDtoPort cannot be null"
+                ProducerWebControllerConstants.ERROR_MESSAGE_CONVERTER_DTO_PORT_CANNOT_BE_NULL
         );
         this.getMoviePort = Objects.requireNonNull(
                 getMoviePort,
-                "GetMoviePort cannot be null"
+                ProducerWebControllerConstants.ERROR_MESSAGE_GET_MOVIE_PORT_CANNOT_BE_NULL
+        );
+        this.getMoviesForWebPort = Objects.requireNonNull(
+                getMoviesForWebPort,
+                ProducerWebControllerConstants.ERROR_MESSAGE_GET_MOVIES_FOR_WEB_PORT_CANNOT_BE_NULL
         );
     }
 
+    /**
+     * Redirects root path to dashboard.
+     *
+     * @return Redirect to "/dashboard"
+     */
+    @Operation(
+            summary = ProducerWebControllerConstants.OPERATION_SUMMARY_REDIRECT_TO_DASHBOARD,
+            description = ProducerWebControllerConstants.OPERATION_DESCRIPTION_REDIRECT_TO_DASHBOARD
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_FOUND_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_REDIRECT
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
+            )
+    })
     @GetMapping("/")
-    public String index(Model model) {
+    public String redirectToDashboard() {
+        return "redirect:/dashboard";
+    }
+
+    /**
+     * Handles GET request for manual page.
+     *
+     * @return View name "pages/manual"
+     */
+    @Operation(
+            summary = ProducerWebControllerConstants.OPERATION_SUMMARY_GET_MANUAL,
+            description = ProducerWebControllerConstants.OPERATION_DESCRIPTION_GET_MANUAL
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESS
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
+            )
+    })
+    @GetMapping("/manual")
+    public String manual() {
+        return "pages/manual";
+    }
+
+    /**
+     * Handles GET request for dashboard page.
+     *
+     * @param model Model to add attributes for Thymeleaf
+     * @return View name "pages/dashboard"
+     */
+    @Operation(
+            summary = ProducerWebControllerConstants.OPERATION_SUMMARY_GET_DASHBOARD,
+            description = ProducerWebControllerConstants.OPERATION_DESCRIPTION_GET_DASHBOARD
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESS
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
+            )
+    })
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
         var docInfo = DocumentInfoDTO.createDefault();
         
-        model.addAttribute("title", "Home");
+        model.addAttribute("title", "Dashboard");
         model.addAttribute("apiVersion", docInfo.apiVersion());
         model.addAttribute("baseUrl", docInfo.baseUrl());
         model.addAttribute("description", docInfo.description());
@@ -65,7 +165,7 @@ public class ProducerWebController {
         model.addAttribute("maturityLevel", docInfo.maturityLevel());
         model.addAttribute("author", docInfo.author());
         
-        return "pages/index";
+        return "pages/dashboard";
     }
 
     /**
@@ -75,8 +175,46 @@ public class ProducerWebController {
      * @param modal Whether to return only the content for modal (no layout)
      * @return View name "pages/intervals" or "fragments/intervals-modal" if modal
      */
+    @Operation(
+            summary = ProducerWebControllerConstants.OPERATION_SUMMARY_GET_INTERVALS,
+            description = ProducerWebControllerConstants.OPERATION_DESCRIPTION_GET_INTERVALS
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESS
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_BAD_REQUEST_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_BAD_REQUEST,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Bad Request",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_BAD_REQUEST
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
+            )
+    })
     @GetMapping("/intervals")
-    public String intervals(Model model, @RequestParam(required = false) Boolean modal) {
+    public String intervals(
+            Model model,
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_MODAL,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_MODAL
+            )
+            @RequestParam(required = false) Boolean modal) {
         var response = calculateIntervalsPort.execute();
         var dto = converterDtoPort.toDTO(response);
         model.addAttribute("intervals", dto);
@@ -89,122 +227,182 @@ public class ProducerWebController {
         return "pages/intervals";
     }
 
-    /**
-     * Handles GET request for movies list page with pagination, sorting and page size control.
-     *
-     * @param model Model to add attributes for Thymeleaf
-     * @param page Page number (0-based, default: 0)
-     * @param size Page size (default: 10)
-     * @param sortBy Field to sort by (default: "id")
-     * @param direction Sort direction: "asc" or "desc" (default: "asc")
-     * @return View name "pages/movies"
-     */
+    @Operation(
+            summary = ProducerWebControllerConstants.OPERATION_SUMMARY_GET_MOVIES,
+            description = ProducerWebControllerConstants.OPERATION_DESCRIPTION_GET_MOVIES
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESS
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_BAD_REQUEST_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_BAD_REQUEST,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Bad Request",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_BAD_REQUEST
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
+            )
+    })
     @GetMapping("/movies")
     public String movies(
             Model model,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction,
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_PAGE,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_PAGE
+            )
+            @RequestParam(defaultValue = ProducerWebControllerConstants.DEFAULT_PAGE) int page,
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_SIZE,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_SIZE
+            )
+            @RequestParam(defaultValue = ProducerWebControllerConstants.DEFAULT_SIZE) int size,
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_SORT_BY,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_SORT_BY
+            )
+            @RequestParam(defaultValue = ProducerWebControllerConstants.DEFAULT_SORT_BY) String sortBy,
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_DIRECTION,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_DIRECTION
+            )
+            @RequestParam(defaultValue = ProducerWebControllerConstants.DEFAULT_DIRECTION) String direction,
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_FILTER_TYPE,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_FILTER_TYPE
+            )
             @RequestParam(required = false) String filterType,
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_FILTER_VALUE,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_FILTER_VALUE
+            )
             @RequestParam(required = false) String filterValue) {
         
-        if (page < 0) page = 0;
-        if (size < 1) size = 10;
+        var request = GetMoviesForWebPort.MoviesWebRequest.normalize(
+                page,
+                size,
+                sortBy,
+                direction,
+                filterType,
+                filterValue
+        );
         
-        var sortDirection = "desc".equalsIgnoreCase(direction) 
-                ? Sort.Direction.DESC 
-                : Sort.Direction.ASC;
+        var response = getMoviesForWebPort.execute(request);
         
-        var sort = Sort.by(sortDirection, mapSortField(sortBy));
-        var pageable = PageRequest.of(page, size, sort);
-        
-        // Apply filter to ALL database records, not just current page
-        var moviePage = (filterType != null && filterValue != null && !filterValue.isBlank())
-                ? getMoviePort.executeAllWithFilter(filterType, filterValue, pageable)
-                : getMoviePort.executeAll(pageable);
-        
-        var movieDTOs = moviePage.getContent().stream()
-                .map(movie -> (MovieDTO) converterDtoPort.toDTO(movie))
-                .collect(Collectors.toList());
-        
-        var currentPageNum = moviePage.getNumber();
-        var totalPages = moviePage.getTotalPages();
-        var pageNumbers = calculatePageNumbers(currentPageNum, totalPages);
-        
-        model.addAttribute("movies", movieDTOs);
-        model.addAttribute("currentPage", currentPageNum);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("totalItems", moviePage.getTotalElements());
-        model.addAttribute("pageSize", size);
-        model.addAttribute("sortBy", sortBy);
-        model.addAttribute("direction", direction);
-        model.addAttribute("pageNumbers", pageNumbers);
-        // Preserve filterType from request or default to "id"
-        String finalFilterType = (filterType != null && !filterType.isBlank()) ? filterType : "id";
-        model.addAttribute("filterType", finalFilterType);
-        model.addAttribute("filterValue", filterValue != null ? filterValue : "");
+        model.addAttribute("movies", response.movies());
+        model.addAttribute("currentPage", response.currentPage());
+        model.addAttribute("totalPages", response.totalPages());
+        model.addAttribute("totalItems", response.totalItems());
+        model.addAttribute("pageSize", response.pageSize());
+        model.addAttribute("sortBy", response.sortBy());
+        model.addAttribute("direction", response.direction());
+        model.addAttribute("pageNumbers", response.pageNumbers());
+        model.addAttribute("filterType", response.filterType());
+        model.addAttribute("filterValue", response.filterValue());
         model.addAttribute("title", "Movies");
+        model.addAttribute("currentYear", YearService.getCurrentYear());
         
         return "pages/movies";
     }
 
-    private String mapSortField(String sortBy) {
-        return switch (sortBy.toLowerCase()) {
-            case "year" -> "year";
-            case "title" -> "title";
-            case "studios" -> "studios";
-            case "producers" -> "producers";
-            case "winner" -> "winner";
-            default -> "id";
-        };
+    /**
+     * Handles GET request for new movie page.
+     *
+     * @param model Model to add attributes for Thymeleaf
+     * @return View name "pages/new-movie"
+     */
+    @Operation(
+            summary = ProducerWebControllerConstants.OPERATION_SUMMARY_GET_NEW_MOVIE,
+            description = ProducerWebControllerConstants.OPERATION_DESCRIPTION_GET_NEW_MOVIE
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESS
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
+            )
+    })
+    @GetMapping("/movies/new")
+    public String newMovie(Model model) {
+        model.addAttribute("title", "New Movie");
+        model.addAttribute("currentYear", YearService.getCurrentYear());
+        return "pages/new-movie";
     }
 
-    /**
-     * Calculates page numbers to display with ellipsis for large page counts.
-     * Shows max 7 page numbers: first, last, current, and 2-3 on each side.
-     *
-     * @param currentPage Current page number (0-based)
-     * @param totalPages Total number of pages
-     * @return List of page numbers to display, with -1 representing ellipsis
-     */
-    private java.util.List<Integer> calculatePageNumbers(int currentPage, int totalPages) {
-        var pages = new java.util.ArrayList<Integer>();
+    @Operation(
+            summary = ProducerWebControllerConstants.OPERATION_SUMMARY_GET_EDIT_MOVIE,
+            description = ProducerWebControllerConstants.OPERATION_DESCRIPTION_GET_EDIT_MOVIE
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_OK_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_SUCCESS
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_NOT_FOUND_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_NOT_FOUND,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Not Found",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_NOT_FOUND
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = ProducerWebControllerConstants.HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR_STRING,
+                    description = ProducerWebControllerConstants.API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR,
+                    content = @Content(
+                            schema = @Schema(implementation = ApiErrorDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Internal Server Error",
+                                    value = ApiIllustrationSetConstants.ILLUSTRATION_SET_ERROR_INTERNAL_SERVER
+                            )
+                    )
+            )
+    })
+    @GetMapping("/movies/{id}/edit")
+    public String editMovie(
+            @Parameter(
+                    description = ProducerWebControllerConstants.PARAMETER_DESCRIPTION_ID,
+                    example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_ID
+            )
+            @PathVariable Long id,
+            Model model) {
+        var movieWithId = getMoviePort.execute(id);
+        var movieDTO = (MovieDTO) converterDtoPort.toDTO(movieWithId);
         
-        if (totalPages <= 7) {
-            // Show all pages if 7 or fewer
-            for (int i = 0; i < totalPages; i++) {
-                pages.add(i);
-            }
-        } else {
-            // Always show first page
-            pages.add(0);
-            
-            if (currentPage <= 3) {
-                // Near the beginning: show 1,2,3,4,5
-                for (int i = 1; i <= 5; i++) {
-                    pages.add(i);
-                }
-                pages.add(-1); // ellipsis
-                pages.add(totalPages - 1); // last page
-            } else if (currentPage >= totalPages - 4) {
-                // Near the end: show ... n-4, n-3, n-2, n-1, n
-                pages.add(-1); // ellipsis
-                for (int i = totalPages - 5; i < totalPages; i++) {
-                    pages.add(i);
-                }
-            } else {
-                // In the middle: show ... current-1, current, current+1 ...
-                pages.add(-1); // ellipsis
-                pages.add(currentPage - 1);
-                pages.add(currentPage);
-                pages.add(currentPage + 1);
-                pages.add(-1); // ellipsis
-                pages.add(totalPages - 1); // last page
-            }
-        }
+        model.addAttribute("title", "Edit Movie");
+        model.addAttribute("currentYear", YearService.getCurrentYear());
+        model.addAttribute("movie", movieDTO);
+        model.addAttribute("movieId", movieDTO.id());
         
-        return pages;
+        return "pages/edit-movie";
     }
 }
 
