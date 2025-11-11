@@ -1,18 +1,19 @@
 package golden.raspberry.awards.adapter.driving.rest.controller.constants;
 
 /**
- * Constants for Swagger API examples.
+ * Constants for API illustration sets used in Swagger/OpenAPI documentation.
+ * Contains illustration set JSON responses for success and error scenarios.
  *
  * @author Luiz Generoso
  * @since 1.0.0
  */
-public final class SwaggerExamplesConstants {
+public final class ApiIllustrationSetConstants {
 
-    private SwaggerExamplesConstants() {
+    private ApiIllustrationSetConstants() {
         throw new AssertionError("Utility class cannot be instantiated");
     }
 
-    public static final String EXAMPLE_MOVIE_SUCCESS = """
+    public static final String ILLUSTRATION_SET_MOVIE_SUCCESS = """
             {
               "id": 1,
               "year": 1980,
@@ -23,7 +24,7 @@ public final class SwaggerExamplesConstants {
             }
             """;
 
-    public static final String EXAMPLE_MOVIE_LIST_SUCCESS = """
+    public static final String ILLUSTRATION_SET_MOVIE_LIST_SUCCESS = """
             {
               "content": [
                 {
@@ -52,17 +53,17 @@ public final class SwaggerExamplesConstants {
             }
             """;
 
-    public static final String EXAMPLE_CREATE_MOVIE_REQUEST = """
+    public static final String ILLUSTRATION_SET_CREATE_MOVIE_REQUEST = """
             {
               "year": 2024,
-              "title": "Example Movie Title",
-              "studios": "Example Studios",
+              "title": "Illustration Set Movie Title",
+              "studios": "Illustration Set Studios",
               "producers": "Producer One, Producer Two",
               "winner": false
             }
             """;
 
-    public static final String EXAMPLE_UPDATE_MOVIE_REQUEST = """
+    public static final String ILLUSTRATION_SET_UPDATE_MOVIE_REQUEST = """
             {
               "year": 2024,
               "title": "Updated Movie Title",
@@ -72,7 +73,7 @@ public final class SwaggerExamplesConstants {
             }
             """;
 
-    public static final String EXAMPLE_PRODUCER_INTERVALS_SUCCESS = """
+    public static final String ILLUSTRATION_SET_PRODUCER_INTERVALS_SUCCESS = """
             {
               "min": [
                 {
@@ -93,7 +94,7 @@ public final class SwaggerExamplesConstants {
             }
             """;
 
-    public static final String EXAMPLE_ERROR_BAD_REQUEST = """
+    public static final String ILLUSTRATION_SET_ERROR_BAD_REQUEST = """
             {
               "timestamp": "2025-01-21T12:00:00",
               "status": 400,
@@ -103,7 +104,7 @@ public final class SwaggerExamplesConstants {
             }
             """;
 
-    public static final String EXAMPLE_ERROR_NOT_FOUND = """
+    public static final String ILLUSTRATION_SET_ERROR_NOT_FOUND = """
             {
               "timestamp": "2025-01-21T12:00:00",
               "status": 404,
@@ -113,7 +114,7 @@ public final class SwaggerExamplesConstants {
             }
             """;
 
-    public static final String EXAMPLE_ERROR_VALIDATION = """
+    public static final String ILLUSTRATION_SET_ERROR_VALIDATION = """
             {
               "timestamp": "2025-01-21T12:00:00",
               "status": 400,
@@ -132,7 +133,7 @@ public final class SwaggerExamplesConstants {
             }
             """;
 
-    public static final String EXAMPLE_ERROR_INTERNAL_SERVER = """
+    public static final String ILLUSTRATION_SET_ERROR_INTERNAL_SERVER = """
             {
               "timestamp": "2025-01-21T12:00:00",
               "status": 500,

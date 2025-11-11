@@ -51,21 +51,21 @@ public final class ProducerWebControllerConstants {
     public static final String API_RESPONSE_DESCRIPTION_INTERNAL_SERVER_ERROR = "Internal server error";
 
     public static final String PARAMETER_DESCRIPTION_PAGE = "Page number (0-based)";
-    public static final String PARAMETER_EXAMPLE_PAGE = "0";
+    public static final String PARAMETER_ILLUSTRATION_SET_PAGE = "0";
     public static final String PARAMETER_DESCRIPTION_SIZE = "Page size (number of items per page)";
-    public static final String PARAMETER_EXAMPLE_SIZE = "10";
+    public static final String PARAMETER_ILLUSTRATION_SET_SIZE = "10";
     public static final String PARAMETER_DESCRIPTION_SORT_BY = "Field to sort by (id, year, title, studios, producers, winner)";
-    public static final String PARAMETER_EXAMPLE_SORT_BY = "id";
+    public static final String PARAMETER_ILLUSTRATION_SET_SORT_BY = "id";
     public static final String PARAMETER_DESCRIPTION_DIRECTION = "Sort direction (asc or desc)";
-    public static final String PARAMETER_EXAMPLE_DIRECTION = "asc";
+    public static final String PARAMETER_ILLUSTRATION_SET_DIRECTION = "asc";
     public static final String PARAMETER_DESCRIPTION_FILTER_TYPE = "Type of filter (id, year, title, studios, producers, all)";
-    public static final String PARAMETER_EXAMPLE_FILTER_TYPE = "id";
+    public static final String PARAMETER_ILLUSTRATION_SET_FILTER_TYPE = "id";
     public static final String PARAMETER_DESCRIPTION_FILTER_VALUE = "Value to filter by";
-    public static final String PARAMETER_EXAMPLE_FILTER_VALUE = "1";
+    public static final String PARAMETER_ILLUSTRATION_SET_FILTER_VALUE = "1";
     public static final String PARAMETER_DESCRIPTION_MODAL = "Whether to return only modal content (no layout)";
-    public static final String PARAMETER_EXAMPLE_MODAL = "false";
+    public static final String PARAMETER_ILLUSTRATION_SET_MODAL = "false";
     public static final String PARAMETER_DESCRIPTION_ID = "Movie unique identifier";
-    public static final String PARAMETER_EXAMPLE_ID = "1";
+    public static final String PARAMETER_ILLUSTRATION_SET_ID = "1";
 
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_SIZE = "10";
