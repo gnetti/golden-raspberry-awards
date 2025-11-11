@@ -58,7 +58,12 @@ code {
     padding: 0.5rem 0.75rem;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: var(--text-primary);
 }
 
@@ -67,7 +72,8 @@ h2 {
     font-weight: 600;
 }
 
-p, span {
+p,
+span {
     color: var(--text-secondary);
 }
 
@@ -148,4 +154,3 @@ footer p {
     font-size: 0.8rem;
     padding: 0.15rem 0.3rem;
 }
-

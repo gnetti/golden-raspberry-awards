@@ -41,16 +41,16 @@ html body {
     color: #212529 !important;
 }
 
-.login input[type="text"],
-.login input[type="password"],
+.login input[type='text'],
+.login input[type='password'],
 .login select {
     background-color: #ffffff !important;
     color: #212529 !important;
     border: 1px solid #d4d4c4 !important;
 }
 
-.login input[type="text"]:focus,
-.login input[type="password"]:focus,
+.login input[type='text']:focus,
+.login input[type='password']:focus,
 .login select:focus {
     background-color: #ffffff !important;
     border-color: #86b7fe !important;
@@ -91,7 +91,7 @@ html body {
     border-color: #0d6efd !important;
 }
 
-.toolbar input[type="text"],
+.toolbar input[type='text'],
 .toolbar select {
     background-color: #ffffff !important;
     color: #212529 !important;
@@ -181,12 +181,12 @@ th {
     color: #212529 !important;
 }
 
-div[class*="left"],
-div[class*="right"],
-div[class*="content"],
-div[class*="panel"],
-td[class*="left"],
-td[class*="right"] {
+div[class*='left'],
+div[class*='right'],
+div[class*='content'],
+div[class*='panel'],
+td[class*='left'],
+td[class*='right'] {
     background-color: transparent !important;
     color: #212529 !important;
 }
@@ -214,8 +214,8 @@ a:hover {
     color: #0a58ca !important;
 }
 
-input[type="text"],
-input[type="password"],
+input[type='text'],
+input[type='password'],
 select,
 textarea {
     background-color: #ffffff !important;
