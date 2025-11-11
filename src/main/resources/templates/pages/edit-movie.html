@@ -1,184 +1,206 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}"
-      lang="en-us">
-<head>
-    <link th:href="@{/css/new-movie.css}" rel="stylesheet">
-</head>
-<body>
-    <div layout:fragment="content">
-        <div class="new-movie-container">
-            <div class="form-wrapper">
-                <!-- Header -->
-                <div class="form-header">
-                    <div class="header-icon">
-                        <i class="fas fa-film"></i>
+<!doctype html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}"
+    lang="en-us"
+>
+    <head>
+        <link th:href="@{/css/new-movie.css}" rel="stylesheet" />
+    </head>
+    <body>
+        <div layout:fragment="content">
+            <div class="new-movie-container">
+                <div class="form-wrapper">
+                    <div class="form-header">
+                        <div class="header-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <h1>Edit Movie</h1>
+                        <p class="header-subtitle">
+                            Update the information below to edit the movie
+                        </p>
                     </div>
-                    <h1>Edit Movie</h1>
-                    <p class="header-subtitle">Update the information below to edit the movie</p>
-                </div>
 
-                <!-- Form -->
-                <form id="editMovieForm" novalidate>
-                    <input type="hidden" id="movieId" th:value="${movieId}">
-                    
-                    <!-- ID Field (Read-only) -->
-                    <div class="form-field-wrapper">
-                        <div class="input-group-modern">
-                            <input type="text" 
-                                   class="form-input-modern form-input-disabled" 
-                                   id="displayId" 
-                                   name="displayId"
-                                   th:value="${movieId}"
-                                   placeholder="ID"
-                                   readonly
-                                   disabled
-                                   tabindex="-1">
-                            <span class="input-icon">
-                                <i class="fas fa-hashtag"></i>
-                            </span>
+                    <form id="editMovieForm" novalidate>
+                        <input type="hidden" id="movieId" th:value="${movieId}" />
+                        <div class="form-field-wrapper">
+                            <div class="input-group-modern">
+                                <input
+                                    type="text"
+                                    class="form-input-modern form-input-disabled"
+                                    id="displayId"
+                                    name="displayId"
+                                    th:value="${movieId}"
+                                    placeholder="ID"
+                                    readonly
+                                    disabled
+                                    tabindex="-1"
+                                />
+                                <span class="input-icon">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Year Field -->
-                    <div class="form-field-wrapper">
-                        <div class="input-group-modern">
-                            <input type="text" 
-                                   class="form-input-modern" 
-                                   id="year" 
-                                   name="year"
-                                   th:value="${movie.year}"
-                                   th:attr="data-current-year=${currentYear}, data-min-year=1900"
-                                   placeholder="Year"
-                                   readonly
-                                   required>
-                            <span class="input-icon calendar-icon" id="yearCalendarIcon" onclick="openYearPicker()">
-                                <i class="fas fa-calendar-alt"></i>
-                            </span>
-                            <span class="required-star">*</span>
-                        </div>
-                        <div class="invalid-feedback-modern" id="year-error"></div>
-                        <!-- Year Picker Modal -->
-                        <div id="yearPickerModal" class="year-picker-modal" style="display: none;">
-                            <div class="year-picker-content">
-                                <div class="year-picker-header">
-                                    <button type="button" class="year-picker-nav" onclick="changeYearPicker(-10)">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </button>
-                                    <span id="yearPickerRange" class="year-picker-range"></span>
-                                    <button type="button" class="year-picker-nav" onclick="changeYearPicker(10)">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                                <div class="year-picker-grid" id="yearPickerGrid"></div>
-                                <div class="year-picker-footer">
-                                    <button type="button" class="year-picker-btn" onclick="closeYearPicker()">Cancel</button>
+                        <div class="form-field-wrapper">
+                            <div class="input-group-modern">
+                                <input
+                                    type="text"
+                                    class="form-input-modern"
+                                    id="year"
+                                    name="year"
+                                    th:value="${movie.year}"
+                                    th:attr="data-current-year=${currentYear}, data-min-year=1900"
+                                    placeholder="Year"
+                                    readonly
+                                    required
+                                />
+                                <span
+                                    class="input-icon calendar-icon"
+                                    id="yearCalendarIcon"
+                                    onclick="openYearPicker()"
+                                >
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                                <span class="required-star">*</span>
+                            </div>
+                            <div class="invalid-feedback-modern" id="year-error"></div>
+                            <div
+                                id="yearPickerModal"
+                                class="year-picker-modal"
+                                style="display: none"
+                            >
+                                <div class="year-picker-content">
+                                    <div class="year-picker-header">
+                                        <button
+                                            type="button"
+                                            class="year-picker-nav"
+                                            onclick="changeYearPicker(-10)"
+                                        >
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <span id="yearPickerRange" class="year-picker-range"></span>
+                                        <button
+                                            type="button"
+                                            class="year-picker-nav"
+                                            onclick="changeYearPicker(10)"
+                                        >
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="year-picker-grid" id="yearPickerGrid"></div>
+                                    <div class="year-picker-footer">
+                                        <button
+                                            type="button"
+                                            class="year-picker-btn"
+                                            onclick="closeYearPicker()"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Title Field -->
-                    <div class="form-field-wrapper">
-                        <div class="input-group-modern">
-                            <input type="text" 
-                                   class="form-input-modern" 
-                                   id="title" 
-                                   name="title"
-                                   th:value="${movie.title}"
-                                   minlength="2"
-                                   maxlength="255"
-                                   placeholder="Title"
-                                   required>
-                            <span class="input-icon">
-                                <i class="fas fa-film"></i>
-                            </span>
-                            <span class="required-star">*</span>
-                        </div>
-                        <div class="invalid-feedback-modern" id="title-error"></div>
-                    </div>
-
-                    <!-- Studios Field -->
-                    <div class="form-field-wrapper">
-                        <div class="input-group-modern">
-                            <input type="text" 
-                                   class="form-input-modern" 
-                                   id="studios" 
-                                   name="studios"
-                                   th:value="${movie.studios}"
-                                   minlength="2"
-                                   maxlength="255"
-                                   placeholder="Studios"
-                                   required>
-                            <span class="input-icon">
-                                <i class="fas fa-building"></i>
-                            </span>
-                            <span class="required-star">*</span>
-                        </div>
-                        <div class="invalid-feedback-modern" id="studios-error"></div>
-                    </div>
-
-                    <!-- Producers Field -->
-                    <div class="form-field-wrapper">
-                        <div class="input-group-modern">
-                            <input type="text" 
-                                   class="form-input-modern" 
-                                   id="producers" 
-                                   name="producers"
-                                   th:value="${movie.producers}"
-                                   minlength="2"
-                                   maxlength="255"
-                                   placeholder="Producers"
-                                   required>
-                            <span class="input-icon">
-                                <i class="fas fa-users"></i>
-                            </span>
-                            <span class="required-star">*</span>
-                        </div>
-                        <div class="invalid-feedback-modern" id="producers-error"></div>
-                    </div>
-
-                    <!-- Winner Field -->
-                    <div class="form-field-wrapper">
-                        <div class="checkbox-wrapper-modern">
-                            <label class="checkbox-label-modern">
-                                <input type="checkbox" 
-                                       class="checkbox-modern" 
-                                       id="winner" 
-                                       name="winner"
-                                       th:checked="${movie.winner}">
-                                <span class="checkbox-custom">
-                                    <i class="fas fa-check"></i>
+                        <div class="form-field-wrapper">
+                            <div class="input-group-modern">
+                                <input
+                                    type="text"
+                                    class="form-input-modern"
+                                    id="title"
+                                    name="title"
+                                    th:value="${movie.title}"
+                                    minlength="2"
+                                    maxlength="255"
+                                    placeholder="Title"
+                                    required
+                                />
+                                <span class="input-icon">
+                                    <i class="fas fa-film"></i>
                                 </span>
-                                <span class="checkbox-text">
-                                    <i class="fas fa-trophy me-2"></i>Winner
-                                </span>
-                            </label>
+                                <span class="required-star">*</span>
+                            </div>
+                            <div class="invalid-feedback-modern" id="title-error"></div>
                         </div>
-                        <div class="invalid-feedback-modern" id="winner-error"></div>
-                    </div>
 
-                    <!-- Action Buttons -->
-                    <div class="form-actions">
-                        <a th:href="@{/movies}" class="btn-cancel">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </a>
-                        <button type="button" 
-                                class="btn-save" 
-                                id="saveButton"
-                                disabled>
-                            <i class="fas fa-save me-2"></i>Update Movie
-                        </button>
-                    </div>
-                </form>
+                        <div class="form-field-wrapper">
+                            <div class="input-group-modern">
+                                <input
+                                    type="text"
+                                    class="form-input-modern"
+                                    id="studios"
+                                    name="studios"
+                                    th:value="${movie.studios}"
+                                    minlength="2"
+                                    maxlength="255"
+                                    placeholder="Studios"
+                                    required
+                                />
+                                <span class="input-icon">
+                                    <i class="fas fa-building"></i>
+                                </span>
+                                <span class="required-star">*</span>
+                            </div>
+                            <div class="invalid-feedback-modern" id="studios-error"></div>
+                        </div>
+
+                        <div class="form-field-wrapper">
+                            <div class="input-group-modern">
+                                <input
+                                    type="text"
+                                    class="form-input-modern"
+                                    id="producers"
+                                    name="producers"
+                                    th:value="${movie.producers}"
+                                    minlength="2"
+                                    maxlength="255"
+                                    placeholder="Producers"
+                                    required
+                                />
+                                <span class="input-icon">
+                                    <i class="fas fa-users"></i>
+                                </span>
+                                <span class="required-star">*</span>
+                            </div>
+                            <div class="invalid-feedback-modern" id="producers-error"></div>
+                        </div>
+
+                        <div class="form-field-wrapper">
+                            <div class="checkbox-wrapper-modern">
+                                <label class="checkbox-label-modern">
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox-modern"
+                                        id="winner"
+                                        name="winner"
+                                        th:checked="${movie.winner}"
+                                    />
+                                    <span class="checkbox-custom">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span class="checkbox-text">
+                                        <i class="fas fa-trophy me-2"></i>Winner
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="invalid-feedback-modern" id="winner-error"></div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a th:href="@{/movies}" class="btn-cancel">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="button" class="btn-save" id="saveButton" disabled>
+                                <i class="fas fa-save me-2"></i>Update Movie
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div layout:fragment="scripts">
-        <script th:src="@{/js/edit-movie.js}"></script>
-    </div>
-</body>
+        <div layout:fragment="scripts">
+            <script th:src="@{/js/edit-movie.js}"></script>
+        </div>
+    </body>
 </html>
-
