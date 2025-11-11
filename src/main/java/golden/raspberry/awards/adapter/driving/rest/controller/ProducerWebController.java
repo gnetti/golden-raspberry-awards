@@ -105,7 +105,9 @@ public class ProducerWebController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction) {
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String filterType,
+            @RequestParam(required = false) String filterValue) {
         
         if (page < 0) page = 0;
         if (size < 1) size = 10;
@@ -117,7 +119,11 @@ public class ProducerWebController {
         var sort = Sort.by(sortDirection, mapSortField(sortBy));
         var pageable = PageRequest.of(page, size, sort);
         
-        var moviePage = getMoviePort.executeAll(pageable);
+        // Apply filter to ALL database records, not just current page
+        var moviePage = (filterType != null && filterValue != null && !filterValue.isBlank())
+                ? getMoviePort.executeAllWithFilter(filterType, filterValue, pageable)
+                : getMoviePort.executeAll(pageable);
+        
         var movieDTOs = moviePage.getContent().stream()
                 .map(movie -> (MovieDTO) converterDtoPort.toDTO(movie))
                 .collect(Collectors.toList());
@@ -134,6 +140,10 @@ public class ProducerWebController {
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("direction", direction);
         model.addAttribute("pageNumbers", pageNumbers);
+        // Preserve filterType from request or default to "id"
+        String finalFilterType = (filterType != null && !filterType.isBlank()) ? filterType : "id";
+        model.addAttribute("filterType", finalFilterType);
+        model.addAttribute("filterValue", filterValue != null ? filterValue : "");
         model.addAttribute("title", "Movies");
         
         return "pages/movies";
