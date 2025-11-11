@@ -103,8 +103,13 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    margin: 0 2px;
+    margin: 0 4px;
     transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.btn-action i {
+    font-size: 0.875rem;
 }
 
 .btn-edit {
@@ -225,20 +230,116 @@
     flex: 0 1 auto;
 }
 
-/* Table Improvements */
-#moviesTable {
-    font-size: 0.9rem;
+/* Table Container - Fixed size to prevent expansion */
+.d-none.d-md-block .col-md-12 {
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0;
 }
 
+.d-none.d-md-block .card {
+    max-width: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+
+.d-none.d-md-block .card-body {
+    padding: 0 !important;
+    max-width: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Table Responsive - Control overflow without expanding */
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+    display: block;
+}
+
+/* Table - Fixed layout with absolute column widths */
+#moviesTable {
+    font-size: 0.875rem;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+/* Table Headers - Fixed padding and overflow control */
 #moviesTable thead th {
     font-weight: 600;
     border-bottom: 2px solid var(--border-color);
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
 }
 
+/* Column widths - ABSOLUTE FIXED SIZES in pixels - Using percentages for responsive */
+#moviesTable thead th:nth-child(1),
+#moviesTable tbody td:nth-child(1) { 
+    width: 6%;
+    min-width: 60px;
+} /* ID - 6% */
+
+#moviesTable thead th:nth-child(2),
+#moviesTable tbody td:nth-child(2) { 
+    width: 7%;
+    min-width: 70px;
+} /* Year - 7% */
+
+#moviesTable thead th:nth-child(3),
+#moviesTable tbody td:nth-child(3) { 
+    width: 25%;
+    min-width: 200px;
+} /* Title - 25% */
+
+#moviesTable thead th:nth-child(4),
+#moviesTable tbody td:nth-child(4) { 
+    width: 20%;
+    min-width: 150px;
+} /* Studios - 20% */
+
+#moviesTable thead th:nth-child(5),
+#moviesTable tbody td:nth-child(5) { 
+    width: 25%;
+    min-width: 200px;
+} /* Producers - 25% */
+
+#moviesTable thead th:nth-child(6),
+#moviesTable tbody td:nth-child(6) { 
+    width: 8%;
+    min-width: 70px;
+} /* Winner - 8% */
+
+#moviesTable thead th:nth-child(7),
+#moviesTable tbody td:nth-child(7) { 
+    width: 9%;
+    min-width: 80px;
+} /* Actions - 9% (reduced for smaller icons) */
+
+/* Table Body Cells - Fixed padding and overflow */
 #moviesTable tbody td {
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem;
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Winner column - center align */
+#moviesTable tbody td:nth-child(6) { 
+    text-align: center;
+}
+
+/* Actions column - allow buttons to show properly */
+#moviesTable tbody td:nth-child(7) { 
+    white-space: normal;
+    overflow: visible;
+    text-align: right;
 }
 
 #moviesTable tbody tr:hover {
