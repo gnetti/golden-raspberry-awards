@@ -28,19 +28,20 @@
             <div class="col-12 col-md-6">
                 <div class="input-group">
                     <select id="filterType" class="form-select filter-type-selector" onchange="filterMovies()">
-                        <option value="all">All Fields</option>
-                        <option value="title">Title</option>
-                        <option value="year">Year</option>
-                        <option value="studios">Studios</option>
-                        <option value="producers">Producers</option>
-                        <option value="id" selected>ID</option>
+                        <option value="all" th:selected="${filterType == 'all'}">All Fields</option>
+                        <option value="title" th:selected="${filterType == 'title'}">Title</option>
+                        <option value="year" th:selected="${filterType == 'year'}">Year</option>
+                        <option value="studios" th:selected="${filterType == 'studios'}">Studios</option>
+                        <option value="producers" th:selected="${filterType == 'producers'}">Producers</option>
+                        <option value="id" th:selected="${filterType == 'id'}">ID</option>
                     </select>
                     <div class="filter-divider"></div>
                     <input type="text" 
                            id="filterInput" 
                            class="form-control" 
                            placeholder="Filter" 
-                           onkeyup="filterMovies()">
+                           th:value="${filterValue != null ? filterValue : ''}"
+                           onkeyup="handleFilterKeyup(event)">
                     <button class="btn btn-outline-secondary" type="button" onclick="filterMovies()">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
@@ -58,7 +59,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-start">
-                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='id', direction=${sortBy == 'id' and direction == 'asc' ? 'desc' : 'asc'})}" 
+                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='id', direction=${sortBy == 'id' and direction == 'asc' ? 'desc' : 'asc'}, filterType=${filterType}, filterValue=${filterValue})}" 
                                                class="text-decoration-none text-white">
                                                 ID
                                                 <i th:if="${sortBy == 'id'}" 
@@ -67,7 +68,7 @@
                                             </a>
                                         </th>
                                         <th class="text-center">
-                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='year', direction=${sortBy == 'year' and direction == 'asc' ? 'desc' : 'asc'})}" 
+                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='year', direction=${sortBy == 'year' and direction == 'asc' ? 'desc' : 'asc'}, filterType=${filterType}, filterValue=${filterValue})}" 
                                                class="text-decoration-none text-white">
                                                 Year
                                                 <i th:if="${sortBy == 'year'}" 
@@ -76,7 +77,7 @@
                                             </a>
                                         </th>
                                         <th class="text-center">
-                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='title', direction=${sortBy == 'title' and direction == 'asc' ? 'desc' : 'asc'})}" 
+                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='title', direction=${sortBy == 'title' and direction == 'asc' ? 'desc' : 'asc'}, filterType=${filterType}, filterValue=${filterValue})}" 
                                                class="text-decoration-none text-white">
                                                 Title
                                                 <i th:if="${sortBy == 'title'}" 
@@ -85,7 +86,7 @@
                                             </a>
                                         </th>
                                         <th class="text-center">
-                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='studios', direction=${sortBy == 'studios' and direction == 'asc' ? 'desc' : 'asc'})}" 
+                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='studios', direction=${sortBy == 'studios' and direction == 'asc' ? 'desc' : 'asc'}, filterType=${filterType}, filterValue=${filterValue})}" 
                                                class="text-decoration-none text-white">
                                                 Studios
                                                 <i th:if="${sortBy == 'studios'}" 
@@ -94,7 +95,7 @@
                                             </a>
                                         </th>
                                         <th class="text-center">
-                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='producers', direction=${sortBy == 'producers' and direction == 'asc' ? 'desc' : 'asc'})}" 
+                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='producers', direction=${sortBy == 'producers' and direction == 'asc' ? 'desc' : 'asc'}, filterType=${filterType}, filterValue=${filterValue})}" 
                                                class="text-decoration-none text-white">
                                                 Producers
                                                 <i th:if="${sortBy == 'producers'}" 
@@ -103,7 +104,7 @@
                                             </a>
                                         </th>
                                         <th class="text-center">
-                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='winner', direction=${sortBy == 'winner' and direction == 'asc' ? 'desc' : 'asc'})}" 
+                                            <a th:href="@{/movies(page=${currentPage}, size=${pageSize}, sortBy='winner', direction=${sortBy == 'winner' and direction == 'asc' ? 'desc' : 'asc'}, filterType=${filterType}, filterValue=${filterValue})}" 
                                                class="text-decoration-none text-white">
                                                 Winner
                                                 <i th:if="${sortBy == 'winner'}" 
@@ -238,7 +239,7 @@
                             <!-- First page -->
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                 <a class="page-link rounded-circle" 
-                                   th:href="@{/movies(page=0, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:href="@{/movies(page=0, size=${pageSize}, sortBy=${sortBy}, direction=${direction}, filterType=${filterType}, filterValue=${filterValue})}"
                                    th:if="${currentPage > 0}">
                                     <i class="fa-solid fa-angles-left"></i>
                                 </a>
@@ -250,7 +251,7 @@
                             <!-- Previous page -->
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                 <a class="page-link rounded-circle" 
-                                   th:href="@{/movies(page=${currentPage - 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:href="@{/movies(page=${currentPage - 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction}, filterType=${filterType}, filterValue=${filterValue})}"
                                    th:if="${currentPage > 0}">
                                     <i class="fa-solid fa-chevron-left"></i>
                                 </a>
@@ -270,7 +271,7 @@
                                       th:text="${pageNum + 1}"></span>
                                 <!-- Other pages -->
                                 <a class="page-link rounded-circle" 
-                                   th:href="@{/movies(page=${pageNum}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:href="@{/movies(page=${pageNum}, size=${pageSize}, sortBy=${sortBy}, direction=${direction}, filterType=${filterType}, filterValue=${filterValue})}"
                                    th:text="${pageNum + 1}"
                                    th:if="${pageNum != -1 and pageNum != currentPage}"></a>
                             </li>
@@ -278,7 +279,7 @@
                             <!-- Next page -->
                             <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
                                 <a class="page-link rounded-circle" 
-                                   th:href="@{/movies(page=${currentPage + 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:href="@{/movies(page=${currentPage + 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction}, filterType=${filterType}, filterValue=${filterValue})}"
                                    th:if="${currentPage < totalPages - 1}">
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </a>
@@ -290,7 +291,7 @@
                             <!-- Last page -->
                             <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
                                 <a class="page-link rounded-circle" 
-                                   th:href="@{/movies(page=${totalPages - 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction})}"
+                                   th:href="@{/movies(page=${totalPages - 1}, size=${pageSize}, sortBy=${sortBy}, direction=${direction}, filterType=${filterType}, filterValue=${filterValue})}"
                                    th:if="${currentPage < totalPages - 1}">
                                     <i class="fa-solid fa-angles-right"></i>
                                 </a>
