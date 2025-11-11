@@ -19,7 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * <p><strong>Test Coverage:</strong>
  * <ul>
- *   <li>GET / (index page) - Home page rendering</li>
+ *   <li>GET / - Redirects to /dashboard</li>
+ *   <li>GET /dashboard - Dashboard page rendering</li>
  *   <li>GET /intervals - Intervals page rendering with data</li>
  *   <li>Model attributes validation</li>
  *   <li>View names validation</li>
@@ -40,20 +41,31 @@ class ProducerWebControllerIntegrationTest {
     private MockMvc mockMvc;
 
     /**
-     * Tests that the home page (/) returns successfully
+     * Tests that the root path (/) redirects to /dashboard.
+     *
+     * @throws Exception if the test fails
+     */
+    @Test
+    void shouldRedirectRootToDashboard() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/dashboard"));
+    }
+
+    /**
+     * Tests that the dashboard page (/dashboard) returns successfully
      * with the correct view name and content type.
      *
      * @throws Exception if the test fails
      */
     @Test
-    void shouldReturnHomePage() throws Exception {
-        mockMvc.perform(get("/"))
+    void shouldReturnDashboardPage() throws Exception {
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/index"))
+                .andExpect(view().name("pages/dashboard"))
                 .andExpect(content().contentType("text/html;charset=UTF-8"))
                 .andExpect(content().string(Matchers.containsString("Golden Raspberry Awards")))
-                .andExpect(content().string(Matchers.containsString("Producer Intervals")))
-                .andExpect(content().string(Matchers.containsString("API REST")));
+                .andExpect(content().string(Matchers.containsString("Producer Intervals")));
     }
 
     /**
@@ -91,14 +103,14 @@ class ProducerWebControllerIntegrationTest {
     }
 
     /**
-     * Tests that the home page contains navigation cards
+     * Tests that the dashboard page contains navigation cards
      * with proper links and buttons.
      *
      * @throws Exception if the test fails
      */
     @Test
     void shouldContainNavigationCards() throws Exception {
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.containsString("card")))
                 .andExpect(content().string(Matchers.containsString("View Intervals")))
@@ -113,7 +125,7 @@ class ProducerWebControllerIntegrationTest {
      */
     @Test
     void shouldContainBootstrapAndFontAwesome() throws Exception {
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.containsString("bootstrap")))
                 .andExpect(content().string(Matchers.containsString("font-awesome")));
