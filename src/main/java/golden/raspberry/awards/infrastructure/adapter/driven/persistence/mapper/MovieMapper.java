@@ -75,22 +75,5 @@ public final class MovieMapper {
                 .map(MovieMapper::toDomain)
                 .collect(Collectors.toList());
     }
-
-    /**
-     * Converts list of Domain Movie to list of MovieEntity.
-     *
-     * @param domains List of Domain Models
-     * @return List of JPA Entities
-     */
-    public static List<MovieEntity> toEntityList(List<Movie> domains) {
-        if (domains == null) {
-            return List.of();
-        }
-
-        return domains.stream()
-                .filter(Objects::nonNull)
-                .map(MovieMapper::toEntity)
-                .collect(Collectors.toList());
-    }
 }
 
