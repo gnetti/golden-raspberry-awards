@@ -143,6 +143,52 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort, SaveMovieWit
         var domainList = MovieWithIdMapper.toDomainList(entityPage.getContent());
         return new PageImpl<>(domainList, pageable, entityPage.getTotalElements());
     }
+    
+    /**
+     * Finds movies with ID using pagination, sorting and filtering.
+     *
+     * @param filterType Type of filter (all, title, year, studios, producers, id)
+     * @param filterValue Value to search for
+     * @param pageable Pagination and sorting parameters
+     * @return Page of MovieWithId
+     */
+    @Override
+    public Page<MovieWithId> findAllWithFilter(String filterType, String filterValue, Pageable pageable) {
+        Objects.requireNonNull(filterType, "Filter type cannot be null");
+        Objects.requireNonNull(filterValue, "Filter value cannot be null");
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+        
+        if (filterValue.isBlank()) {
+            return findAll(pageable);
+        }
+        
+        Page<MovieEntity> entityPage;
+        
+        switch (filterType.toLowerCase()) {
+            case "title":
+                entityPage = jpaRepository.findByTitleContainingIgnoreCase(filterValue, pageable);
+                break;
+            case "year":
+                entityPage = jpaRepository.findByYearContaining(filterValue, pageable);
+                break;
+            case "studios":
+                entityPage = jpaRepository.findByStudiosContainingIgnoreCase(filterValue, pageable);
+                break;
+            case "producers":
+                entityPage = jpaRepository.findByProducersContainingIgnoreCase(filterValue, pageable);
+                break;
+            case "id":
+                entityPage = jpaRepository.findByIdContaining(filterValue, pageable);
+                break;
+            case "all":
+            default:
+                entityPage = jpaRepository.findByAllFieldsContaining(filterValue, pageable);
+                break;
+        }
+        
+        var domainList = MovieWithIdMapper.toDomainList(entityPage.getContent());
+        return new PageImpl<>(domainList, pageable, entityPage.getTotalElements());
+    }
 
 }
 
