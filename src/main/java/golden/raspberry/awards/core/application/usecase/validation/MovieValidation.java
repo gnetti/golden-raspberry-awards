@@ -1,7 +1,6 @@
 package golden.raspberry.awards.core.application.usecase.validation;
 
 import java.time.Year;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -15,10 +14,8 @@ import java.util.function.Predicate;
 public final class MovieValidation {
 
     private static final int MIN_YEAR = 1900;
-    private static final int MIN_STRING_LENGTH = 1;
-    private static final int MAX_TITLE_LENGTH = 500;
-    private static final int MAX_STUDIOS_LENGTH = 500;
-    private static final int MAX_PRODUCERS_LENGTH = 1000;
+    private static final int MIN_STRING_LENGTH = 2;
+    private static final int MAX_STRING_LENGTH = 255;
 
     private MovieValidation() {
         throw new AssertionError("Utility class cannot be instantiated");
@@ -43,7 +40,9 @@ public final class MovieValidation {
      * @throws IllegalArgumentException if validation fails
      */
     public static void validateYear(Integer year) {
-        Objects.requireNonNull(year, "Year cannot be null");
+        if (year == null) {
+            throw new IllegalArgumentException("Year cannot be null");
+        }
         
         var currentYear = getCurrentYear();
         var validationContext = new YearValidationContext(year, MIN_YEAR, currentYear);
@@ -104,17 +103,20 @@ public final class MovieValidation {
      * @throws IllegalArgumentException if validation fails
      */
     public static void validateTitle(String title) {
-        Objects.requireNonNull(title, "Title cannot be null");
+        if (title == null) {
+            throw new IllegalArgumentException("Title cannot be null");
+        }
         var trimmed = title.trim();
         Optional.of(trimmed)
                 .filter(Predicate.not(String::isBlank))
                 .orElseThrow(() -> new IllegalArgumentException("Title cannot be blank"));
 
         Optional.of(trimmed.length())
-                .filter(length -> length <= MAX_TITLE_LENGTH)
+                .filter(length -> length >= MIN_STRING_LENGTH)
+                .filter(length -> length <= MAX_STRING_LENGTH)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Title must be between %d and %d characters, but was: %d".formatted(
-                                MIN_STRING_LENGTH, MAX_TITLE_LENGTH, trimmed.length()
+                                MIN_STRING_LENGTH, MAX_STRING_LENGTH, trimmed.length()
                         )
                 ));
     }
@@ -126,17 +128,20 @@ public final class MovieValidation {
      * @throws IllegalArgumentException if validation fails
      */
     public static void validateStudios(String studios) {
-        Objects.requireNonNull(studios, "Studios cannot be null");
+        if (studios == null) {
+            throw new IllegalArgumentException("Studios cannot be null");
+        }
         var trimmed = studios.trim();
         Optional.of(trimmed)
                 .filter(Predicate.not(String::isBlank))
                 .orElseThrow(() -> new IllegalArgumentException("Studios cannot be blank"));
 
         Optional.of(trimmed.length())
-                .filter(length -> length <= MAX_STUDIOS_LENGTH)
+                .filter(length -> length >= MIN_STRING_LENGTH)
+                .filter(length -> length <= MAX_STRING_LENGTH)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Studios must be between %d and %d characters, but was: %d".formatted(
-                                MIN_STRING_LENGTH, MAX_STUDIOS_LENGTH, trimmed.length()
+                                MIN_STRING_LENGTH, MAX_STRING_LENGTH, trimmed.length()
                         )
                 ));
     }
@@ -148,17 +153,20 @@ public final class MovieValidation {
      * @throws IllegalArgumentException if validation fails
      */
     public static void validateProducers(String producers) {
-        Objects.requireNonNull(producers, "Producers cannot be null");
+        if (producers == null) {
+            throw new IllegalArgumentException("Producers cannot be null");
+        }
         var trimmed = producers.trim();
         Optional.of(trimmed)
                 .filter(Predicate.not(String::isBlank))
                 .orElseThrow(() -> new IllegalArgumentException("Producers cannot be blank"));
 
         Optional.of(trimmed.length())
-                .filter(length -> length <= MAX_PRODUCERS_LENGTH)
+                .filter(length -> length >= MIN_STRING_LENGTH)
+                .filter(length -> length <= MAX_STRING_LENGTH)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Producers must be between %d and %d characters, but was: %d".formatted(
-                                MIN_STRING_LENGTH, MAX_PRODUCERS_LENGTH, trimmed.length()
+                                MIN_STRING_LENGTH, MAX_STRING_LENGTH, trimmed.length()
                         )
                 ));
     }
@@ -170,7 +178,9 @@ public final class MovieValidation {
      * @throws IllegalArgumentException if validation fails
      */
     public static void validateWinner(Boolean winner) {
-        Objects.requireNonNull(winner, "Winner cannot be null");
+        if (winner == null) {
+            throw new IllegalArgumentException("Winner cannot be null");
+        }
     }
 
     /**
@@ -180,7 +190,9 @@ public final class MovieValidation {
      * @throws IllegalArgumentException if validation fails
      */
     public static void validateId(Long id) {
-        Objects.requireNonNull(id, "ID cannot be null");
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
+        }
         Optional.of(id)
                 .filter(Predicate.not(i -> i <= 0))
                 .orElseThrow(() -> new IllegalArgumentException(
