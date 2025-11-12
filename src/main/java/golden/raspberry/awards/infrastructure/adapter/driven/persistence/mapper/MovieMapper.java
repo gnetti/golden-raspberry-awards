@@ -30,12 +30,22 @@ public final class MovieMapper {
             return null;
         }
 
+        var year = entity.getYear();
+        var title = entity.getTitle();
+        var studios = entity.getStudios();
+        var producers = entity.getProducers();
+        var winner = entity.getWinner();
+
+        if (year == null || title == null || studios == null || producers == null) {
+            return null;
+        }
+
         return new Movie(
-                entity.getYear(),
-                entity.getTitle(),
-                entity.getStudios(),
-                entity.getProducers(),
-                entity.getWinner()
+                year,
+                title,
+                studios,
+                producers,
+                winner != null ? winner : false
         );
     }
 

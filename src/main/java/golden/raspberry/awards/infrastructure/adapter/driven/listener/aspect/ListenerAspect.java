@@ -409,6 +409,7 @@ public class ListenerAspect {
         }
 
         return java.util.Arrays.stream(args)
+                .filter(Objects::nonNull)
                 .map(arg -> switch (arg) {
                     case String str when !str.isBlank() -> str;
                     case Long l -> String.valueOf(l);
