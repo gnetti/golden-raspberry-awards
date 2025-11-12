@@ -70,9 +70,6 @@ Thumbs.db
 application-local.properties
 application-dev.properties
 
-# Documentation
-/docs
-
 # Log directories
 log/
 **/log/
