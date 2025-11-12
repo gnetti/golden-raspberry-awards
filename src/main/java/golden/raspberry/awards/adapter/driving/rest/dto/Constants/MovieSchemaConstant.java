@@ -17,7 +17,7 @@ public final class MovieSchemaConstant {
     public static final String YEAR_DESCRIPTION = "Release year of the movie";
     public static final String YEAR_ILLUSTRATION_SET = "2024";
     public static final String YEAR_MINIMUM = "1900";
-    public static final String YEAR_MAXIMUM = "2100";
+    public static final String YEAR_MAXIMUM = "2025";
 
     public static final String TITLE_DESCRIPTION = "Title of the movie";
     public static final String TITLE_ILLUSTRATION_SET = "The Matrix Resurrections";

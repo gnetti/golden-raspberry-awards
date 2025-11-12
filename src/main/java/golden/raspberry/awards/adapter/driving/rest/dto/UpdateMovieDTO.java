@@ -30,6 +30,7 @@ public record UpdateMovieDTO(
         )
         @NotNull(message = "Field 'year' is required and cannot be null")
         @Min(value = 1900, message = "Field 'year' must be at least 1900")
+        @Max(value = 2025, message = "Field 'year' cannot be in the future. Maximum allowed year is 2025")
         Integer year,
 
         @JsonProperty("title")

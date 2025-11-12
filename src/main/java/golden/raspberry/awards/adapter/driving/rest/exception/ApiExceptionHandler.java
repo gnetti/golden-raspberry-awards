@@ -90,6 +90,12 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiErrorDTO> handleNullPointerException(
             NullPointerException ex, WebRequest request) {
 
+        var path = extractPath(request);
+        if (path != null && (path.startsWith("/dashboard") || path.startsWith("/intervals") || 
+                path.startsWith("/movies") || path.startsWith("/document-info"))) {
+            throw ex;
+        }
+
         var message = Optional.ofNullable(ex.getMessage())
                 .filter(Predicate.not(String::isBlank))
                 .orElse("Required field is missing or null");
