@@ -205,10 +205,15 @@ src/
 ├── 📁 main/
 │   ├── 📁 java/
 │   │   └── 📁 golden/raspberry/awards/
-│   │       ├── 📁 adapter/driving/rest/    # REST Controllers
-│   │       ├── 📁 core/application/       # Use Cases and Ports
-│   │       ├── 📁 core/domain/            # Domain Models
-│   │       └── 📁 infrastructure/          # Adapters (JPA, CSV)
+│   │       ├── 📁 adapter/                 # Driving Adapters
+│   │       │   └── 📁 driving/rest/       # REST Controllers
+│   │       ├── 📁 core/                   # Core Business Logic
+│   │       │   ├── 📁 application/        # Use Cases and Ports
+│   │       │   └── 📁 domain/             # Domain Models
+│   │       │
+│   │       ├── 📁 infrastructure/         # Driven Adapters (JPA, CSV, XML)
+│   │       └── 📁 shared/                 # Shared Components
+│   │           └── 📁 exception/          # Exception Classes
 │   └── 📁 resources/
 │       ├── 📁 data/movieList.csv          # CSV Data
 │       ├── 📁 templates/                  # Thymeleaf Templates
