@@ -95,6 +95,18 @@
                             <i class="fa-solid fa-sync"></i> Synchronization
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link"
+                            id="postman-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#postman"
+                            type="button"
+                            role="tab"
+                        >
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Postman
+                        </button>
+                    </li>
                 </ul>
 
                 <div class="tab-content manual-content" id="manualTabContent">
@@ -605,6 +617,69 @@
                                     <li>New movie receives next sequential ID</li>
                                     <li>IDs are preserved from original CSV</li>
                                     <li>System ensures there are no ID conflicts</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="postman" role="tabpanel">
+                        <div class="content-section">
+                            <h2>
+                                <i class="fa-solid fa-cloud-arrow-down text-primary"></i> API Testing with Postman
+                            </h2>
+
+                            <div class="postman-section">
+                                <h3><i class="fa-solid fa-download"></i> Import Files</h3>
+                                <p>Import the following files from the <code>/data</code> directory:</p>
+                                
+                                <div class="postman-dashboard mb-4">
+                                    <div class="postman-dashboard-header">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;">
+                                            <rect x="2" y="4" width="20" height="16" rx="2" fill="#FF6C37"/>
+                                            <path d="M7 8H17M7 12H15M7 16H13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                        </svg>
+                                        <span>Postman Collection Dashboard</span>
+                                    </div>
+                                    <div class="postman-dashboard-content">
+                                        <div class="postman-card">
+                                            <div class="postman-card-text">
+                                                <span class="postman-card-description">Complete API request collection</span>
+                                            </div>
+                                            <a th:href="@{/data/golden-raspberry-awards.postman_collection.json}" download class="postman-download-btn">
+                                                <i class="fa-solid fa-download"></i> Download
+                                            </a>
+                                        </div>
+                                        <div class="postman-card">
+                                            <div class="postman-card-text">
+                                                <span class="postman-card-description">Environment variables configuration</span>
+                                            </div>
+                                            <a th:href="@{/data/golden-raspberry-awards.postman_environment.json}" download class="postman-download-btn">
+                                                <i class="fa-solid fa-download"></i> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="postman-section mt-4">
+                                <h3><i class="fa-solid fa-cog"></i> Setup Instructions</h3>
+                                <ol>
+                                    <li>Open Postman application</li>
+                                    <li>Import Collection: File → Import → Select <code>golden-raspberry-awards.postman_collection.json</code></li>
+                                    <li>Import Environment: File → Import → Select <code>golden-raspberry-awards.postman_environment.json</code></li>
+                                    <li>Select the imported environment from the environment dropdown</li>
+                                    <li>Start the application: <code>mvn spring-boot:run</code></li>
+                                    <li>Run requests from the collection</li>
+                                </ol>
+                            </div>
+
+                            <div class="postman-section mt-4">
+                                <h3><i class="fa-solid fa-list"></i> Available Requests</h3>
+                                <p>The collection includes all REST endpoints:</p>
+                                <ul>
+                                    <li>Movie CRUD operations (Create, Read, Update, Delete)</li>
+                                    <li>Producer intervals calculation</li>
+                                    <li>Pagination and filtering examples</li>
                                 </ul>
                             </div>
                         </div>

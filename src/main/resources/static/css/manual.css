@@ -450,6 +450,90 @@
     color: rgba(255, 255, 255, 0.9);
 }
 
+.postman-dashboard {
+    background: #2d3748;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.postman-dashboard-header {
+    background: #1a202c;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.postman-dashboard-header svg {
+    flex-shrink: 0;
+}
+
+.postman-dashboard-header span {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.postman-dashboard-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.postman-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.postman-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.postman-card-text {
+    flex: 1;
+}
+
+.postman-card-description {
+    color: #4a5568;
+    font-size: 0.95rem;
+    display: block;
+}
+
+.postman-download-btn {
+    background: #0d6efd;
+    color: #ffffff;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.postman-download-btn:hover {
+    background: #0b5ed7;
+    border-color: #0a58ca;
+    color: #ffffff;
+}
+
+.postman-download-btn i {
+    font-size: 0.85rem;
+}
+
 @media (max-width: 768px) {
     .manual-container {
         padding: 1rem 0.5rem;
@@ -484,5 +568,16 @@
 
     .module-icon i {
         font-size: 1.5rem;
+    }
+
+    .postman-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .postman-download-btn {
+        width: 100%;
+        justify-content: center;
     }
 }

@@ -18,8 +18,8 @@ import java.io.File;
 public class WebConfig implements WebMvcConfigurer {
 
     /**
-     * Configures resource handlers for JavaDoc documentation.
-     * Serves JavaDoc files from the external docs directory.
+     * Configures resource handlers for JavaDoc documentation and Postman files.
+     * Serves JavaDoc files from the external docs directory and Postman files from data directory.
      *
      * @param registry ResourceHandlerRegistry to configure
      */
@@ -30,6 +30,14 @@ public class WebConfig implements WebMvcConfigurer {
         
         registry.addResourceHandler("/docs/**")
                 .addResourceLocations(docsPath)
+                .setCachePeriod(3600)
+                .resourceChain(true);
+        
+        var dataDir = new File("data").getAbsolutePath();
+        var dataPath = "file:" + dataDir.replace("\\", "/") + "/";
+        
+        registry.addResourceHandler("/data/**")
+                .addResourceLocations(dataPath)
                 .setCachePeriod(3600)
                 .resourceChain(true);
     }
