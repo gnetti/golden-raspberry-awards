@@ -54,7 +54,7 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
     public XmlIdKeyManagerAdapter(
             @Value("${csv.key-file:primary-key/key.xml}") String xmlFilePath,
             @Value("${csv.xml-indent-amount:4}") String xmlIndentAmount,
-            @Value("${csv.xml-indent-property}") String xmlIndentProperty) {
+            @Value("${csv.xml-indent-property:{https://xml.apache.org/xslt}indent-amount}") String xmlIndentProperty) {
         this.xmlFilePath = Objects.requireNonNull(xmlFilePath, "XML file path cannot be null");
         this.xmlIndentAmount = Objects.requireNonNull(xmlIndentAmount, "XML indent amount cannot be null");
         this.xmlIndentProperty = Objects.requireNonNull(xmlIndentProperty, "XML indent property cannot be null");
@@ -275,6 +275,8 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
 
     /**
      * Synchronizes the last ID with the database maximum ID.
+     * If XML key is less than database max ID, updates XML to database max ID.
+     * If XML key is greater than or equal to database max ID, keeps XML value.
      *
      * @param maxIdFromDatabase Maximum ID from database
      * @throws NullPointerException     if maxIdFromDatabase is null
@@ -285,11 +287,10 @@ public class XmlIdKeyManagerAdapter implements IdKeyManagerPort {
         validateMaxIdFromDatabase(maxIdFromDatabase);
 
         var lastIdFromXml = getLastId().orElse(0L);
-        var synchronizedId = Math.max(maxIdFromDatabase, lastIdFromXml);
-
-        Optional.of(synchronizedId)
-                .filter(id -> !id.equals(lastIdFromXml))
-                .ifPresent(this::updateLastId);
+        
+        if (lastIdFromXml < maxIdFromDatabase) {
+            updateLastId(maxIdFromDatabase);
+        }
 
     }
 
