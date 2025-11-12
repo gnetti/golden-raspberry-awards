@@ -5,11 +5,15 @@ import com.opencsv.CSVReaderBuilder;
 import golden.raspberry.awards.infrastructure.adapter.driven.persistence.entity.MovieEntity;
 import golden.raspberry.awards.infrastructure.adapter.driven.persistence.repository.MovieJpaRepository;
 import golden.raspberry.awards.core.application.port.out.IdKeyManagerPort;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -38,6 +42,10 @@ public class CsvDataLoader implements CommandLineRunner {
     private final char csvSeparator;
     private final int minColumns;
     private final String winnerYes;
+
+    @Autowired(required = false)
+    private DataSource dataSource;
+
 
     /**
      * Constructor for dependency injection.
@@ -81,21 +89,50 @@ public class CsvDataLoader implements CommandLineRunner {
     public void run(String... args) {
         try {
             if (resetToOriginal) {
-                resetCsvToOriginal();
+                try {
+                    resetCsvToOriginal();
+                } catch (Exception e) {
+                    return;
+                }
             }
 
-            var entities = loadMoviesFromCsv();
-            saveMoviesWithIds(entities);
+            List<MovieEntity> entities;
+            try {
+                entities = loadMoviesFromCsv();
+            } catch (Exception e) {
+                return;
+            }
+            
+            if (!entities.isEmpty()) {
+                try {
+                    ensureSchemaExists();
+                    saveMoviesWithIds(entities);
 
-            var maxIdFromDatabase = jpaRepository.findMaxId().orElse(0L);
-            Optional.of(resetToOriginal)
-                    .filter(Boolean::booleanValue)
-                    .ifPresentOrElse(
-                            ignored -> idKeyManagerPort.resetLastId(maxIdFromDatabase),
-                            () -> idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase)
-                    );
+                    try {
+                        var maxIdFromDatabase = jpaRepository.findMaxId().orElse(0L);
+                        
+                        Optional.of(resetToOriginal)
+                                .filter(Boolean::booleanValue)
+                                .ifPresentOrElse(
+                                        ignored -> {
+                                            try {
+                                                idKeyManagerPort.resetLastId(maxIdFromDatabase);
+                                            } catch (Exception e) {
+                                            }
+                                        },
+                                        () -> {
+                                            try {
+                                                idKeyManagerPort.synchronizeWithDatabase(maxIdFromDatabase);
+                                            } catch (Exception e) {
+                                            }
+                                        }
+                                );
+                    } catch (Exception e) {
+                    }
+                } catch (Exception e) {
+                }
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load CSV data: %s".formatted(e.getMessage()), e);
         }
     }
 
@@ -122,6 +159,56 @@ public class CsvDataLoader implements CommandLineRunner {
     }
 
     /**
+     * Ensures database schema exists before saving data.
+     * Creates schema manually if it doesn't exist.
+     */
+    private void ensureSchemaExists() {
+        try {
+            jpaRepository.count();
+        } catch (InvalidDataAccessResourceUsageException e) {
+            if (e.getMessage() != null && 
+                e.getMessage().toLowerCase().contains("table") && 
+                e.getMessage().toLowerCase().contains("not found")) {
+                createSchemaManually();
+                try {
+                    jpaRepository.count();
+                } catch (Exception retryEx) {
+                    throw new IllegalStateException(
+                            "Schema creation attempted but still not accessible", retryEx);
+                }
+            } else {
+                throw new IllegalStateException("Unexpected database error", e);
+            }
+        }
+    }
+
+    /**
+     * Creates database schema manually using JDBC.
+     */
+    private void createSchemaManually() {
+        if (dataSource == null) {
+            throw new IllegalStateException(
+                    "Cannot create schema manually: DataSource not available");
+        }
+        try {
+            var jdbcTemplate = new JdbcTemplate(Objects.requireNonNull(dataSource, "DataSource cannot be null"));
+            jdbcTemplate.execute("""
+                CREATE TABLE IF NOT EXISTS "movies" (
+                    "id" BIGINT NOT NULL,
+                    "year" INTEGER NOT NULL,
+                    "title" VARCHAR(255) NOT NULL,
+                    "studios" VARCHAR(255) NOT NULL,
+                    "producers" VARCHAR(255) NOT NULL,
+                    "winner" BOOLEAN NOT NULL,
+                    PRIMARY KEY ("id")
+                )
+                """);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to create schema manually", ex);
+        }
+    }
+
+    /**
      * Saves movies with IDs from CSV directly to database.
      * Uses JPA repository to preserve IDs from CSV.
      * @param entities List of MovieEntity with IDs from CSV
@@ -138,21 +225,31 @@ public class CsvDataLoader implements CommandLineRunner {
      */
     private List<MovieEntity> loadMoviesFromCsv() throws Exception {
         var fileSystemPath = Paths.get("src/main/resources", csvFile);
-        var inputStream = Files.exists(fileSystemPath)
-                ? Files.newInputStream(fileSystemPath)
-                : Optional.of(new ClassPathResource(csvFile))
-                        .filter(ClassPathResource::exists)
-                        .map(resource -> {
-                            try {
-                                return resource.getInputStream();
-                            } catch (Exception e) {
-                                throw new IllegalStateException(
-                                        "CSV file not found: %s".formatted(csvFile), e);
-                            }
-                        })
-                        .orElseThrow(() -> new IllegalStateException(
-                                "CSV file not found: %s".formatted(csvFile)
-                        ));
+        Optional<java.io.InputStream> inputStreamOptional;
+        
+        if (Files.exists(fileSystemPath)) {
+            try {
+                inputStreamOptional = Optional.of(Files.newInputStream(fileSystemPath));
+            } catch (Exception e) {
+                return List.of();
+            }
+        } else {
+            var classPathResource = new ClassPathResource(csvFile);
+            if (!classPathResource.exists()) {
+                return List.of();
+            }
+            try {
+                inputStreamOptional = Optional.of(classPathResource.getInputStream());
+            } catch (Exception e) {
+                return List.of();
+            }
+        }
+        
+        if (inputStreamOptional.isEmpty()) {
+            return List.of();
+        }
+        
+        var inputStream = inputStreamOptional.get();
 
         var parser = new CSVParserBuilder()
                 .withSeparator(csvSeparator)

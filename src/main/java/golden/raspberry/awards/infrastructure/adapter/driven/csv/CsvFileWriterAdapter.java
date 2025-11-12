@@ -32,22 +32,26 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
     private final String csvFile;
     private final char csvSeparator;
     private final String winnerYes;
+    private final boolean writeEnabled;
 
     /**
      * Constructor for dependency injection.
      * @param csvFile      CSV file path from properties
      * @param csvSeparator CSV separator character from properties
      * @param winnerYes    Winner value string from properties
+     * @param writeEnabled Whether CSV writing is enabled (false in tests)
      */
     public CsvFileWriterAdapter(
             @Value("${csv.file:data/movieList.csv}") String csvFile,
             @Value("${csv.separator:;}") String csvSeparator,
-            @Value("${csv.winner-yes:yes}") String winnerYes) {
+            @Value("${csv.winner-yes:yes}") String winnerYes,
+            @Value("${csv.write-enabled:true}") boolean writeEnabled) {
         this.csvFile = Objects.requireNonNull(csvFile, "CSV file path cannot be null");
         this.csvSeparator = csvSeparator != null && !csvSeparator.isEmpty()
                 ? csvSeparator.charAt(0)
                 : ';';
         this.winnerYes = Objects.requireNonNull(winnerYes, "Winner yes value cannot be null");
+        this.writeEnabled = writeEnabled;
     }
 
     /**
@@ -80,6 +84,10 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
     public void updateMovie(MovieWithId movie) {
         Objects.requireNonNull(movie, "Movie cannot be null");
 
+        if (!writeEnabled) {
+            return;
+        }
+
         var csvData = readCsvData();
         var movieId = String.valueOf(movie.id());
 
@@ -100,6 +108,10 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
     @Override
     public void removeMovie(Long id) {
         Objects.requireNonNull(id, "ID cannot be null");
+
+        if (!writeEnabled) {
+            return;
+        }
 
         var csvData = readCsvData();
         var movieId = String.valueOf(id);
@@ -236,11 +248,16 @@ public class CsvFileWriterAdapter implements CsvFileWriterPort {
     /**
      * Writes CSV data to file system.
      * Creates parent directories if they don't exist and writes header and data lines.
+     * Silently skips writing if writeEnabled is false (e.g., in tests).
      *
      * @param csvData CsvData containing header line and data lines to write
      * @throws IllegalStateException if CSV file cannot be written or directories cannot be created
      */
     private void writeCsvData(CsvData csvData) {
+        if (!writeEnabled) {
+            return;
+        }
+        
         var fileSystemPath = Path.of("src/main/resources", csvFile);
         try {
             Files.createDirectories(fileSystemPath.getParent());
