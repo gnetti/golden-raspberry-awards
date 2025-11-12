@@ -1,9 +1,6 @@
 # Compiled class files
 *.class
 
-# Log files
-*.log
-
 # Package Files
 *.jar
 *.war
@@ -69,9 +66,4 @@ Thumbs.db
 # StartApplication specific
 application-local.properties
 application-dev.properties
-
-# Log directories
-log/
-**/log/
-/src/main/resources/log/
 
