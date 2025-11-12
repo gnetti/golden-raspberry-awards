@@ -1,0 +1,102 @@
+{
+	"info": {
+		"_postman_id": "14ece9e8-369e-4b31-8545-2e703fa7cc1c",
+		"name": "golden-raspberry-awards",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "18751021"
+	},
+	"item": [
+		{
+			"name": "Producers_intervals",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/api/movies/producers/intervals"
+			},
+			"response": []
+		},
+		{
+			"name": "Create_Movie",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"year\": 2024,\r\n    \"title\": \"The Matrix Resurrections\",\r\n    \"studios\": \"Warner Bros. Pictures\",\r\n    \"producers\": \"Lana Wachowski, Grant Hill\",\r\n    \"winner\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/api/movies"
+			},
+			"response": []
+		},
+		{
+			"name": "Search_Movie_id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"year\": 2024,\r\n    \"title\": \"The Matrix Resurrections\",\r\n    \"studios\": \"Warner Bros. Pictures\",\r\n    \"producers\": \"Lana Wachowski, Grant Hill\",\r\n    \"winner\": false\r\n}"
+				},
+				"url": "{{host}}/api/movies/1"
+			},
+			"response": []
+		},
+		{
+			"name": "update_movie_id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"year\": 2024,\r\n    \"title\": \"The Matrix Resurrections - Updated\",\r\n    \"studios\": \"Warner Bros. Pictures, Village Roadshow Pictures\",\r\n    \"producers\": \"Lana Wachowski, Grant Hill, James McTeigue\",\r\n    \"winner\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/api/movies/1"
+			},
+			"response": []
+		},
+		{
+			"name": "get_docs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/docs"
+			},
+			"response": []
+		},
+		{
+			"name": "get_all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/api/movies"
+			},
+			"response": []
+		},
+		{
+			"name": "delete_id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"year\": 2024,\r\n    \"title\": \"The Matrix Resurrections - Updated\",\r\n    \"studios\": \"Warner Bros. Pictures, Village Roadshow Pictures\",\r\n    \"producers\": \"Lana Wachowski, Grant Hill, James McTeigue\",\r\n    \"winner\": true\r\n}"
+				},
+				"url": "{{host}}/api/movies/212"
+			},
+			"response": []
+		}
+	]
+}
