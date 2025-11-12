@@ -1,0 +1,6 @@
+========================================
+[2025_11_12_02_37_19] GET /api/movies/producers/intervals | Status: 200 OK | Session: 7590E056839D0EEE2012BE14575D65C7
+Entity: Awards | ID: N/A
+Response: {"min":[{"producer":"Joel Silver","interval":1,"previousWin":1990,"followingWin":1991}],"max":[{"producer":"Matthew Vaughn","interval":13,"previousWin":2002,"followingWin":2015}]}
+
+========================================
