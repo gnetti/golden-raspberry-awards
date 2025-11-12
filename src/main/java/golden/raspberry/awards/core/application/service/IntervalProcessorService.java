@@ -38,39 +38,47 @@ public record IntervalProcessorService(MovieRepositoryPort repository,
      * @return ProducerIntervalResponse with min and max intervals
      */
     public ProducerIntervalResponse calculate() {
-        List<Movie> winningMovies = repository.findByWinnerTrue();
+        try {
+            if (repository == null || calculator == null) {
+                return new ProducerIntervalResponse(List.of(), List.of());
+            }
+            
+            List<Movie> winningMovies = repository.findByWinnerTrue();
+            
+            if (winningMovies == null || winningMovies.isEmpty()) {
+                return new ProducerIntervalResponse(List.of(), List.of());
+            }
 
-        if (winningMovies.isEmpty()) {
+            Map<String, List<Integer>> producerWins = calculator.groupWinsByProducer(winningMovies);
+
+            List<ProducerInterval> allIntervals = calculator.calculateIntervals(producerWins);
+
+            if (allIntervals.isEmpty()) {
+                return new ProducerIntervalResponse(List.of(), List.of());
+            }
+
+            Integer minInterval = allIntervals.stream()
+                    .mapToInt(ProducerInterval::interval)
+                    .min()
+                    .orElse(0);
+
+            Integer maxInterval = allIntervals.stream()
+                    .mapToInt(ProducerInterval::interval)
+                    .max()
+                    .orElse(0);
+
+            List<ProducerInterval> minIntervals = allIntervals.stream()
+                    .filter(interval -> interval.interval().equals(minInterval))
+                    .collect(Collectors.toList());
+
+            List<ProducerInterval> maxIntervals = allIntervals.stream()
+                    .filter(interval -> interval.interval().equals(maxInterval))
+                    .collect(Collectors.toList());
+
+            return new ProducerIntervalResponse(minIntervals, maxIntervals);
+        } catch (Exception e) {
             return new ProducerIntervalResponse(List.of(), List.of());
         }
-
-        Map<String, List<Integer>> producerWins = calculator.groupWinsByProducer(winningMovies);
-
-        List<ProducerInterval> allIntervals = calculator.calculateIntervals(producerWins);
-
-        if (allIntervals.isEmpty()) {
-            return new ProducerIntervalResponse(List.of(), List.of());
-        }
-
-        Integer minInterval = allIntervals.stream()
-                .mapToInt(ProducerInterval::interval)
-                .min()
-                .orElse(0);
-
-        Integer maxInterval = allIntervals.stream()
-                .mapToInt(ProducerInterval::interval)
-                .max()
-                .orElse(0);
-
-        List<ProducerInterval> minIntervals = allIntervals.stream()
-                .filter(interval -> interval.interval().equals(minInterval))
-                .collect(Collectors.toList());
-
-        List<ProducerInterval> maxIntervals = allIntervals.stream()
-                .filter(interval -> interval.interval().equals(maxInterval))
-                .collect(Collectors.toList());
-
-        return new ProducerIntervalResponse(minIntervals, maxIntervals);
     }
 }
 

@@ -26,7 +26,15 @@ public record CalculateIntervalsPortHandler(
 
     @Override
     public ProducerIntervalResponse execute() {
-        return calculationService.calculate();
+        try {
+            if (calculationService == null) {
+                return new ProducerIntervalResponse(java.util.List.of(), java.util.List.of());
+            }
+            var result = calculationService.calculate();
+            return result != null ? result : new ProducerIntervalResponse(java.util.List.of(), java.util.List.of());
+        } catch (Exception e) {
+            return new ProducerIntervalResponse(java.util.List.of(), java.util.List.of());
+        }
     }
 }
 
