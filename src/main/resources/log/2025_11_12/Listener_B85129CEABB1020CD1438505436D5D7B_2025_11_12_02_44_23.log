@@ -1,0 +1,52 @@
+========================================
+[2025_11_12_02_44_23] GET /api/movies/producers/intervals | Status: 200 OK | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Awards | ID: N/A
+Response: {"min":[{"producer":"Joel Silver","interval":1,"previousWin":1990,"followingWin":1991}],"max":[{"producer":"Matthew Vaughn","interval":13,"previousWin":2002,"followingWin":2015}]}
+
+========================================
+========================================
+[2025_11_12_02_44_31] POST /api/movies | Status: 201 Created | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Movie | ID: N/A
+Request:  {"year":2025,"title":"The Matrix Resurrections","studios":"Warner Bros. Pictures","producers":"Lana Wachowski, Grant Hill","winner":true}
+Response: {"id":207,"year":2025,"title":"The Matrix Resurrections","studios":"Warner Bros. Pictures","producers":"Lana Wachowski, Grant Hill","winner":true}
+
+
+========================================
+========================================
+[2025_11_12_02_44_40] GET /api/movies/{id} | Status: 200 OK | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Movie | ID: 207
+Response: {"id":207,"year":2025,"title":"The Matrix Resurrections","studios":"Warner Bros. Pictures","producers":"Lana Wachowski, Grant Hill","winner":true}
+
+========================================
+========================================
+[2025_11_12_02_44_46] PUT /api/movies/{id} | Status: 200 OK | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Movie | ID: 207
+Before: 207
+After:  {"id":207,"year":2024,"title":"The Matrix Resurrections","studios":"Warner Bros. Pictures","producers":"Lana Wachowski, Grant Hill","winner":true}
+
+
+========================================
+========================================
+[2025_11_12_02_44_59] DELETE /api/movies/{id} | Status: 204 Status 204 | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Movie | ID: 207
+Deleted: null
+
+========================================
+========================================
+[2025_11_12_02_45_09] GET /docs | Status: 200 OK | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Javadoc | ID: N/A
+Response: null
+
+========================================
+========================================
+[2025_11_12_02_45_14] GET /api/movies | Status: 200 OK | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Movie | ID: 0
+Response: {"content":[{"id":1,"year":1980,"title":"Can't Stop the Music","studios":"Associated Film Distribution","producers":"Allan Carr","winner":true},{"id":2,"year":1980,"title":"Cruising","studios":"Lorimar Productions, United Artists","producers":"Jerry Weintraub","winner":false},{"id":3,"year":1980,"title":"The Formula","studios":"MGM, United Artists","producers":"Steve Shagan","winner":false},{"id":4,"year":1980,"title":"Friday the 13th","studios":"Paramount Pictures","producers":"Sean S. Cunningham","winner":false},{"id":5,"year":1980,"title":"The Nude Bomb","studios":"Universal Studios","producers":"Jennings Lang","winner":false},{"id":6,"year":1980,"title":"The Jazz Singer","studios":"Associated Film Distribution","producers":"Jerry Leider","winner":false},{"id":7,"year":1980,"title":"Raise the Titanic","studios":"Associated Film Distribution","producers":"William Frye","winner":false},{"id":8,"year":1980,"title":"Saturn 3","studios":"Associated Film Distribution","producers":"Stanley Donen","winner":false},{"id":9,"year":1980,"title":"Windows","studios":"United Artists","producers":"Mike Lobell","winner":false},{"id":10,"year":1980,"title":"Xanadu","studios":"Universal Studios","producers":"Lawrence Gordon","winner":false}],"pageable":{"pageNumber":0,"pageSize":10,"sort":{"empty":false,"unsorted":false,"sorted":true},"offset":0,"unpaged":false,"paged":true},"last":false,"totalElements":206,"totalPages":21,"size":10,"number":0,"sort":{"empty":false,"unsorted":false,"sorted":true},"numberOfElements":10,"first":true,"empty":false}
+
+========================================
+========================================
+[2025_11_12_02_45_39] GET /api/movies/{id} | Status: 500 Internal Server Error | Session: B85129CEABB1020CD1438505436D5D7B
+Entity: Movie | ID: 207
+Response: null
+ERROR: Movie with ID 207 not found
+========================================
