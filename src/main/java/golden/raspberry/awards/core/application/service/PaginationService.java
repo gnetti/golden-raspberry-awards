@@ -34,9 +34,13 @@ public final class PaginationService {
      * @param currentPage Current page number (0-based)
      * @param totalPages  Total number of pages
      * @return List of page numbers to display, with -1 representing ellipsis
-     * @throws IllegalArgumentException if currentPage < 0 or totalPages < 1
+     * @throws IllegalArgumentException if currentPage is less than 0 or totalPages is less than 0
      */
     public static List<Integer> calculatePageNumbers(int currentPage, int totalPages) {
+        if (totalPages == 0) {
+            return List.of();
+        }
+        
         validateInputs(currentPage, totalPages);
 
         return totalPages <= MAX_VISIBLE_PAGES
