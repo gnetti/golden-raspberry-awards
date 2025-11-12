@@ -3,6 +3,7 @@ package golden.raspberry.awards.adapter.driving.rest.controller;
 import golden.raspberry.awards.adapter.driving.rest.dto.ApiErrorDTO;
 import golden.raspberry.awards.adapter.driving.rest.dto.DocumentInfoDTO;
 import golden.raspberry.awards.adapter.driving.rest.dto.MovieDTO;
+import golden.raspberry.awards.adapter.driving.rest.dto.ProducerIntervalResponseDTO;
 import golden.raspberry.awards.adapter.driving.rest.controller.constants.ProducerWebControllerConstants;
 import golden.raspberry.awards.adapter.driving.rest.controller.constants.ApiIllustrationSetConstants;
 import golden.raspberry.awards.core.application.port.in.CalculateIntervalsPort;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -215,16 +217,40 @@ public class ProducerWebController {
                     example = ProducerWebControllerConstants.PARAMETER_ILLUSTRATION_SET_MODAL
             )
             @RequestParam(required = false) Boolean modal) {
-        var response = calculateIntervalsPort.execute();
-        var dto = converterDtoPort.toDTO(response);
-        model.addAttribute("intervals", dto);
-        model.addAttribute("title", "Producer Intervals");
-        
-        if (Boolean.TRUE.equals(modal)) {
-            return "fragments/intervals-modal";
+        try {
+            if (calculateIntervalsPort == null || converterDtoPort == null) {
+                model.addAttribute("intervals", new ProducerIntervalResponseDTO(List.of(), List.of()));
+                model.addAttribute("title", "Producer Intervals");
+                return Boolean.TRUE.equals(modal) ? "fragments/intervals-modal" : "pages/intervals";
+            }
+            
+            var response = calculateIntervalsPort.execute();
+            if (response == null) {
+                model.addAttribute("intervals", new ProducerIntervalResponseDTO(List.of(), List.of()));
+                model.addAttribute("title", "Producer Intervals");
+                return Boolean.TRUE.equals(modal) ? "fragments/intervals-modal" : "pages/intervals";
+            }
+            
+            var dto = converterDtoPort.toDTO(response);
+            if (dto == null) {
+                model.addAttribute("intervals", new ProducerIntervalResponseDTO(List.of(), List.of()));
+                model.addAttribute("title", "Producer Intervals");
+                return Boolean.TRUE.equals(modal) ? "fragments/intervals-modal" : "pages/intervals";
+            }
+            
+            model.addAttribute("intervals", dto);
+            model.addAttribute("title", "Producer Intervals");
+            
+            if (Boolean.TRUE.equals(modal)) {
+                return "fragments/intervals-modal";
+            }
+            
+            return "pages/intervals";
+        } catch (Exception e) {
+            model.addAttribute("intervals", new ProducerIntervalResponseDTO(List.of(), List.of()));
+            model.addAttribute("title", "Producer Intervals");
+            return Boolean.TRUE.equals(modal) ? "fragments/intervals-modal" : "pages/intervals";
         }
-        
-        return "pages/intervals";
     }
 
     @Operation(

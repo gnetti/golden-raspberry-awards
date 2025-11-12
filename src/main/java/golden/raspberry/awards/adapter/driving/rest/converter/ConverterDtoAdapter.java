@@ -68,11 +68,17 @@ public class ConverterDtoAdapter implements ConverterDtoPort {
      * @return Converted ProducerIntervalResponseDTO
      */
     private ProducerIntervalResponseDTO convertProducerIntervalResponse(ProducerIntervalResponse response) {
-        List<ProducerIntervalDTO> minDTOs = response.min().stream()
+        if (response == null) {
+            return new ProducerIntervalResponseDTO(List.of(), List.of());
+        }
+        
+        List<ProducerIntervalDTO> minDTOs = (response.min() != null ? response.min() : List.<ProducerInterval>of()).stream()
+                .filter(java.util.Objects::nonNull)
                 .map(this::convertProducerInterval)
                 .toList();
 
-        List<ProducerIntervalDTO> maxDTOs = response.max().stream()
+        List<ProducerIntervalDTO> maxDTOs = (response.max() != null ? response.max() : List.<ProducerInterval>of()).stream()
+                .filter(java.util.Objects::nonNull)
                 .map(this::convertProducerInterval)
                 .toList();
 
@@ -86,11 +92,15 @@ public class ConverterDtoAdapter implements ConverterDtoPort {
      * @return Converted ProducerIntervalDTO
      */
     private ProducerIntervalDTO convertProducerInterval(ProducerInterval interval) {
+        if (interval == null) {
+            return new ProducerIntervalDTO("Unknown", 0, 0, 0);
+        }
+        
         return new ProducerIntervalDTO(
-                interval.producer(),
-                interval.interval(),
-                interval.previousWin(),
-                interval.followingWin()
+                interval.producer() != null ? interval.producer() : "Unknown",
+                interval.interval() != null ? interval.interval() : 0,
+                interval.previousWin() != null ? interval.previousWin() : 0,
+                interval.followingWin() != null ? interval.followingWin() : 0
         );
     }
 }
